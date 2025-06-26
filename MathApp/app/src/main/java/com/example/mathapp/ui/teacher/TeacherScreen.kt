@@ -23,13 +23,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.example.mathapp.ui.components.TopAppBarNavIcon
+import com.example.mathapp.ui.navigation.Routes
 import com.example.mathapp.utils.ResultState
 import kotlinx.coroutines.delay
 
 @Composable
-fun TeacherScreen(modifier: Modifier = Modifier) {
+fun TeacherScreen(modifier: Modifier = Modifier, navHostController: NavHostController) {
     val viewModel: TeacherViewModel = hiltViewModel()
 
     val state by viewModel.state.collectAsState()
@@ -37,7 +39,9 @@ fun TeacherScreen(modifier: Modifier = Modifier) {
 
     Scaffold(
         topBar = {
-            TopAppBarNavIcon("Teachers")
+            TopAppBarNavIcon(title = "Teachers", onClick = {
+                navHostController.popBackStack()
+            })
         }
     ) { innerPadding ->
 
@@ -82,7 +86,11 @@ fun TeacherScreen(modifier: Modifier = Modifier) {
                         Teacher(
                             teacherName = teacher.teacherName,
                             profilePicture = teacher.profilePicture
-                        ) { }
+                        ) {
+                            navHostController.navigate(Routes.TeacherScreenByNameRoute(
+                                name = teacher.teacherName
+                            ))
+                        }
                     }
                 }
             }

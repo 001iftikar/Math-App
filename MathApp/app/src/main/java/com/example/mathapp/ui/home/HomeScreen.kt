@@ -6,10 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -27,15 +25,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.mathapp.R
 import com.example.mathapp.ui.navigation.Routes
+import com.example.mathapp.utils.ColorHex.toColor
 
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier, navHostController: NavHostController) {
     Scaffold(
-        topBar = { TopAppBar(title = "Welcome!!!") }
+        topBar = { TopBar(title = "WELCOME") }
     ) {
         innerPadding ->
 
@@ -53,11 +51,11 @@ fun HomeScreen(modifier: Modifier = Modifier, navHostController: NavHostControll
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBar(title: String) {
+private fun TopBar(title: String) {
 
     CenterAlignedTopAppBar(
         title = { Text(title, style = MaterialTheme.typography.headlineLarge,
-            color = Color.Cyan) }
+            color = "#9d0ddb".toColor()) }
     )
 }
 

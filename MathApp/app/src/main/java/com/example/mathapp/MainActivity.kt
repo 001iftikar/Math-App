@@ -1,24 +1,18 @@
 package com.example.mathapp
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.mathapp.domain.model.Teacher
-import com.example.mathapp.ui.home.HomeScreen
 import com.example.mathapp.ui.navigation.NavApp
-import com.example.mathapp.ui.teacher.TeacherScreen
-import com.example.mathapp.ui.teacher.TeacherScreenByName
 import com.example.mathapp.ui.theme.MathAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,7 +22,7 @@ class MainActivity : ComponentActivity() {
             MathAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
-                    NavApp(Modifier.padding(innerPadding))
+                    NavApp()
                 }
             }
         }
