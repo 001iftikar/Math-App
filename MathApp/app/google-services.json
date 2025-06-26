@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "805931301860",
+    "project_id": "mathapp-97047",
+    "storage_bucket": "mathapp-97047.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:805931301860:android:c99314ff75c5bcbfdde5f1",
+        "android_client_info": {
+          "package_name": "com.example.mathapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBj0H05z_gsN8LEZW_71itfr6aHkyo7h14"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
