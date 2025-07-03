@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
 import com.example.mathapp.ui.components.TopAppBarNavIcon
 import com.example.mathapp.ui.navigation.Routes
 import com.example.mathapp.utils.ResultState
@@ -113,9 +115,10 @@ fun Teacher(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            AsyncImage(
+            SubcomposeAsyncImage(
                 model = profilePicture,
-                contentDescription = null
+                contentDescription = null,
+                loading = {LoadingState()}
             )
             Spacer(Modifier.height(12.dp))
             Text(text = teacherName)
@@ -124,7 +127,14 @@ fun Teacher(
 
 }
 
-
+@Composable
+fun LoadingState() {
+    CircularProgressIndicator(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(128.dp)
+    )
+}
 
 
 
