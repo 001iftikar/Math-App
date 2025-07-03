@@ -2,14 +2,22 @@ package com.example.mathapp.ui.home
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,47 +69,87 @@ private fun TopBar(title: String) {
 
 @Composable
 fun FirstLayer(onClick: () -> Unit) {
-    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Box(modifier = Modifier
+        ElevatedCard(modifier = Modifier.fillMaxWidth()
             .weight(1f)
             .aspectRatio(1f)
-            .clickable(onClick = onClick)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.teacher),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize()
-            )
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    .padding(bottom = 5.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.teacher),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f) // Take up most of the vertical space
+                        .clickable(
+                            onClick = onClick
+                        )
 
-            Text("TEACHERS", modifier = Modifier
-                .align(Alignment.BottomCenter))
+                )
+                Text(
+                    text = "TEACHERS",
+                    modifier = Modifier
+                        .border(
+                            width = 1.dp,
+                            color = Color.Cyan,
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(8.dp)
+                        .clickable(
+                            onClick = onClick
+                        ),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
         }
-        Box(modifier = Modifier
+
+        Spacer(Modifier.width(10.dp))
+        ElevatedCard(modifier = Modifier
             .weight(1f)
-            .aspectRatio(1f)
-            .clickable(onClick = {
-
-                Toast.makeText(context, "Will navigate to Study Resource Screen", Toast.LENGTH_LONG).show()
-
-            })
-        ) {
-
-            Image(
-                painter = painterResource(id = R.drawable.bookselv),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize()
-            )
-
-            Text("STUDY RESOURCES", modifier = Modifier
-                .align(Alignment.BottomCenter))
+            .aspectRatio(1f)) {
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    .padding(bottom = 5.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.bookselv),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f) // Take up most of the vertical space
+                        .clickable(
+                            onClick = {}
+                        )
+                )
+                Text(
+                    text = "STUDY TIME",
+                    modifier = Modifier
+                        .border(
+                            width = 1.dp,
+                            color = Color.Cyan,
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(8.dp)
+                        .clickable(
+                            onClick = {}
+                        ),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
         }
     }
 }
