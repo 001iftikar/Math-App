@@ -47,10 +47,9 @@ fun HomeScreen(modifier: Modifier = Modifier, navHostController: NavHostControll
 
         LazyColumn(Modifier.padding(innerPadding)) {
             item { FirstLayer(
-                onClick = {
+                goToTeacher = {navHostController.navigate(Routes.TeacherScreenRoute)},
+                goToStudy = {navHostController.navigate(Routes.StudyScreenRoute)}
 
-                    navHostController.navigate(Routes.TeacherScreenRoute)
-                }
             ) }
             item { DepartmentAchievements() }
         }
@@ -68,7 +67,7 @@ private fun TopBar(title: String) {
 }
 
 @Composable
-fun FirstLayer(onClick: () -> Unit) {
+fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -93,7 +92,7 @@ fun FirstLayer(onClick: () -> Unit) {
                         .fillMaxSize()
                         .weight(1f) // Take up most of the vertical space
                         .clickable(
-                            onClick = onClick
+                            onClick = goToTeacher
                         )
 
                 )
@@ -107,7 +106,7 @@ fun FirstLayer(onClick: () -> Unit) {
                         )
                         .padding(8.dp)
                         .clickable(
-                            onClick = onClick
+                            onClick = goToTeacher
                         ),
                     style = MaterialTheme.typography.titleMedium,
                 )
@@ -132,7 +131,7 @@ fun FirstLayer(onClick: () -> Unit) {
                         .fillMaxSize()
                         .weight(1f) // Take up most of the vertical space
                         .clickable(
-                            onClick = {}
+                            onClick = goToStudy
                         )
                 )
                 Text(
@@ -145,7 +144,7 @@ fun FirstLayer(onClick: () -> Unit) {
                         )
                         .padding(8.dp)
                         .clickable(
-                            onClick = {}
+                            onClick = goToStudy
                         ),
                     style = MaterialTheme.typography.titleMedium,
                 )

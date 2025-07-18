@@ -45,6 +45,9 @@ android {
 
 dependencies {
 
+    // pdf
+    implementation("io.github.grizzi91:bouquet:1.1.3")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

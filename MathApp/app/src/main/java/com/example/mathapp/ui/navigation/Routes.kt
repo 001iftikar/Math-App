@@ -13,5 +13,10 @@ sealed class Routes {
     @Serializable
     data class TeacherScreenByNameRoute(val name: String)
 
+    @Serializable
+    object StudyScreenRoute
+
+    @Serializable
+    data class FirstSemRoute(val sem: String)
 
 }
