@@ -1,6 +1,10 @@
 package com.example.mathapp.di
 
+import com.example.mathapp.data.repository.BookRepositoryImpl
+import com.example.mathapp.data.repository.PaperRepositoryImpl
 import com.example.mathapp.data.repository.TeacherRepositoryImpl
+import com.example.mathapp.domain.repository.BookRepository
+import com.example.mathapp.domain.repository.PaperRepository
 import com.example.mathapp.domain.repository.TeacherRepository
 import dagger.Binds
 import dagger.Module
@@ -14,4 +18,12 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindTeacherRepository(impl: TeacherRepositoryImpl): TeacherRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindBookRepository(impl: BookRepositoryImpl): BookRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindPaperRepository(impl: PaperRepositoryImpl): PaperRepository
 }

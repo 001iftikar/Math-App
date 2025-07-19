@@ -16,7 +16,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,12 +24,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil3.compose.AsyncImage
-import coil3.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImage
 import com.example.mathapp.ui.components.TopAppBarNavIcon
 import com.example.mathapp.ui.navigation.Routes
-import com.example.mathapp.utils.ResultState
-import kotlinx.coroutines.delay
 
 @Composable
 fun TeacherScreen(modifier: Modifier = Modifier, navHostController: NavHostController) {

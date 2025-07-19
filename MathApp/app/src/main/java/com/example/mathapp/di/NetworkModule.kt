@@ -17,10 +17,4 @@ object NetworkModule {
     fun provideRealtimeDatabase(): FirebaseDatabase {
         return FirebaseDatabase.getInstance()
     }
-
-    @Provides
-    @Singleton
-    fun provideFirebaseStorage(): FirebaseStorage {
-        return FirebaseStorage.getInstance()
-    }
 }

@@ -6,7 +6,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.mathapp.ui.home.HomeScreen
-import com.example.mathapp.ui.study.ContentScreen
 import com.example.mathapp.ui.study.StudyHomeScreen
 import com.example.mathapp.ui.teacher.TeacherScreen
 import com.example.mathapp.ui.teacher.TeacherScreenByName
@@ -32,13 +31,9 @@ fun NavApp() {
         }
 
         composable<Routes.StudyScreenRoute> {
-            StudyHomeScreen(navController)
+            StudyHomeScreen(navHostController = navController)
         }
 
-        composable<Routes.FirstSemRoute> {
-            val sem = it.toRoute<Routes.FirstSemRoute>().sem
-            ContentScreen(sem)
-        }
     }
 }
 

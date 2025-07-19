@@ -59,8 +59,7 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.database)
     //coil
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
+    implementation("io.coil-kt:coil-compose:2.7.0")
     //hilt
     implementation("com.google.dagger:hilt-android:2.56.2")
     ksp("com.google.dagger:hilt-android-compiler:2.56.2")
