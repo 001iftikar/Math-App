@@ -15,4 +15,7 @@ sealed class Routes {
 
     @Serializable
     object StudyScreenRoute
+
+    @Serializable
+    data class BookByPaperScreen(val paperCode: String)
 }

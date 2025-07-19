@@ -6,14 +6,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.mathapp.ui.home.HomeScreen
+import com.example.mathapp.ui.study.BooksByPaperScreen
 import com.example.mathapp.ui.study.StudyHomeScreen
 import com.example.mathapp.ui.teacher.TeacherScreen
 import com.example.mathapp.ui.teacher.TeacherScreenByName
 
 @Composable
 fun NavApp() {
-
-
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Routes.HomeScreenRoute) {
         composable<Routes.HomeScreenRoute> {
@@ -34,6 +33,10 @@ fun NavApp() {
             StudyHomeScreen(navHostController = navController)
         }
 
+        composable<Routes.BookByPaperScreen> {
+            val paperCode = it.toRoute<Routes.BookByPaperScreen>().paperCode
+            BooksByPaperScreen(paperCode)
+        }
     }
 }
 

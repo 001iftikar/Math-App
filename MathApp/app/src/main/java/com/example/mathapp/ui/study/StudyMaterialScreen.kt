@@ -16,7 +16,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -25,7 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.mathapp.ui.components.TopAppBarNavIcon
-import com.example.mathapp.ui.components.bookList
+import com.example.mathapp.ui.components.paperList
+import com.example.mathapp.ui.navigation.Routes
 
 @Composable
 fun StudyHomeScreen(
@@ -67,9 +67,10 @@ fun StudyHomeScreen(
                     modifier = Modifier.fillMaxSize()
                         .padding(10.dp)
                 ) {
-                    bookList(
+                    paperList(
                         sem = semesterState,
-                        papers = papersState.value.papers
+                        papers = papersState.value.papers,
+                        onClick = {navHostController.navigate(Routes.BookByPaperScreen(it))}
                     )
                 }
             }.let {
