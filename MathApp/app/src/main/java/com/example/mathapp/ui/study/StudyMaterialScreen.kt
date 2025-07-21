@@ -64,13 +64,21 @@ fun StudyHomeScreen(
             semesterState?.let { semesterState ->
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                         .padding(10.dp)
                 ) {
                     paperList(
                         sem = semesterState,
                         papers = papersState.value.papers,
-                        onClick = {navHostController.navigate(Routes.BookByPaperScreen(it))}
+                        onClick = {
+                            navHostController.navigate(
+                                Routes.BookByPaperScreen(
+                                    semester = semesterState,
+                                    paperCode = it
+                                )
+                            )
+                        }
                     )
                 }
             }.let {
@@ -102,13 +110,25 @@ fun SemesterSelectinRow(
                 },
                 modifier = Modifier.padding(8.dp)
             ) {
-                Text(text = when(it) {
-                     "1" -> { "${it}st" }
-                    "2" -> {"${it}nd"}
-                    "3" -> {"3rd"}
+                Text(
+                    text = when (it) {
+                        "1" -> {
+                            "${it}st"
+                        }
 
-                    else -> {"${it}th"}
-                })
+                        "2" -> {
+                            "${it}nd"
+                        }
+
+                        "3" -> {
+                            "3rd"
+                        }
+
+                        else -> {
+                            "${it}th"
+                        }
+                    }
+                )
             }
         }
     }

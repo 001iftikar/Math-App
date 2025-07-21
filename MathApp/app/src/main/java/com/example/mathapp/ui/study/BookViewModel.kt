@@ -17,13 +17,9 @@ class BookViewModel @Inject constructor(private val bookRepository: BookReposito
     private val _booksState = MutableStateFlow(BookResultState())
     val booksState = _booksState.asStateFlow()
 
-    init {
-        getAllBooks()
-    }
-
-    private fun getAllBooks() {
+    fun getAllBooks(semester: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            bookRepository.getAllBooks().collect {
+            bookRepository.getBooksBySemester(semester).collect {
                 when(it) {
                     is ResultState.Error -> {
                         _booksState.value = _booksState.value.copy(

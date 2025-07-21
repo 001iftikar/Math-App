@@ -34,8 +34,8 @@ fun NavApp() {
         }
 
         composable<Routes.BookByPaperScreen> {
-            val paperCode = it.toRoute<Routes.BookByPaperScreen>().paperCode
-            BooksByPaperScreen(paperCode)
+            val data = it.toRoute<Routes.BookByPaperScreen>()
+            BooksByPaperScreen(semester = data.semester, paperCode = data.paperCode)
         }
     }
 }

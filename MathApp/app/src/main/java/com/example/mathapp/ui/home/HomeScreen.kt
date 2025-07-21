@@ -124,9 +124,9 @@ fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.bookselv),
+                    painter = painterResource(id = R.drawable.study_res),
                     contentDescription = null,
-                    contentScale = ContentScale.FillBounds,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
                         .weight(1f) // Take up most of the vertical space

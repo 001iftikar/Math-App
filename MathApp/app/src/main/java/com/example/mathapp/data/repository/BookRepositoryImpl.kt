@@ -13,13 +13,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
 class BookRepositoryImpl @Inject constructor(private  val firebaseDatabase: FirebaseDatabase) : BookRepository {
-    override fun getAllBooks(): Flow<ResultState<List<Book>>> = callbackFlow{
+    override fun getBooksBySemester(semester: String): Flow<ResultState<List<Book>>> = callbackFlow{
         trySend(ResultState.Loading)
 
         val bookRef = firebaseDatabase.reference
             .child("StudyRes")
             .child("Semester")
-            .child("1")
+            .child(semester)
             .child("Books")
 
         val listener = object : ValueEventListener {
