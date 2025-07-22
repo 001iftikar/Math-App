@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.example.mathapp.domain.model.Paper
+import com.example.mathapp.ui.effects.ImageAnimation
 
 fun LazyGridScope.paperList(
     sem: String,
@@ -64,8 +65,8 @@ fun ContentScreen(
                 SubcomposeAsyncImage(
                     model = paper.paperImage,
                     contentDescription = null,
-                  //  loading = { Loader() },
                     modifier = Modifier.fillMaxSize(),
+                    loading = { ImageAnimation() },
                     contentScale = ContentScale.Crop
                 )
                 Card(

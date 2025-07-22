@@ -33,19 +33,24 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
 import com.example.mathapp.domain.model.Book
+import com.example.mathapp.domain.model.Paper
 import com.example.mathapp.ui.components.TopAppBarNavIcon
 
 @Composable
 fun BooksByPaperScreen(
     semester: String,
     paperCode: String,
-    bookViewModel: BookViewModel = hiltViewModel()
+    bookViewModel: BookViewModel = hiltViewModel(),
+    paperViewModel: PaperViewModel = hiltViewModel()
 ) {
 
     val bookState = bookViewModel.booksState.collectAsState()
 
+    val paperState = paperViewModel.paperState.collectAsState()
+
     LaunchedEffect(Unit) {
         bookViewModel.getAllBooks(semester)
+        paperViewModel.getPapers(semester)
     }
 
     Scaffold(
@@ -70,11 +75,13 @@ fun BooksByPaperScreen(
 
                 }
 
-                result.bookList.isNotEmpty() -> {
-                    items(result.bookList.filter { it.bookPaper == paperCode }) {book ->
-                        Log.d("Tag-comp", book.toString())
-                        BookItem(book) { }
+                result.bookList.isNotEmpty() && paperState.value.papers.isNotEmpty() -> {
+                    val matchingPaper = paperState.value.papers.find { it.paperCode == paperCode }
 
+                    if (matchingPaper != null) {
+                        items(result.bookList.filter { it.bookPaper == paperCode }) { book ->
+                            BookItem(book, matchingPaper) { }
+                        }
                     }
                 }
             }
@@ -85,6 +92,7 @@ fun BooksByPaperScreen(
 @Composable
 private fun BookItem(
     book: Book,
+    paper: Paper,
     onClick: () -> Unit
 ) {
     ElevatedCard(
@@ -106,7 +114,7 @@ private fun BookItem(
                     .clip(CircleShape)
             ) {
                 SubcomposeAsyncImage(
-                    model = book.bookImage,
+                    model = paper.paperImage,
                     contentDescription = null,
                     loading = { CircularProgressIndicator() },
                     contentScale = ContentScale.Crop
@@ -119,6 +127,7 @@ private fun BookItem(
                 Text(
                     text = book.bookName,
                     style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 2,
                     fontSize = 20.sp,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.Bold,

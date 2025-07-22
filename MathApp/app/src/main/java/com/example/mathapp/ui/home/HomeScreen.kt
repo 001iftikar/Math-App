@@ -61,7 +61,6 @@ import kotlinx.coroutines.launch
 fun HomeScreen(modifier: Modifier = Modifier, navHostController: NavHostController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val urlHandler = LocalUriHandler.current
 
     ModalNavigationDrawer(

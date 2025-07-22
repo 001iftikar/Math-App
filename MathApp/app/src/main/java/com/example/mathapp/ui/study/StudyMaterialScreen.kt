@@ -14,7 +14,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -34,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.mathapp.ui.components.TopAppBarNavIcon
 import com.example.mathapp.ui.components.paperList
+import com.example.mathapp.ui.effects.PapersLoadingShimmer
 import com.example.mathapp.ui.navigation.Routes
 import kotlinx.coroutines.launch
 
@@ -44,13 +44,14 @@ fun StudyHomeScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var semesterNotSelectedText by remember { mutableStateOf("Select which semester you are on") }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { TopAppBarNavIcon(title = "Study Here") { navHostController.popBackStack() } },
         floatingActionButton = {
             IconButton(
                 onClick = {
-                    scope.launch { 
+                    scope.launch {
                         snackbarHostState.showSnackbar("Resources for the 4th year will be added whenever the university releases the syllabus")
                     }
                 }
@@ -88,32 +89,59 @@ fun StudyHomeScreen(
             }
 
             semesterState?.let { semesterState ->
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(10.dp)
-                ) {
-                    paperList(
-                        sem = semesterState,
-                        papers = papersState.value.papers,
-                        onClick = {
-                            navHostController.navigate(
-                                Routes.BookByPaperScreen(
-                                    semester = semesterState,
-                                    paperCode = it
-                                )
+
+                when {
+                    papersState.value.isLoading -> {
+
+                        semesterNotSelectedText = ""
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2)
+                        ) { 
+                            items(6) {
+                                PapersLoadingShimmer()
+                            }
+                        }
+                    }
+                    papersState.value.exception != null -> {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text("Error")
+                        }
+                    }
+
+                    papersState.value.papers.isNotEmpty() -> {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(10.dp)
+                        ) {
+                            paperList(
+                                sem = semesterState,
+                                papers = papersState.value.papers,
+                                onClick = {
+                                    navHostController.navigate(
+                                        Routes.BookByPaperScreen(
+                                            semester = semesterState,
+                                            paperCode = it
+                                        )
+                                    )
+                                }
                             )
                         }
-                    )
+                    }
                 }
-            }.let {
+
+            }.run {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text("Select which semester you are on")
+                    Text(semesterNotSelectedText)
                 }
             }
         }
