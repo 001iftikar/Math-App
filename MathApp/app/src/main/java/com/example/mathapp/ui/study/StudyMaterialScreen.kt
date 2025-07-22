@@ -8,14 +8,23 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -26,15 +35,32 @@ import androidx.navigation.NavHostController
 import com.example.mathapp.ui.components.TopAppBarNavIcon
 import com.example.mathapp.ui.components.paperList
 import com.example.mathapp.ui.navigation.Routes
+import kotlinx.coroutines.launch
 
 @Composable
 fun StudyHomeScreen(
     navHostController: NavHostController,
     paperViewModel: PaperViewModel = hiltViewModel(),
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { TopAppBarNavIcon(title = "Study Here") { navHostController.popBackStack() } }
+        topBar = { TopAppBarNavIcon(title = "Study Here") { navHostController.popBackStack() } },
+        floatingActionButton = {
+            IconButton(
+                onClick = {
+                    scope.launch { 
+                        snackbarHostState.showSnackbar("Resources for the 4th year will be added whenever the university releases the syllabus")
+                    }
+                }
+            ) {
+                Icon(imageVector = Icons.Default.Info, contentDescription = null)
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
     ) { innerPadding ->
         val semesterList = listOf(
             "1", "2", "3", "4", "5", "6"
@@ -90,7 +116,6 @@ fun StudyHomeScreen(
                     Text("Select which semester you are on")
                 }
             }
-
         }
     }
 }
@@ -133,9 +158,6 @@ fun SemesterSelectinRow(
         }
     }
 }
-
-
-
 
 
 

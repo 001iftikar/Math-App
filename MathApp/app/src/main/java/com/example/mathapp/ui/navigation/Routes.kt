@@ -18,4 +18,7 @@ sealed class Routes {
 
     @Serializable
     data class BookByPaperScreen(val semester: String, val paperCode: String)
+
+    @Serializable
+    object ChatBotScreen
 }
