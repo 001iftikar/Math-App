@@ -4,11 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.items
@@ -21,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
@@ -28,20 +27,18 @@ import com.example.mathapp.domain.model.Paper
 import com.example.mathapp.ui.effects.ImageAnimation
 
 fun LazyGridScope.paperList(
-    sem: String,
     papers: List<Paper>,
     onClick: (String) -> Unit
 ) {
     items(papers) { paper ->
         ContentScreen(
-            sem = sem, paper = paper, onClick = { onClick(it) }
+            paper = paper, onClick = { onClick(it) }
         )
     }
 }
 
 @Composable
 fun ContentScreen(
-    sem: String,
     paper: Paper,
     onClick: (String) -> Unit,
     ) {
@@ -74,14 +71,17 @@ fun ContentScreen(
                     modifier = Modifier
                         .padding(12.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.Black.copy(alpha = 0.6f) // semi-transparent dark background
+                        //containerColor = Color.Black.copy(alpha = 0.6f) // semi-transparent dark background
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f)
                     )
                 ) {
                     Text(
-                        text = paper.paperName,
+                        text = paper.paperName.trim(),
                         modifier = Modifier.padding(8.dp)
                             .background(color = Color.Transparent),
                         style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center
                     )
                 }

@@ -110,5 +110,5 @@ fun ImageAnimation() {
         end = Offset(translateAnimation.value, translateAnimation.value)
     )
 
-    Spacer(Modifier.size(80.dp).clip(RoundedCornerShape(8.dp)).background(brush))
+    Box(Modifier.size(300.dp).clip(RoundedCornerShape(8.dp)).background(brush))
 }

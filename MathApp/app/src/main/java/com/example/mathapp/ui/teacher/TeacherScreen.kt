@@ -50,9 +50,7 @@ fun TeacherScreen(modifier: Modifier = Modifier, navHostController: NavHostContr
 
     Scaffold(
         topBar = {
-            TopAppBarNavIcon(title = "Teachers", onClick = {
-                navHostController.popBackStack()
-            })
+            TopAppBarNavIcon(title = "Teachers", navController = navHostController)
         }
     ) { innerPadding ->
 

@@ -1,16 +1,21 @@
 package com.example.mathapp.ui.study
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -28,6 +33,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -47,7 +54,7 @@ fun StudyHomeScreen(
     var semesterNotSelectedText by remember { mutableStateOf("Select which semester you are on") }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { TopAppBarNavIcon(title = "Study Here") { navHostController.popBackStack() } },
+        topBar = { TopAppBarNavIcon(title = "Study Here", navController = navHostController) },
         floatingActionButton = {
             IconButton(
                 onClick = {
@@ -84,7 +91,8 @@ fun StudyHomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            SemesterSelectinRow(semesterList) {
+            SemesterSelectinRow(semesters = semesterList,
+                selectedSemester = semesterState) {
                 semesterState = it
             }
 
@@ -96,12 +104,13 @@ fun StudyHomeScreen(
                         semesterNotSelectedText = ""
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(2)
-                        ) { 
+                        ) {
                             items(6) {
                                 PapersLoadingShimmer()
                             }
                         }
                     }
+
                     papersState.value.exception != null -> {
                         Column(
                             modifier = Modifier.fillMaxSize(),
@@ -120,7 +129,6 @@ fun StudyHomeScreen(
                                 .padding(10.dp)
                         ) {
                             paperList(
-                                sem = semesterState,
                                 papers = papersState.value.papers,
                                 onClick = {
                                     navHostController.navigate(
@@ -151,38 +159,41 @@ fun StudyHomeScreen(
 @Composable
 fun SemesterSelectinRow(
     semesters: List<String>,
+    selectedSemester: String?,
     onClick: (String) -> Unit,
 ) {
     LazyRow(
         modifier = Modifier.padding(10.dp)
     ) {
         items(semesters) {
-            Button(
-                onClick = {
-                    onClick(it)
-                },
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Text(
-                    text = when (it) {
-                        "1" -> {
-                            "${it}st"
-                        }
-
-                        "2" -> {
-                            "${it}nd"
-                        }
-
-                        "3" -> {
-                            "3rd"
-                        }
-
-                        else -> {
-                            "${it}th"
-                        }
+            val isSelected = it == selectedSemester
+            Text(
+                text = when (it) {
+                    "1" -> {
+                        "${it}st"
                     }
-                )
-            }
+
+                    "2" -> {
+                        "${it}nd"
+                    }
+
+                    "3" -> {
+                        "3rd"
+                    }
+
+                    else -> {
+                        "${it}th"
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(color = if (isSelected) Color.Green.copy(0.2f) else Color.Transparent)
+                    .border(BorderStroke(1.dp, color = Color.Green), RoundedCornerShape(16.dp))
+                    .clickable(
+                        onClick = {onClick(it)}
+                    ).padding(vertical = 5.dp, horizontal = 20.dp)
+            )
         }
     }
 }

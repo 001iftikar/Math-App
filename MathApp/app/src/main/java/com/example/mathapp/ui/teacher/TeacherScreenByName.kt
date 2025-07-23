@@ -46,10 +46,7 @@ fun TeacherScreenByName(
     Scaffold(
         topBar = {
 
-            TopBar(teacherName = teacherName,
-                onClick = {
-                    navHostController.popBackStack()
-                })
+            TopAppBarNavIcon(title = teacherName, navController = navHostController)
         }
     ) {
         innerPadding ->
@@ -100,12 +97,6 @@ fun IndividualTeacher(teacher: Teacher, role: String, degrees: String, modifier:
             role = role
         )
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopBar(teacherName: String, onClick: () -> Unit) {
-    TopAppBarNavIcon(title = teacherName, onClick = onClick)
 }
 
 @Composable

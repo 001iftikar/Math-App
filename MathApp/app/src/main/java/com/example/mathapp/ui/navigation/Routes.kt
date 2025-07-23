@@ -21,4 +21,7 @@ sealed class Routes {
 
     @Serializable
     object ChatBotScreen
+
+    @Serializable
+    data class PdfViewerScreen(val pdfUrl: String, val bookName: String)
 }

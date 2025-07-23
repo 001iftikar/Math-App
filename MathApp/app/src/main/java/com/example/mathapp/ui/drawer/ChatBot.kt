@@ -5,15 +5,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import com.example.mathapp.ui.components.TopAppBarNavIcon
 
 @Composable
-fun ChatBot() {
+fun ChatBot(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBarNavIcon(
-                title = "Harnath"
-            ) { }
+                title = "Harnath",
+                navController = navController
+            )
         }
     ) { innerPadding ->
         Text(text = "A chat bot will be added when I learn to integrate AI",

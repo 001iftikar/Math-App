@@ -31,17 +31,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import com.example.mathapp.domain.model.Book
 import com.example.mathapp.domain.model.Paper
 import com.example.mathapp.ui.components.TopAppBarNavIcon
+import com.example.mathapp.ui.navigation.Routes
 
 @Composable
 fun BooksByPaperScreen(
     semester: String,
     paperCode: String,
     bookViewModel: BookViewModel = hiltViewModel(),
-    paperViewModel: PaperViewModel = hiltViewModel()
+    paperViewModel: PaperViewModel = hiltViewModel(),
+    navController: NavController
 ) {
 
     val bookState = bookViewModel.booksState.collectAsState()
@@ -56,7 +59,7 @@ fun BooksByPaperScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBarNavIcon(title = paperCode) { }
+            TopAppBarNavIcon(title = paperCode, navController = navController)
         }
     ) { innerPadding ->
         LazyColumn(
@@ -80,7 +83,9 @@ fun BooksByPaperScreen(
 
                     if (matchingPaper != null) {
                         items(result.bookList.filter { it.bookPaper == paperCode }) { book ->
-                            BookItem(book, matchingPaper) { }
+                            BookItem(book, matchingPaper) { 
+                                navController.navigate(Routes.PdfViewerScreen(book.bookUrl, book.bookName))
+                            }
                         }
                     }
                 }
@@ -125,7 +130,7 @@ private fun BookItem(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = book.bookName,
+                    text = book.bookName.trim(),
                     style = MaterialTheme.typography.bodyLarge,
                     maxLines = 2,
                     fontSize = 20.sp,

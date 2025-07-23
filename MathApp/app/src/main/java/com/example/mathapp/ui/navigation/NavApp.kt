@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.mathapp.ui.drawer.ChatBot
 import com.example.mathapp.ui.home.HomeScreen
+import com.example.mathapp.ui.study.BookPdfViewer
 import com.example.mathapp.ui.study.BooksByPaperScreen
 import com.example.mathapp.ui.study.StudyHomeScreen
 import com.example.mathapp.ui.teacher.TeacherScreen
@@ -36,11 +37,16 @@ fun NavApp() {
 
         composable<Routes.BookByPaperScreen> {
             val data = it.toRoute<Routes.BookByPaperScreen>()
-            BooksByPaperScreen(semester = data.semester, paperCode = data.paperCode)
+            BooksByPaperScreen(semester = data.semester, paperCode = data.paperCode, navController = navController)
         }
 
         composable<Routes.ChatBotScreen> {
-            ChatBot()
+            ChatBot(navController)
+        }
+
+        composable<Routes.PdfViewerScreen> {  
+            val data = it.toRoute<Routes.PdfViewerScreen>()
+            BookPdfViewer(data.pdfUrl, data.bookName, navController)
         }
     }
 }
