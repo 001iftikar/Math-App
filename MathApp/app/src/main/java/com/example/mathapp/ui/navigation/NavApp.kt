@@ -27,25 +27,29 @@ fun NavApp() {
         enterTransition = {
             slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(durationMillis = 150, easing = FastOutSlowInEasing)
+                animationSpec = tween(durationMillis = 165
+                    , easing = FastOutSlowInEasing)
             )
         },
         exitTransition = {
             slideOutOfContainer(
                 AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(durationMillis = 150, easing = FastOutSlowInEasing)
+                animationSpec = tween(durationMillis = 165
+                    , easing = FastOutSlowInEasing)
             )
         },
         popEnterTransition = {
             slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec = tween(durationMillis = 150, easing = FastOutSlowInEasing)
+                animationSpec = tween(durationMillis = 165
+                    , easing = FastOutSlowInEasing)
             )
         },
         popExitTransition = {
             slideOutOfContainer(
                 AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec = tween(durationMillis = 150, easing = FastOutSlowInEasing)
+                animationSpec = tween(durationMillis = 165
+                    , easing = FastOutSlowInEasing)
             )
         }
     ) {
