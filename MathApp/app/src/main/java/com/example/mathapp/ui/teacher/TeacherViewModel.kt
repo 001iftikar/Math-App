@@ -2,8 +2,8 @@ package com.example.mathapp.ui.teacher
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mathapp.domain.repository.TeacherRepository
 import com.example.mathapp.data.ResultState
+import com.example.mathapp.domain.repository.TeacherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

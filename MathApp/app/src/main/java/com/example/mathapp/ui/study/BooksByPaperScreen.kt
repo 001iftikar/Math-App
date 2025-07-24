@@ -1,6 +1,5 @@
 package com.example.mathapp.ui.study
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +34,6 @@ import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import com.example.mathapp.domain.model.Book
 import com.example.mathapp.domain.model.Paper
-import com.example.mathapp.ui.components.LinearLoader
 import com.example.mathapp.ui.components.TopAppBarNavIcon
 import com.example.mathapp.ui.navigation.Routes
 
