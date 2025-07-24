@@ -7,28 +7,31 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
+import coil.compose.SubcomposeAsyncImage
 import com.example.mathapp.domain.model.Teacher
+import com.example.mathapp.ui.components.HomeButton
 import com.example.mathapp.ui.components.TopAppBarNavIcon
+import com.example.mathapp.ui.effects.ImageAnimation
+import com.example.mathapp.ui.navigation.Routes
 import com.example.mathapp.utils.ColorHex.toColor
 
 @Composable
@@ -46,7 +49,17 @@ fun TeacherScreenByName(
     Scaffold(
         topBar = {
 
-            TopAppBarNavIcon(title = teacherName, navController = navHostController)
+            TopAppBarNavIcon(
+                title = teacherName, navController = navHostController,
+                goHome = {
+                    HomeButton { navHostController.navigate(Routes.HomeScreenRoute) {
+                        popUpTo(0) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    } }
+                },
+            )
         }
     ) {
         innerPadding ->
@@ -81,14 +94,18 @@ fun TeacherScreenByName(
 fun IndividualTeacher(teacher: Teacher, role: String, degrees: String, modifier: Modifier = Modifier) {
     Column(modifier = modifier
         .fillMaxWidth()
-        .padding(12.dp)) {
+        .padding(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.size(350.dp)
+                .clip(RoundedCornerShape(6.dp))
         ) {
-            AsyncImage(
+            SubcomposeAsyncImage(
                 model = teacher.profilePicture,
-                contentDescription = null
+                contentDescription = null,
+                loading = { ImageAnimation() },
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
         }
         Spacer(Modifier.height(50.dp))

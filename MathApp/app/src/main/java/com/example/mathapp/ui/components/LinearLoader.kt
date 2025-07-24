@@ -16,11 +16,12 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun LinearLoader(
-    loadingText: String,
-    padding: PaddingValues = PaddingValues(0.dp)
+    modifier: Modifier = Modifier,
+    loadingText: String? = null,
+    padding: PaddingValues = PaddingValues(0.dp),
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(padding),
         verticalArrangement = Arrangement.Center,
@@ -28,6 +29,6 @@ fun LinearLoader(
     ) {
         LinearProgressIndicator()
         Spacer(Modifier.height(10.dp))
-        Text(loadingText)
+        Text(loadingText ?: "")
     }
 }

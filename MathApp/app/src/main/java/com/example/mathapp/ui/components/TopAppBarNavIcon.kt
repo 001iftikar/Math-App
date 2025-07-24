@@ -12,7 +12,7 @@ import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBarNavIcon(title: String, navController: NavController) {
+fun TopAppBarNavIcon(title: String, navController: NavController, goHome: (@Composable () -> Unit)? = null) {
     TopAppBar(
         title = { Text(text = title) },
         navigationIcon = {
@@ -24,6 +24,7 @@ fun TopAppBarNavIcon(title: String, navController: NavController) {
                     contentDescription = null
                 )
             }
-        }
+        },
+        actions = { goHome?.invoke() }
     )
 }

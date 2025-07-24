@@ -48,6 +48,7 @@ dependencies {
     // pdf
     implementation("io.github.grizzi91:bouquet:1.1.3")
 
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -67,7 +68,7 @@ dependencies {
     ksp("androidx.hilt:hilt-compiler:1.2.0")
 
     //navigation
-    implementation("androidx.navigation:navigation-compose:2.9.0")
+    implementation("androidx.navigation:navigation-compose:2.9.2")
 
     // serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")

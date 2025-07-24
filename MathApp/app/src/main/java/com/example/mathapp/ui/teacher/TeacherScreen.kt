@@ -10,8 +10,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
@@ -29,9 +33,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -42,11 +49,13 @@ import com.example.mathapp.ui.effects.ImageAnimation
 import com.example.mathapp.ui.navigation.Routes
 
 @Composable
-fun TeacherScreen(modifier: Modifier = Modifier, navHostController: NavHostController) {
+fun TeacherScreen(navHostController: NavHostController) {
     val viewModel: TeacherViewModel = hiltViewModel()
 
     val state by viewModel.state.collectAsState()
     val teachers = state.teachers
+
+    val listState = rememberLazyListState()
 
     Scaffold(
         topBar = {
@@ -85,7 +94,8 @@ fun TeacherScreen(modifier: Modifier = Modifier, navHostController: NavHostContr
             }
 
             else -> {
-                LazyColumn(Modifier.padding(innerPadding)) {
+                LazyColumn(Modifier.padding(innerPadding),
+                    state = listState) {
                     items(teachers.sortedBy { it.teacherName }) { teacher ->
                         Teacher(
                             teacherName = teacher.teacherName,
@@ -110,11 +120,10 @@ fun Teacher(
     profilePicture: String,
     onClick: () -> Unit
 ) {
-
     val shimmerColors = listOf(
-        Color.Red.copy(0.6f),
-        Color.Green.copy(0.6f),
-        Color.Blue.copy(0.6f)
+        Color.Red.copy(alpha = 0.6f),
+        Color.Green.copy(alpha = 0.6f),
+        Color.Blue.copy(alpha = 0.6f)
     )
 
     val transition = rememberInfiniteTransition()
@@ -122,10 +131,7 @@ fun Teacher(
         initialValue = 0f,
         targetValue = 100f,
         animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 1000,
-                easing = FastOutSlowInEasing
-            )
+            animation = tween(1000, easing = FastOutSlowInEasing)
         )
     )
 
@@ -138,38 +144,45 @@ fun Teacher(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .clickable(
-                onClick = onClick
-            ),
+            .clickable(onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 24.dp)
+                .padding(bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = teacherName,
                 modifier = Modifier
-                    .padding(bottom = 8.dp)
+                    .padding(start = 18.dp)
                     .border(
                         brush = brushBorder,
                         width = 2.dp,
                         shape = RoundedCornerShape(3.dp)
                     )
-                    .padding(vertical = 5.dp, horizontal = 10.dp)
+                    .padding(vertical = 5.dp, horizontal = 10.dp),
+                textAlign = TextAlign.Start
             )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.9f) 
+                .aspectRatio(1f)    // Keeps image square
+                .clip(RoundedCornerShape(6.dp))
+        ) {
             SubcomposeAsyncImage(
                 model = profilePicture,
                 contentDescription = null,
                 loading = { ImageAnimation() },
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
         }
-
-
     }
+
 }
 
 

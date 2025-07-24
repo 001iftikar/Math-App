@@ -1,6 +1,7 @@
 package com.example.mathapp.ui.study
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import com.example.mathapp.domain.model.Book
 import com.example.mathapp.domain.model.Paper
+import com.example.mathapp.ui.components.LinearLoader
 import com.example.mathapp.ui.components.TopAppBarNavIcon
 import com.example.mathapp.ui.navigation.Routes
 
@@ -62,29 +64,44 @@ fun BooksByPaperScreen(
             TopAppBarNavIcon(title = paperCode, navController = navController)
         }
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding)
-        ) {
-            val result = bookState.value
-            when {
-                result.exception != null -> {
-                    item { Text(result.exception.message!!) }
+
+        val result = bookState.value
+
+        when {
+            result.exception != null -> {
+                Column(
+                    modifier = Modifier.padding(innerPadding),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(result.exception.message!!)
                 }
 
-                result.isLoading -> {
-                    item { LinearProgressIndicator() }
+            }
 
-                }
+            result.isLoading -> {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth().padding(innerPadding)
+                )
+            }
 
-                result.bookList.isNotEmpty() && paperState.value.papers.isNotEmpty() -> {
+            result.bookList.isNotEmpty() && paperState.value.papers.isNotEmpty() -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(innerPadding)
+                ) {
                     val matchingPaper = paperState.value.papers.find { it.paperCode == paperCode }
 
                     if (matchingPaper != null) {
                         items(result.bookList.filter { it.bookPaper == paperCode }) { book ->
-                            BookItem(book, matchingPaper) { 
-                                navController.navigate(Routes.PdfViewerScreen(book.bookUrl, book.bookName))
+                            BookItem(book, matchingPaper) {
+                                navController.navigate(
+                                    Routes.PdfViewerScreen(
+                                        book.bookUrl,
+                                        book.bookName
+                                    )
+                                )
                             }
                         }
                     }
@@ -93,6 +110,7 @@ fun BooksByPaperScreen(
         }
     }
 }
+
 
 @Composable
 private fun BookItem(
@@ -121,7 +139,6 @@ private fun BookItem(
                 SubcomposeAsyncImage(
                     model = paper.paperImage,
                     contentDescription = null,
-                    loading = { CircularProgressIndicator() },
                     contentScale = ContentScale.Crop
                 )
             }

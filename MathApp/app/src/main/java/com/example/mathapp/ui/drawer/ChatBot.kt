@@ -18,6 +18,6 @@ fun ChatBot(navController: NavController) {
             )
         }
     ) { innerPadding ->
-        Text(text = "A chat bot will be added when I learn to integrate AI",
+        Text(text = "Working on it!",
             modifier = Modifier.padding(innerPadding)) }
 }
