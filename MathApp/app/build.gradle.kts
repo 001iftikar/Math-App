@@ -63,6 +63,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
     //hilt
     implementation("com.google.dagger:hilt-android:2.56.2")
+    implementation(libs.firebase.ai)
     ksp("com.google.dagger:hilt-android-compiler:2.56.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
