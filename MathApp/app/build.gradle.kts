@@ -48,6 +48,15 @@ dependencies {
     // pdf
     implementation("io.github.grizzi91:bouquet:1.1.3")
 
+    // Ai
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+
+    implementation ("androidx.constraintlayout:constraintlayout-compose:1.1.1")
+
+    //Room
+    implementation("androidx.room:room-runtime:2.7.2")
+    ksp("androidx.room:room-compiler:2.7.2")
+    implementation("androidx.room:room-ktx:2.7.2")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

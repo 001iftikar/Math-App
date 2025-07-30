@@ -1,12 +1,16 @@
 package com.example.mathapp.di
 
-import com.example.mathapp.data.repository.AiRepositoryImpl
 import com.example.mathapp.data.repository.BookRepositoryImpl
 import com.example.mathapp.data.repository.PaperRepositoryImpl
+import com.example.mathapp.data.repository.SessionRepositoryImpl
+import com.example.mathapp.data.repository.SubjectRepositoryImpl
+import com.example.mathapp.data.repository.TaskRepositoryImpl
 import com.example.mathapp.data.repository.TeacherRepositoryImpl
-import com.example.mathapp.domain.repository.AiRepository
 import com.example.mathapp.domain.repository.BookRepository
 import com.example.mathapp.domain.repository.PaperRepository
+import com.example.mathapp.domain.repository.SessionRepository
+import com.example.mathapp.domain.repository.SubjectRepository
+import com.example.mathapp.domain.repository.TaskRepository
 import com.example.mathapp.domain.repository.TeacherRepository
 import dagger.Binds
 import dagger.Module
@@ -31,5 +35,13 @@ abstract class RepositoryModule {
     
     @Singleton
     @Binds
-    abstract fun bindAiRepository(impl: AiRepositoryImpl): AiRepository
+    abstract fun bindSubjectRepository(impl: SubjectRepositoryImpl): SubjectRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindTaskRepository(impl: TaskRepositoryImpl): TaskRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindSessionRepository(impl: SessionRepositoryImpl): SessionRepository
 }

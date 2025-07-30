@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
@@ -47,7 +48,7 @@ import com.example.mathapp.utils.ColorHex.toColor
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, navHostController: NavHostController) {
+fun HomeScreen(navHostController: NavHostController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val urlHandler = LocalUriHandler.current
@@ -73,7 +74,6 @@ fun HomeScreen(modifier: Modifier = Modifier, navHostController: NavHostControll
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
-                        navHostController.navigate(Routes.ChatBotScreen)
                     }
                 )
                 NavigationDrawerItem(
@@ -95,18 +95,30 @@ fun HomeScreen(modifier: Modifier = Modifier, navHostController: NavHostControll
     ) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            topBar = { TopBar(title = "WELCOME") {
-                scope.launch { drawerState.open() }
-            } }
-        ) {
-                innerPadding ->
+            topBar = {
+                TopBar(title = "WELCOME") {
+                    scope.launch { drawerState.open() }
+                }
+            }
+        ) { innerPadding ->
 
             LazyColumn(Modifier.padding(innerPadding)) {
-                item { FirstLayer(
-                    goToTeacher = {navHostController.navigate(Routes.TeacherScreenRoute)},
-                    goToStudy = {navHostController.navigate(Routes.StudyScreenRoute)}
+                item {
+                    FirstLayer(
+                        goToTeacher = { navHostController.navigate(Routes.TeacherScreenRoute) },
+                        goToStudy = { navHostController.navigate(Routes.StudyScreenRoute) }
 
-                ) }
+                    )
+                }
+                item {
+                    Spacer(Modifier.height(12.dp))
+                }
+                item {
+                    SecondLayer(
+                        goToStudySmart = {navHostController.navigate(Routes.StudySmartScreen)},
+                        goToAiChat = {}
+                    )
+                }
                 item { DepartmentAchievements() }
             }
         }
@@ -118,8 +130,12 @@ fun HomeScreen(modifier: Modifier = Modifier, navHostController: NavHostControll
 private fun TopBar(title: String, onClick: () -> Unit) {
 
     CenterAlignedTopAppBar(
-        title = { Text(title, style = MaterialTheme.typography.headlineLarge,
-            color = "#9d0ddb".toColor()) },
+        title = {
+            Text(
+                title, style = MaterialTheme.typography.headlineLarge,
+                color = "#9d0ddb".toColor()
+            )
+        },
         navigationIcon = {
             IconButton(
                 onClick = onClick
@@ -138,12 +154,15 @@ fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
             .padding(horizontal = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        ElevatedCard(modifier = Modifier.fillMaxWidth()
-            .weight(1f)
-            .aspectRatio(1f)
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .aspectRatio(1f)
         ) {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(bottom = 5.dp),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -173,11 +192,14 @@ fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
         }
 
         Spacer(Modifier.width(10.dp))
-        ElevatedCard(modifier = Modifier
-            .weight(1f)
-            .aspectRatio(1f)) {
+        ElevatedCard(
+            modifier = Modifier
+                .weight(1f)
+                .aspectRatio(1f)
+        ) {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(bottom = 5.dp),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -211,19 +233,105 @@ fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
 fun DepartmentAchievements() {
     val context = LocalContext.current
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(horizontal = 20.dp),
         onClick = {
             Toast.makeText(context, "This feature will be added soon", Toast.LENGTH_LONG).show()
         }
     ) {
-        Text("Department Achievements",
-            modifier = Modifier.align(Alignment.CenterHorizontally))
+        Text(
+            "Department Achievements",
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
     }
 }
 
+@Composable
+fun SecondLayer(goToStudySmart: () -> Unit,
+                goToAiChat: () -> Unit
+               ) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .aspectRatio(1f)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 5.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.study_smart),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f) // Take up most of the vertical space
+                        .clickable(
+                            onClick = goToStudySmart
+                        )
 
+                )
+                Text(
+                    text = "STUDY SMART",
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable(
+                            onClick = goToStudySmart
+                        ),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
+        }
 
+        Spacer(Modifier.width(10.dp))
+
+        ElevatedCard(
+            modifier = Modifier
+                .weight(1f)
+                .aspectRatio(1f)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 5.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ai_assistance),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f) // Take up most of the vertical space
+                        .clickable(
+                            onClick = goToAiChat
+                        )
+                )
+                Text(
+                    text = "Ai",
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable(
+                            onClick = goToAiChat
+                        ),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
+        }
+    }
+}
 
 
 

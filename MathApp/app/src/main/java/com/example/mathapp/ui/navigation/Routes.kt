@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 sealed class Routes {
 
+    // Routes for Study Resources and Teacher Screens
     @Serializable
     object HomeScreenRoute
 
@@ -20,8 +21,15 @@ sealed class Routes {
     data class BookByPaperScreen(val semester: String, val paperCode: String)
 
     @Serializable
-    object ChatBotScreen
+    data class PdfViewerScreen(val pdfUrl: String, val bookName: String)
+
+
+    // Routes for Smart Study
+    @Serializable
+    object StudySmartScreen
 
     @Serializable
-    data class PdfViewerScreen(val pdfUrl: String, val bookName: String)
+    data class SubjectScreen(val subjectId: Int)
+    @Serializable
+    object SessionScreen
 }
