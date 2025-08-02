@@ -2,6 +2,7 @@ package com.example.mathapp.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -25,7 +26,8 @@ fun TaskCheckBox(
         modifier = Modifier
             .size(25.dp)
             .clip(CircleShape)
-            .border(width = 2.dp, color = borderColor, shape = CircleShape),
+            .border(width = 2.dp, color = borderColor, shape = CircleShape)
+            .clickable(onClick = onCheckBoxClick),
         contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(visible = isComplete) {

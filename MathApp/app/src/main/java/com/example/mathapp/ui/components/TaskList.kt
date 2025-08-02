@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.example.mathapp.R
 import com.example.mathapp.domain.model.Task
 import com.example.mathapp.utils.Priority
+import com.example.mathapp.utils.changeMillisToDateString
 import com.google.android.gms.tasks.Tasks
 
 fun LazyListScope.taskList(
@@ -116,7 +117,7 @@ private fun TaskCard(task: Task, onCheckBoxClick: () -> Unit, onClick: () -> Uni
                 Spacer(Modifier.height(4.dp))
 
                 Text(
-                    text = "${task.dueDate}",
+                    text = task.dueDate.changeMillisToDateString(),
                     style = MaterialTheme.typography.bodySmall
                 )
             }

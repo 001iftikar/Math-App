@@ -18,6 +18,9 @@ interface SessionDao {
     @Query("SELECT * FROM Session")
     fun getAllSessions(): Flow<List<Session>>
 
+    @Query("SELECT * FROM SESSION ORDER BY date DESC LIMIT 5")
+    fun getRecentFiveSessions(): Flow<List<Session>>
+
     @Query("SELECT SUM(duration) FROM Session")
     fun getTotalSessionDuration(): Flow<Long>
 
@@ -25,7 +28,7 @@ interface SessionDao {
     fun getRecentSessionForSubject(subjectId: Int): Flow<List<Session>>
 
     @Query("SELECT SUM(duration) FROM SESSION WHERE sessionSubjectId = :subjectId")
-    fun getTotalSessionDurationBySubjectId(subjectId: Int): Flow<Long>
+    fun getTotalSessionDurationBySubject(subjectId: Int): Flow<Long>
 
     @Query("DELETE FROM SESSION WHERE sessionSubjectId = :subjectId")
     suspend fun deleteSessionBySubjectId(subjectId: Int)

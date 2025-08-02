@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -14,6 +15,10 @@ import com.example.mathapp.ui.study.BooksByPaperScreen
 import com.example.mathapp.ui.study.StudyHomeScreen
 import com.example.mathapp.ui.studysmart.dashboard.StudySmartScreen
 import com.example.mathapp.ui.studysmart.session.SessionScreen
+import com.example.mathapp.ui.studysmart.subject.SubjectScreen
+import com.example.mathapp.ui.studysmart.subject.SubjectViewModel
+import com.example.mathapp.ui.studysmart.task.TaskScreen
+import com.example.mathapp.ui.studysmart.task.TaskViewModel
 import com.example.mathapp.ui.teacher.TeacherScreen
 import com.example.mathapp.ui.teacher.TeacherScreenByName
 
@@ -84,7 +89,33 @@ fun NavApp() {
         }
 
         composable<Routes.SessionScreen> {
-            SessionScreen()
+            SessionScreen(navHostController = navController)
+        }
+
+        composable<Routes.SubjectScreen> {
+            val screenArgs = it.toRoute<Routes.SubjectScreen>()
+            val viewModel = hiltViewModel<SubjectViewModel>(
+                key = "subject-${screenArgs.subjectId}" //    "Oh, this is a new key, let's make a new instance of the ViewModel."
+
+//                        That means:
+//
+//                Navigating to different subject IDs = different ViewModels
+            )
+            val taskViewModel = hiltViewModel<TaskViewModel>()
+            SubjectScreen(
+                subjectViewModel = viewModel,
+                navController = navController,
+                subjectId = screenArgs.subjectId
+            )
+        }
+
+        composable<Routes.TaskScreen> {
+
+            val taskScreenArgs = it.toRoute<Routes.TaskScreen>()
+            val viewModel = hiltViewModel<TaskViewModel>(
+                key = "task-${taskScreenArgs.taskId}"
+            )
+            TaskScreen(taskViewModel = viewModel, navController = navController)
         }
     }
 }

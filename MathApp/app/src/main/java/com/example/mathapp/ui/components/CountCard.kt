@@ -21,9 +21,9 @@ fun CountCard(
     headLineText: String,
     count: String
 ) {
-    ElevatedCard(modifier = modifier) {
+    ElevatedCard(modifier = modifier.padding(4.dp)) {
         Column(
-            modifier = modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .padding(horizontal = 4.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally

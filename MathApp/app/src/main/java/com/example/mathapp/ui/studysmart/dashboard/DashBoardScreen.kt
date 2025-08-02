@@ -26,9 +26,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,25 +43,50 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.mathapp.R
 import com.example.mathapp.domain.model.Subject
-import com.example.mathapp.sessions
-import com.example.mathapp.tasks
 import com.example.mathapp.ui.components.AddSubjectDialog
 import com.example.mathapp.ui.components.CountCard
+import com.example.mathapp.ui.components.DeleteDialog
 import com.example.mathapp.ui.components.SubjectCard
 import com.example.mathapp.ui.components.studySessionList
 import com.example.mathapp.ui.components.taskList
 import com.example.mathapp.ui.navigation.Routes
+import com.example.mathapp.utils.SnackBarEvent
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun StudySmartScreen(navHostController: NavHostController, dashBoardViewModel: DashBoardViewModel = hiltViewModel()) {
-    val dashBoardState by dashBoardViewModel.state.collectAsState()
+    val dashBoardState by dashBoardViewModel.state.collectAsStateWithLifecycle()
+    val tasks by dashBoardViewModel.tasks.collectAsStateWithLifecycle()
+    val recentSessions by dashBoardViewModel.recentSession.collectAsStateWithLifecycle()
     var isAddSubjectDialogOpen by rememberSaveable { mutableStateOf(false) }
+    var isDeleteSessionDialogOpen by rememberSaveable { mutableStateOf(false) }
+
     val onEvent = dashBoardViewModel::onEvent
+
+    val snackBarEvent = dashBoardViewModel.snackBarEventFlow
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(true) {
+        snackBarEvent.collectLatest { event ->
+            when(event) {
+                is SnackBarEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(
+                        message = event.message,
+                        duration = event.duration
+                    )
+                }
+
+                SnackBarEvent.NavigateBack -> {}
+            }
+        }
+    }
     Scaffold(
-        topBar = { TopBar { navHostController.popBackStack() } }
+        topBar = { TopBar { navHostController.popBackStack() } },
+        snackbarHost = { SnackbarHost(snackBarHostState) }
     ) { innerPadding ->
 
         AddSubjectDialog(
@@ -76,6 +103,16 @@ fun StudySmartScreen(navHostController: NavHostController, dashBoardViewModel: D
             isAddSubjectDialogOpen = false
         }
 
+        DeleteDialog(
+            isOpen = isDeleteSessionDialogOpen,
+            title = "Delete Session",
+            bodyText = "Are you sure you don't want to keep track?",
+            onDismissRequest = {isDeleteSessionDialogOpen = false}
+        ) {
+            onEvent(DashBoardEvent.DeleteSession)
+            isDeleteSessionDialogOpen = false
+        }
+
 
 
 
@@ -88,7 +125,7 @@ fun StudySmartScreen(navHostController: NavHostController, dashBoardViewModel: D
                 CountCardLayer(
                     modifier = Modifier.fillMaxWidth().padding(12.dp),
                     subjectCount = dashBoardState.totalSubjectCount,
-                    studiedHours = dashBoardState.totalSubjectCount.toString(),
+                    studiedHours = dashBoardState.totalStudiedHours.toString(),
                     goalHours = dashBoardState.totalGoalStudyHours.toString()
                 )
             }
@@ -97,9 +134,9 @@ fun StudySmartScreen(navHostController: NavHostController, dashBoardViewModel: D
                 SubjectCardsLayer(
                     subjectList = dashBoardState.subjectList,
                     onAddIconClick = {isAddSubjectDialogOpen = true}
-                ) {
-                    if (it != null) {
-                        navHostController.navigate(Routes.SubjectScreen(it))
+                ) {subjectId ->
+                    if (subjectId != null) {
+                        navHostController.navigate(Routes.SubjectScreen(subjectId))
                     }
                 }
             }
@@ -120,7 +157,9 @@ fun StudySmartScreen(navHostController: NavHostController, dashBoardViewModel: D
             taskList(
                 sectionTitle = "UPCOMING TASKS",
                 tasks = tasks,
-                onTaskCardClick = {},
+                onTaskCardClick = {
+                    navHostController.navigate(Routes.TaskScreen(taskId = it!!))
+                },
                 onCheckBoxClick = {onEvent(DashBoardEvent.onTaskIsCompleteChange(it))}
             )
 
@@ -131,8 +170,9 @@ fun StudySmartScreen(navHostController: NavHostController, dashBoardViewModel: D
             studySessionList(
                 sectionTitle = "RECENT STUDY SESSIONS",
                 emptyListText = "So you haven't studied yet.\n START!!!",
-                sessions = sessions,
-                onDeleteIconClick = {onEvent(DashBoardEvent.onDeleteSessionButtonClick(it))}
+                sessions = recentSessions,
+                onDeleteIconClick = {onEvent(DashBoardEvent.onDeleteSessionButtonClick(it))
+                isDeleteSessionDialogOpen = true}
             )
         }
     }

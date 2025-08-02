@@ -1,5 +1,6 @@
 package com.example.mathapp.ui.studysmart.dashboard
 
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,12 +10,15 @@ import com.example.mathapp.domain.model.Task
 import com.example.mathapp.domain.repository.SessionRepository
 import com.example.mathapp.domain.repository.SubjectRepository
 import com.example.mathapp.domain.repository.TaskRepository
+import com.example.mathapp.utils.SnackBarEvent
 import com.example.mathapp.utils.toHours
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -59,6 +63,9 @@ class DashBoardViewModel @Inject constructor(private val subjectRepository: Subj
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    private val _snackBarEventFlow = MutableSharedFlow<SnackBarEvent>()
+    val snackBarEventFlow = _snackBarEventFlow.asSharedFlow()
     fun onEvent(event: DashBoardEvent) {
         when(event) {
             DashBoardEvent.SaveSubject -> saveSubject()
@@ -82,7 +89,8 @@ class DashBoardViewModel @Inject constructor(private val subjectRepository: Subj
 
             }
 
-            DashBoardEvent.DeleteSession -> {}
+            DashBoardEvent.DeleteSession -> {
+            }
             is DashBoardEvent.onDeleteSessionButtonClick -> {
                 _state.update {
                     it.copy(session = event.session)
@@ -93,13 +101,35 @@ class DashBoardViewModel @Inject constructor(private val subjectRepository: Subj
 
     private fun saveSubject() {
         viewModelScope.launch(Dispatchers.IO) {
-            subjectRepository.upsertSubject(
-                subject = Subject(
-                    name = state.value.subjectName,
-                    goalHours = state.value.goalStudyHours.toFloatOrNull()!!,
-                    colors = state.value.subjectCardColors.map { it.toArgb() }
+            try {
+                subjectRepository.upsertSubject(
+                    subject = Subject(
+                        name = state.value.subjectName,
+                        goalHours = state.value.goalStudyHours.toFloatOrNull()!!,
+                        colors = state.value.subjectCardColors.map { it.toArgb() }
+                    )
                 )
-            )
+                _state.update {
+                    it.copy(
+                        subjectName = "",
+                        goalStudyHours = ""
+                    )
+                }
+                _snackBarEventFlow.emit(
+                    SnackBarEvent.ShowSnackBar(
+                        message = "Subject added."
+                    )
+                )
+            } catch (e: Exception) {
+                _snackBarEventFlow.emit(
+                    SnackBarEvent.ShowSnackBar(
+                        message = "Couldn't save subject. ${e.message}",
+                        SnackbarDuration.Long
+                    )
+                )
+
+            }
+
         }
     }
 }

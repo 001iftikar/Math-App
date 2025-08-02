@@ -32,4 +32,7 @@ sealed class Routes {
     data class SubjectScreen(val subjectId: Int)
     @Serializable
     object SessionScreen
+
+    @Serializable
+    data class TaskScreen(val taskId: Int)
 }
