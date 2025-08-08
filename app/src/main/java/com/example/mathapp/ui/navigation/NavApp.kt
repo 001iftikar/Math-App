@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.mathapp.ui.chatbot.ChatBotScreen
 import com.example.mathapp.ui.home.HomeScreen
 import com.example.mathapp.ui.study.BookPdfViewer
 import com.example.mathapp.ui.study.BooksByPaperScreen
@@ -116,6 +117,10 @@ fun NavApp() {
                 key = "task-${taskScreenArgs.taskId}"
             )
             TaskScreen(taskViewModel = viewModel, navController = navController)
+        }
+
+        composable<Routes.ChatBotScreen> {
+            ChatBotScreen()
         }
     }
 }

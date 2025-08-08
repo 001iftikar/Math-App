@@ -35,4 +35,7 @@ sealed class Routes {
 
     @Serializable
     data class TaskScreen(val taskId: Int)
+
+    @Serializable
+    object ChatBotScreen
 }

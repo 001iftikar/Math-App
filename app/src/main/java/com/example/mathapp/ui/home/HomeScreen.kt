@@ -116,7 +116,9 @@ fun HomeScreen(navHostController: NavHostController) {
                 item {
                     SecondLayer(
                         goToStudySmart = {navHostController.navigate(Routes.StudySmartScreen)},
-                        goToAiChat = {}
+                        goToAiChat = {
+                            navHostController.navigate(Routes.ChatBotScreen)
+                        }
                     )
                 }
                 item { DepartmentAchievements() }
@@ -147,7 +149,7 @@ private fun TopBar(title: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
+private fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -230,7 +232,7 @@ fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
 }
 
 @Composable
-fun DepartmentAchievements() {
+private fun DepartmentAchievements() {
     val context = LocalContext.current
     ElevatedCard(
         modifier = Modifier
@@ -248,7 +250,7 @@ fun DepartmentAchievements() {
 }
 
 @Composable
-fun SecondLayer(goToStudySmart: () -> Unit,
+private fun SecondLayer(goToStudySmart: () -> Unit,
                 goToAiChat: () -> Unit
                ) {
     Row(
