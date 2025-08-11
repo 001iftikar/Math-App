@@ -47,7 +47,6 @@ dependencies {
 
     // pdf
     implementation("com.github.mhiew:android-pdf-viewer:3.2.0-beta.3")
-    implementation("io.github.grizzi91:bouquet:1.1.3")
 
 
     implementation ("androidx.constraintlayout:constraintlayout-compose:1.1.1")
