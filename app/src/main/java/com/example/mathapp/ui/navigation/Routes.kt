@@ -21,7 +21,10 @@ sealed class Routes {
     data class BookByPaperScreen(val semester: String, val paperCode: String)
 
     @Serializable
-    data class PdfViewerScreen(val pdfUrl: String, val bookName: String)
+    data class PdfViewerScreen(val pdfUrl: String? = null, val downloadedPdf: String? = null, val bookName: String)
+
+    @Serializable
+    object DownloadsScreen
 
 
     // Routes for Smart Study
@@ -36,6 +39,7 @@ sealed class Routes {
     @Serializable
     data class TaskScreen(val taskId: Int)
 
+    // Routes for Ai
     @Serializable
     object ChatBotScreen
 }

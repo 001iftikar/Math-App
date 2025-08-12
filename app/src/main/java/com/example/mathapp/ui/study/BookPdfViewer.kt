@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -36,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.example.mathapp.ui.components.TopAppBarNavIcon
+import com.example.mathapp.utils.PDF_DIRECTORY
 import com.github.barteksc.pdfviewer.PDFView
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import kotlinx.coroutines.Dispatchers
@@ -48,32 +48,56 @@ import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
 @Composable
-fun BookPdfViewer(pdfUrl: String, bookName: String, navController: NavController) {
+fun BookPdfViewer(pdfUrl: String?, bookName: String, downloadedFile: String? = null, navController: NavController) {
 
     val context = LocalContext.current
+    val pdfDir = File(context.getExternalFilesDir(null), PDF_DIRECTORY)
+    val savedFiles = pdfDir.listFiles {
+        it.name == downloadedFile
+    }
 
     var isLoading by remember { mutableStateOf(true) }
 
     var pdfViewState by remember { mutableStateOf<PDFView?>(null) }
 
-    LaunchedEffect(key1 = pdfUrl) {
-        val file = retrievePdfFromCacheOrUrl(
-            context = context,
-            pdfUrl = pdfUrl
-        )
 
-        file?.let { file ->
-            withContext(Dispatchers.Main) {// Switch to the main thread to update the UI
-                pdfViewState?.fromFile(file)
-                    ?.scrollHandle(DefaultScrollHandle(context))
-                    ?.enableAntialiasing(true)
-                    ?.onLoad {
-                        isLoading = false
-                    }
-                    ?.load() // Load the pdf
+
+    LaunchedEffect(key1 = pdfUrl, key2 = downloadedFile) {
+
+
+        if (downloadedFile != null && pdfUrl == null) {
+            val savedFile = savedFiles?.firstOrNull()
+            savedFile?.let { file ->
+                withContext(Dispatchers.Main) {// Switch to the main thread to update the UI
+                    pdfViewState?.fromFile(file)
+                        ?.scrollHandle(DefaultScrollHandle(context))
+                        ?.enableAntialiasing(true)
+                        ?.onLoad {
+                            isLoading = false
+                        }
+                        ?.load() // Load the pdf
+                }
+            }
+        } else {
+            val cacheFile = retrievePdfFromCacheOrUrl(
+                context = context,
+                pdfUrl = pdfUrl
+            )
+            cacheFile?.let { file ->
+                withContext(Dispatchers.Main) {// Switch to the main thread to update the UI
+                    pdfViewState?.fromFile(file)
+                        ?.scrollHandle(DefaultScrollHandle(context))
+                        ?.enableAntialiasing(true)
+                        ?.onLoad {
+                            isLoading = false
+                        }
+                        ?.load() // Load the pdf
+                }
             }
         }
     }
+
+
 
     val shimmerColors = listOf(
         Color.LightGray.copy(0.6f),

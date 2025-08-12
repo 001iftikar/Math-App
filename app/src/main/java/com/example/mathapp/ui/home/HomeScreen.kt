@@ -1,7 +1,6 @@
 package com.example.mathapp.ui.home
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +40,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.SubcomposeAsyncImage
 import com.example.mathapp.R
 import com.example.mathapp.ui.components.DrawerItem
 import com.example.mathapp.ui.navigation.Routes
@@ -67,13 +67,14 @@ fun HomeScreen(navHostController: NavHostController) {
                 NavigationDrawerItem(
                     label = {
                         DrawerItem(
-                            icon = R.drawable.chat_bot,
-                            title = "Chat bot"
+                            icon = R.drawable.downloads,
+                            title = "Downloads"
                         )
                     },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
+                        navHostController.navigate(Routes.DownloadsScreen)
                     }
                 )
                 NavigationDrawerItem(
@@ -169,13 +170,13 @@ private fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.teacher),
+                SubcomposeAsyncImage(
+                    model = R.drawable.teacher,
                     contentDescription = null,
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier
                         .fillMaxSize()
-                        .weight(1f) // Take up most of the vertical space
+                        .weight(1f)
                         .clickable(
                             onClick = goToTeacher
                         )
@@ -206,13 +207,13 @@ private fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.study_res),
+                SubcomposeAsyncImage(
+                    model = R.drawable.study_res,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
-                        .weight(1f) // Take up most of the vertical space
+                        .weight(1f)
                         .clickable(
                             onClick = goToStudy
                         )
@@ -272,13 +273,13 @@ private fun SecondLayer(goToStudySmart: () -> Unit,
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.study_smart),
+                SubcomposeAsyncImage(
+                    model = R.drawable.study_smart,
                     contentDescription = null,
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier
                         .fillMaxSize()
-                        .weight(1f) // Take up most of the vertical space
+                        .weight(1f)
                         .clickable(
                             onClick = goToStudySmart
                         )
@@ -310,13 +311,13 @@ private fun SecondLayer(goToStudySmart: () -> Unit,
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ai_assistance),
+                SubcomposeAsyncImage(
+                    model = R.drawable.ai_assistance,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
-                        .weight(1f) // Take up most of the vertical space
+                        .weight(1f)
                         .clickable(
                             onClick = goToAiChat
                         )
@@ -334,41 +335,3 @@ private fun SecondLayer(goToStudySmart: () -> Unit,
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

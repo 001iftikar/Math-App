@@ -13,6 +13,7 @@ import com.example.mathapp.ui.chatbot.ChatBotScreen
 import com.example.mathapp.ui.home.HomeScreen
 import com.example.mathapp.ui.study.BookPdfViewer
 import com.example.mathapp.ui.study.BooksByPaperScreen
+import com.example.mathapp.ui.study.DownloadsScreen
 import com.example.mathapp.ui.study.StudyHomeScreen
 import com.example.mathapp.ui.studysmart.dashboard.StudySmartScreen
 import com.example.mathapp.ui.studysmart.session.SessionScreen
@@ -22,9 +23,10 @@ import com.example.mathapp.ui.studysmart.task.TaskScreen
 import com.example.mathapp.ui.studysmart.task.TaskViewModel
 import com.example.mathapp.ui.teacher.TeacherScreen
 import com.example.mathapp.ui.teacher.TeacherScreenByName
+import com.ketch.Ketch
 
 @Composable
-fun NavApp() {
+fun NavApp(ketch: Ketch) {
     val navController = rememberNavController()
     NavHost(
         navController = navController, startDestination = Routes.HomeScreenRoute,
@@ -77,12 +79,12 @@ fun NavApp() {
 
         composable<Routes.BookByPaperScreen> {
             val data = it.toRoute<Routes.BookByPaperScreen>()
-            BooksByPaperScreen(semester = data.semester, paperCode = data.paperCode, navController = navController)
+            BooksByPaperScreen(semester = data.semester, paperCode = data.paperCode, ketch = ketch, navController = navController)
         }
 
         composable<Routes.PdfViewerScreen> {  
             val data = it.toRoute<Routes.PdfViewerScreen>()
-            BookPdfViewer(data.pdfUrl, data.bookName, navController)
+            BookPdfViewer(pdfUrl = data.pdfUrl, bookName = data.bookName, downloadedFile = data.downloadedPdf, navController = navController)
         }
 
         composable<Routes.StudySmartScreen> {
@@ -102,7 +104,6 @@ fun NavApp() {
 //
 //                Navigating to different subject IDs = different ViewModels
             )
-            val taskViewModel = hiltViewModel<TaskViewModel>()
             SubjectScreen(
                 subjectViewModel = viewModel,
                 navController = navController,
@@ -122,30 +123,10 @@ fun NavApp() {
         composable<Routes.ChatBotScreen> {
             ChatBotScreen()
         }
+
+        composable<Routes.DownloadsScreen> {
+            DownloadsScreen(navController)
+        }
     }
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

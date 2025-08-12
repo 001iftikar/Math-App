@@ -51,7 +51,7 @@ fun TeacherScreenByName(
 
             TopAppBarNavIcon(
                 title = teacherName, navController = navHostController,
-                goHome = {
+                rightIcon = {
                     HomeButton { navHostController.navigate(Routes.HomeScreenRoute) {
                         popUpTo(0) {
                             inclusive = true

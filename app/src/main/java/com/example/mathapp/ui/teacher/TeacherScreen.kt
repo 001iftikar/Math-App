@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -88,9 +89,14 @@ fun TeacherScreen(navHostController: NavHostController) {
             }
 
             else -> {
-                LazyColumn(Modifier.padding(innerPadding),
-                    state = listState) {
-                    items(teachers.sortedBy { it.teacherName }) { teacher ->
+                LazyColumn(
+                    Modifier.padding(innerPadding),
+                    state = listState
+                ) {
+                    items(
+                        items = teachers.sortedBy { it.teacherName },
+                        key = { it.teacherName }
+                    ) { teacher ->
                         Teacher(
                             teacherName = teacher.teacherName,
                             profilePicture = teacher.profilePicture
@@ -114,27 +120,6 @@ fun Teacher(
     profilePicture: String,
     onClick: () -> Unit
 ) {
-    val shimmerColors = listOf(
-        Color.Red.copy(alpha = 0.6f),
-        Color.Green.copy(alpha = 0.6f),
-        Color.Blue.copy(alpha = 0.6f)
-    )
-
-    val transition = rememberInfiniteTransition()
-    val translateAnimation = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 100f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = FastOutSlowInEasing)
-        )
-    )
-
-    val brushBorder = Brush.linearGradient(
-        colors = shimmerColors,
-        start = Offset(100f, 110f),
-        end = Offset(translateAnimation.value, translateAnimation.value)
-    )
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -153,8 +138,8 @@ fun Teacher(
                 modifier = Modifier
                     .padding(start = 18.dp)
                     .border(
-                        brush = brushBorder,
                         width = 2.dp,
+                        color = MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(3.dp)
                     )
                     .padding(vertical = 5.dp, horizontal = 10.dp),
@@ -163,7 +148,7 @@ fun Teacher(
         }
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.9f) 
+                .fillMaxWidth(0.9f)
                 .aspectRatio(1f)    // Keeps image square
                 .clip(RoundedCornerShape(6.dp))
         ) {

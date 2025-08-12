@@ -49,6 +49,9 @@ dependencies {
     implementation("com.github.mhiew:android-pdf-viewer:3.2.0-beta.3")
 
 
+    // Download manager
+    implementation("com.github.khushpanchal:Ketch:2.0.5")
+
     implementation ("androidx.constraintlayout:constraintlayout-compose:1.1.1")
 
     //Room
@@ -57,6 +60,7 @@ dependencies {
     ksp("androidx.room:room-compiler:2.7.2")
     implementation("androidx.room:room-ktx:2.7.2")
 
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
