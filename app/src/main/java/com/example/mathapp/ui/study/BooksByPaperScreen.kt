@@ -18,7 +18,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -81,7 +83,6 @@ fun BooksByPaperScreen(
     val scope = rememberCoroutineScope()
     var status by remember { mutableStateOf(Status.DEFAULT) }
     var progress by remember { mutableIntStateOf(0) }
-    var total by remember { mutableLongStateOf(0) }
     var isCollecting by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -96,7 +97,7 @@ fun BooksByPaperScreen(
                     downloadModels.forEach {
                         status = it.status
                         progress = it.progress
-                        total = it.total
+                        Log.d("Status", "BooksByPaperScreen: ${it.status}")
                     }
                 }
         }
@@ -146,6 +147,7 @@ fun BooksByPaperScreen(
                                 val fileName = book.bookUrl.substringAfterLast("/")
                                 val file = File(directory, fileName)
                                 if (file.exists().not()) {
+                                    isCollecting = true
                                     ketch.download(
                                         tag = "pdf",
                                         url = book.bookUrl,
@@ -156,17 +158,41 @@ fun BooksByPaperScreen(
                                 } else {
                                     Log.d("File-Down", "File exists")
                                 }
-                            }) {
-                                val file = downloadedFiles?.firstOrNull {
-                                    it.name == book.bookUrl.substringAfterLast("/")
-                                }
-                                navController.navigate(
-                                    Routes.PdfViewerScreen(
-                                        pdfUrl = if (file != null) null else book.bookUrl,
-                                        downloadedPdf = file?.name,
-                                        bookName = book.bookName
+                            },
+                                onClick = {
+                                    val file = downloadedFiles?.firstOrNull {
+                                        it.name == book.bookUrl.substringAfterLast("/")
+                                    }
+                                    navController.navigate(
+                                        Routes.PdfViewerScreen(
+                                            pdfUrl = if (file != null) null else book.bookUrl,
+                                            downloadedPdf = file?.name,
+                                            bookName = book.bookName
+                                        )
                                     )
-                                )
+                                }) {
+                                val directory = context.createPrivateDir()
+                                val fileName = book.bookUrl.substringAfterLast("/")
+                                val file = File(directory, fileName)
+                                if (file.exists().not()) {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowDownward,
+                                        contentDescription = null,
+                                        tint = Color.White
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Default.Done,
+                                        contentDescription = null,
+                                        tint = Color.White
+                                    )
+                                }
+
+                                if (status == Status.PROGRESS) {
+                                    CircularProgressIndicator(
+                                        progress = {progress / 100f}
+                                    )
+                                }
                             }
                         }
                     }
@@ -176,13 +202,13 @@ fun BooksByPaperScreen(
     }
 }
 
-
 @Composable
 private fun BookItem(
     book: Book,
     paper: Paper,
     onDownloadClick: () -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    downloadStateIcon: @Composable () -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier
@@ -219,11 +245,7 @@ private fun BookItem(
                     contentAlignment = Alignment.Center
                 )
                 {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDownward,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
+                    downloadStateIcon()
                 }
             }
             Spacer(Modifier.width(5.dp))
@@ -246,35 +268,3 @@ private fun BookItem(
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

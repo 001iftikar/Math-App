@@ -52,30 +52,28 @@ fun BookPdfViewer(pdfUrl: String?, bookName: String, downloadedFile: String? = n
 
     val context = LocalContext.current
     val pdfDir = File(context.getExternalFilesDir(null), PDF_DIRECTORY)
-    val savedFiles = pdfDir.listFiles {
-        it.name == downloadedFile
-    }
+    val savedFile = if (downloadedFile != null) File(pdfDir, downloadedFile) else null
 
     var isLoading by remember { mutableStateOf(true) }
 
     var pdfViewState by remember { mutableStateOf<PDFView?>(null) }
 
-
-
-    LaunchedEffect(key1 = pdfUrl, key2 = downloadedFile) {
-
-
+    LaunchedEffect(key1 = pdfUrl, key2 = downloadedFile, key3 = bookName) {
         if (downloadedFile != null && pdfUrl == null) {
-            val savedFile = savedFiles?.firstOrNull()
             savedFile?.let { file ->
-                withContext(Dispatchers.Main) {// Switch to the main thread to update the UI
-                    pdfViewState?.fromFile(file)
-                        ?.scrollHandle(DefaultScrollHandle(context))
-                        ?.enableAntialiasing(true)
-                        ?.onLoad {
-                            isLoading = false
-                        }
-                        ?.load() // Load the pdf
+                if (file.exists()) {
+                    Log.d("BookPdfViewer", "Loading PDF from downloaded file: ${file.absolutePath}")
+                    withContext(Dispatchers.Main) {
+                        pdfViewState?.fromFile(file)
+                            ?.scrollHandle(DefaultScrollHandle(context))
+                            ?.enableAntialiasing(true)
+                            ?.onLoad {
+                                isLoading = false
+                            }
+                            ?.load() // Load the pdf
+                    }
+                } else {
+                    Log.d("BookPdfViewer", "Downloaded file not found: ${file.absolutePath}")
                 }
             }
         } else {
@@ -84,7 +82,7 @@ fun BookPdfViewer(pdfUrl: String?, bookName: String, downloadedFile: String? = n
                 pdfUrl = pdfUrl
             )
             cacheFile?.let { file ->
-                withContext(Dispatchers.Main) {// Switch to the main thread to update the UI
+                withContext(Dispatchers.Main) {
                     pdfViewState?.fromFile(file)
                         ?.scrollHandle(DefaultScrollHandle(context))
                         ?.enableAntialiasing(true)
@@ -96,8 +94,6 @@ fun BookPdfViewer(pdfUrl: String?, bookName: String, downloadedFile: String? = n
             }
         }
     }
-
-
 
     val shimmerColors = listOf(
         Color.LightGray.copy(0.6f),
@@ -182,7 +178,6 @@ fun BookPdfViewer(pdfUrl: String?, bookName: String, downloadedFile: String? = n
             }
         }
     }
-
 }
 
 private suspend fun retrievePdfFromCacheOrUrl(context: Context, pdfUrl: String?): File? {
