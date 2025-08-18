@@ -79,8 +79,6 @@ fun BooksByPaperScreen(
 
     val paperState = paperViewModel.paperState.collectAsState()
 
-
-    val scope = rememberCoroutineScope()
     var status by remember { mutableStateOf(Status.DEFAULT) }
     var progress by remember { mutableIntStateOf(0) }
     var isCollecting by remember { mutableStateOf(false) }
@@ -88,6 +86,14 @@ fun BooksByPaperScreen(
     LaunchedEffect(Unit) {
         bookViewModel.getAllBooks(semester)
         paperViewModel.getPapers(semester)
+    }
+
+    LaunchedEffect(status) {
+        // bcz the screen was flickering
+        if (status == Status.SUCCESS) {
+            bookViewModel.getAllBooks(semester)
+            paperViewModel.getPapers(semester)
+        }
     }
 
     LaunchedEffect(key1 = isCollecting) {
@@ -124,13 +130,14 @@ fun BooksByPaperScreen(
 
             }
 
-            result.isLoading -> {
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(innerPadding)
-                )
-            }
+            // commented out bcz it was causing flickering
+//            result.isLoading -> {
+//                LinearProgressIndicator(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(innerPadding)
+//                )
+//            }
 
             result.bookList.isNotEmpty() && paperState.value.papers.isNotEmpty() -> {
                 LazyColumn(
@@ -185,12 +192,6 @@ fun BooksByPaperScreen(
                                         imageVector = Icons.Default.Done,
                                         contentDescription = null,
                                         tint = Color.White
-                                    )
-                                }
-
-                                if (status == Status.PROGRESS) {
-                                    CircularProgressIndicator(
-                                        progress = {progress / 100f}
                                     )
                                 }
                             }
