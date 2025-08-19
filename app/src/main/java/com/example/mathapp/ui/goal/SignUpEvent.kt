@@ -1,0 +1,11 @@
+package com.example.mathapp.ui.goal
+
+sealed class SignUpEvent {
+    data object Idle: SignUpEvent()
+    data class EnterEmail(val email: String) : SignUpEvent()
+    data class EnterPassword(val password: String) : SignUpEvent()
+    data class EnterName(val name: String) : SignUpEvent()
+    data class Success(val userId: String) : SignUpEvent()
+    object PasswordVisibilityChange : SignUpEvent()
+    data class PasswordError(val passwordError: String) : SignUpEvent()
+}

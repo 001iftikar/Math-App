@@ -1,0 +1,121 @@
+package com.example.mathapp.ui.goal
+
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.mathapp.data.ResultState
+import com.example.mathapp.domain.repository.SupabaseRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class SupabaseUserCreateViewModel @Inject constructor(
+    private val supabaseRepository: SupabaseRepository
+) : ViewModel() {
+    private val _createUserState = MutableStateFlow<SignUpUserState>(SignUpUserState())
+    val createUserState = _createUserState.asStateFlow()
+
+    private val _eventState: Channel<SignUpEvent> = Channel()
+    val eventState = _eventState.receiveAsFlow()
+
+    fun onEvent(event: SignUpEvent) {
+        when(event) {
+            is SignUpEvent.EnterEmail -> {
+                _createUserState.update {
+                    it.copy(email = event.email)
+                }
+            }
+            is SignUpEvent.EnterName -> {
+                _createUserState.update {
+                    it.copy(name = event.name)
+                }
+            }
+            is SignUpEvent.EnterPassword -> {
+                _createUserState.update {
+                    it.copy(password = event.password)
+                }
+            }
+            is SignUpEvent.PasswordVisibilityChange -> {
+                _createUserState.update {
+                    it.copy(
+                        isPasswordVisible = !it.isPasswordVisible
+                    )
+                }
+            }
+
+            is SignUpEvent.PasswordError -> {
+                if (_createUserState.value.password.length < 6) {
+                    _createUserState.update {
+                        it.copy(
+                            passwordError = event.passwordError
+                        )
+                    }
+                } else {
+                    _createUserState.update {
+                        it.copy(
+                            passwordError = null
+                        )
+                    }
+                }
+            }
+            else -> {}
+        }
+    }
+    fun signUp() {
+        viewModelScope.launch {
+            supabaseRepository.signUp(
+                emailValue = _createUserState.value.email,
+                passwordValue = _createUserState.value.password,
+                name = _createUserState.value.name
+            ).collect { supabaseOperation ->
+                supabaseOperation.onSuccess {user ->
+                   viewModelScope.launch(Dispatchers.IO) {
+                       _eventState.send(
+                           SignUpEvent.Success(userId = user.userId)
+                       )
+                   }
+                }.onFailure { exception ->
+                    _createUserState.update {
+                        it.copy(
+                            error = exception.message
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

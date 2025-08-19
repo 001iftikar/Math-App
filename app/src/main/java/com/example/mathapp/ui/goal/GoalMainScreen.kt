@@ -1,122 +1,192 @@
 package com.example.mathapp.ui.goal
 
-import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.providers.builtin.Email
-import io.github.jan.supabase.createSupabaseClient
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.mathapp.ui.components.LoginBackgroundComponent
+import com.example.mathapp.ui.components.TextFieldComponent
+import com.example.mathapp.ui.theme.Orange
+import com.example.mathapp.ui.theme.PurpleGrey40
 
 @Composable
-fun GoalMainScreen() {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var resultMessage by remember { mutableStateOf<String?>(null) }
-    val coroutineScope = rememberCoroutineScope()
-    Scaffold { innperPadding ->
+fun GoalMainScreen(
+    supabaseUserCreateViewModel: SupabaseUserCreateViewModel = hiltViewModel()
+) {
+    val context = LocalContext.current
+    val state by supabaseUserCreateViewModel.createUserState.collectAsState()
+    val eventState by supabaseUserCreateViewModel.eventState.collectAsState(initial = SignUpEvent.Idle)
+    val onEvent = supabaseUserCreateViewModel::onEvent
+
+    LaunchedEffect(eventState) {
+        when (eventState) {
+            is SignUpEvent.Success -> {
+                Toast
+                    .makeText(
+                        context,
+                        (eventState as SignUpEvent.Success).userId,
+                        Toast.LENGTH_LONG
+                    )
+                    .show()
+            }
+
+            else -> {}
+        }
+    }
+
+    Scaffold { innerPadding ->
+        LoginBackgroundComponent(
+            modifier = Modifier.fillMaxSize()
+        )
         Column(
-            modifier = Modifier.padding(innperPadding)
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                "Log in sign up will be here",
+
+            TextFieldComponent(
+                modifier = Modifier.padding(all = 8.dp),
+                value = state.email,
+                label = "Enter email",
+                labelColor = PurpleGrey40,
+                onValueChange = {
+                    onEvent(
+                        SignUpEvent.EnterEmail(it)
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Email,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                },
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black.copy(alpha = 0.6f),
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = Orange
             )
 
-            TextField(
-                value = email,
-                onValueChange = {email = it}
+            TextFieldComponent(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                value = state.password,
+                label = "Enter password",
+                labelColor = Orange.copy(alpha = 0.6f),
+                onValueChange = {
+                    onEvent(SignUpEvent.EnterPassword(it))
+
+                    onEvent(SignUpEvent.PasswordError("Password must at least have 6 characters"))
+
+                },
+                supportingText = {
+                    Text(
+                        state.passwordError ?: "",
+                        color = Color.Red
+
+                    )
+                },
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black.copy(alpha = 0.6f),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Password,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                },
+                trailingIcon = {
+                    val icon =
+                        if (state.isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility
+                    IconButton(
+                        onClick = {
+                            onEvent(SignUpEvent.PasswordVisibilityChange)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = if (state.isPasswordVisible) Color.Red else Color.Green
+                        )
+                    }
+
+                },
+                visualTransformation = if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = Orange
             )
 
-            TextField(
-                value = password,
-                onValueChange = {password = it}
+            TextFieldComponent(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                value = state.name,
+                label = "Enter name",
+                labelColor = Orange.copy(alpha = 0.6f),
+                onValueChange = {
+                    onEvent(SignUpEvent.EnterName(it))
+                },
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black.copy(alpha = 0.6f),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                },
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = Orange
             )
+
 
             Button(
                 onClick = {
-                    coroutineScope.launch {
-                        TestAuthManager().signin(
-                            emailValue = email,
-                            passwordValue = password,
-                        ).collect { result ->
-                            when (result) {
-                                is TestResult.Success -> resultMessage = "Sign up successful!"
-                                is TestResult.Error -> resultMessage =
-                                    result.message ?: "Unknown error"
-                            }
-                        }
-                    }
+                    supabaseUserCreateViewModel.signUp()
                 }
             ) {
                 Text("Go")
             }
 
-            resultMessage?.let {
-                Text(it)
-            }
         }
-
     }
 }
 
-sealed interface TestResult {
-    data object Success : TestResult
-    data class Error(val message: String?) : TestResult
-}
 
-class TestAuthManager(
-) {
-    private val supabase = createSupabaseClient(
-        supabaseUrl = "https://ieuvzjskuopzrpfbiuae.supabase.co",
-        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlldXZ6anNrdW9wenJwZmJpdWFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI4MjEwODYsImV4cCI6MjA2ODM5NzA4Nn0.Ir2L0E8lT5PDjRvM-QPDJXn8jVjN8VuRw7JPmYL0ITc",
-    ) {
-        install(Auth)
-    }
-
-    fun signUp(emailValue: String, passwordValue: String): Flow<TestResult> = flow {
-        try {
-            supabase.auth.signUpWith(Email) {
-                email = emailValue
-                password = passwordValue
-            }
-            Log.d("Supabase", "signUp: Success")
-            emit(TestResult.Success)
-        } catch (e: Exception) {
-            Log.e("Supabase", "signUp: ${e.localizedMessage}")
-            emit(TestResult.Error(e.localizedMessage))
-        }
-    }
-
-    fun signin(emailValue: String, passwordValue: String): Flow<TestResult> = flow {
-        try {
-            supabase.auth.signInWith(Email) {
-                email = emailValue
-                password = passwordValue
-            }
-            Log.d("Supabase", "signIn: Success")
-            emit(TestResult.Success)
-        } catch (e: Exception) {
-            Log.e("Supabase", "signIn: ${e.localizedMessage}")
-            emit(TestResult.Error(e.localizedMessage))
-        }
-    }
-
-}
 
 
 
