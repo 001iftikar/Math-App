@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ElevatedCard
@@ -122,7 +123,11 @@ fun HomeScreen(navHostController: NavHostController) {
                         }
                     )
                 }
-                item { DepartmentAchievements() }
+
+                item { Goals {
+                    navHostController.navigate(Routes.GoalMainScreen)
+                } }
+
             }
         }
     }
@@ -232,23 +237,6 @@ private fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
     }
 }
 
-@Composable
-private fun DepartmentAchievements() {
-    val context = LocalContext.current
-    ElevatedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        onClick = {
-            Toast.makeText(context, "This feature will be added soon", Toast.LENGTH_LONG).show()
-        }
-    ) {
-        Text(
-            "Department Achievements",
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-    }
-}
 
 @Composable
 private fun SecondLayer(goToStudySmart: () -> Unit,
@@ -335,3 +323,41 @@ private fun SecondLayer(goToStudySmart: () -> Unit,
         }
     }
 }
+
+@Composable
+private fun Goals(
+    onClick: () -> Unit
+) {
+    Card(
+        onClick = onClick
+    ) {
+        Text("Goal")
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

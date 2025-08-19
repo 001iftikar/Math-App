@@ -44,6 +44,12 @@ android {
 }
 
 dependencies {
+//    // Supabase
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.2.2"))
+//    //implementation("io.github.jan-tennert.supabase:postgrest-kt")
+//    implementation("io.github.jan-tennert.supabase:auth-kt:3.2.2")
+    implementation("io.github.jan-tennert.supabase:auth-kt:3.2.2")
+    implementation("io.ktor:ktor-client-android:3.2.3")
 
     // pdf
     implementation("com.github.mhiew:android-pdf-viewer:3.2.0-beta.3")
@@ -55,6 +61,7 @@ dependencies {
     implementation ("androidx.constraintlayout:constraintlayout-compose:1.1.1")
 
     //Room
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.21")
     implementation("androidx.room:room-runtime:2.7.2")
     implementation(libs.material)
     ksp("androidx.room:room-compiler:2.7.2")

@@ -42,4 +42,8 @@ sealed class Routes {
     // Routes for Ai
     @Serializable
     object ChatBotScreen
+
+    // Routes for Goals
+    @Serializable
+    object GoalMainScreen
 }
