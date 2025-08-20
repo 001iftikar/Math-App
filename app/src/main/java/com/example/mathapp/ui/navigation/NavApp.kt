@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.mathapp.ui.chatbot.ChatBotScreen
+import com.example.mathapp.ui.goal.redirecting_screen.RedirectingScreen
 import com.example.mathapp.ui.goal.sign_in_up_screens.GoalSignInScreen
 import com.example.mathapp.ui.goal.sign_in_up_screens.GoalSignUpScreen
 import com.example.mathapp.ui.home.HomeScreen
@@ -135,7 +136,11 @@ fun NavApp(ketch: Ketch) {
         }
 
         composable<Routes.GoalSignInScreen> {
-            GoalSignInScreen()
+            GoalSignInScreen(navHostController = navController)
+        }
+
+        composable<Routes.RedirectingScreen> {
+            RedirectingScreen()
         }
     }
 

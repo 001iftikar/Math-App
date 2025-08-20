@@ -2,6 +2,7 @@ package com.example.mathapp.domain.repository
 
 import com.example.mathapp.data.SupabaseOperation
 import com.example.mathapp.domain.model.SupabaseUser
+import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.coroutines.flow.Flow
 
 interface SupabaseRepository {
@@ -9,5 +10,5 @@ interface SupabaseRepository {
 
     fun signIn(emailValue: String, passwordValue: String): Flow<SupabaseOperation<SupabaseUser>>
 
-    suspend fun checkUserLogin(): Boolean
+    fun loadUserSession(): Flow<SupabaseOperation<UserSession>>
 }

@@ -34,15 +34,18 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.mathapp.ui.components.LoginBackgroundComponent
 import com.example.mathapp.ui.components.TextFieldComponent
+import com.example.mathapp.ui.navigation.Routes
 import com.example.mathapp.ui.theme.Orange
 import com.example.mathapp.ui.theme.PurpleGrey40
 
 
 @Composable
 fun GoalSignInScreen(
-    supabaseUserCreateViewModel: SupabaseUserCreateViewModel = hiltViewModel()
+    supabaseUserCreateViewModel: SupabaseUserCreateViewModel = hiltViewModel(),
+    navHostController: NavHostController
 ) {
     val context = LocalContext.current
     val state by supabaseUserCreateViewModel.createUserState.collectAsState()
@@ -53,15 +56,8 @@ fun GoalSignInScreen(
     LaunchedEffect(eventState) {
         when (eventState) {
             is SignUpEvent.Success -> {
-                Toast
-                    .makeText(
-                        context,
-                        (eventState as SignUpEvent.Success).userId,
-                        Toast.LENGTH_LONG
-                    )
-                    .show()
+                navHostController.navigate(Routes.RedirectingScreen)
             }
-
             else -> {}
         }
     }

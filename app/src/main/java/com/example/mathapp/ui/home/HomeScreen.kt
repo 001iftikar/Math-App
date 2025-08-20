@@ -31,25 +31,34 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.example.mathapp.R
+import com.example.mathapp.shared.SupabaseSessionViewModel
 import com.example.mathapp.ui.components.DrawerItem
 import com.example.mathapp.ui.navigation.Routes
 import com.example.mathapp.utils.ColorHex.toColor
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(navHostController: NavHostController) {
+fun HomeScreen(
+    supabaseSessionViewModel: SupabaseSessionViewModel = hiltViewModel(),
+    navHostController: NavHostController) {
+    val supabaseSession by supabaseSessionViewModel.userSessionState.collectAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val urlHandler = LocalUriHandler.current
+
+    val user = supabaseSession.userSession
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -122,7 +131,8 @@ fun HomeScreen(navHostController: NavHostController) {
                 }
 
                 item { Goals {
-                    navHostController.navigate(Routes.GoalSignInScreen)
+                    val route = if (user != null) Routes.RedirectingScreen else Routes.GoalSignUpScreen
+                    navHostController.navigate(route)
                 } }
             }
         }

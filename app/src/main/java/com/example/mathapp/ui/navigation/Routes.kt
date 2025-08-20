@@ -49,4 +49,7 @@ sealed class Routes {
 
     @Serializable
     object GoalSignInScreen
+
+    @Serializable
+    object RedirectingScreen
 }

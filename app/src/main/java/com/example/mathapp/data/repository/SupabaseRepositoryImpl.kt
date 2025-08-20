@@ -7,6 +7,7 @@ import com.example.mathapp.domain.repository.SupabaseRepository
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.buildJsonObject
@@ -113,7 +114,45 @@ class SupabaseRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun loadUserSession(): Flow<SupabaseOperation<UserSession>> = flow {
+        try {
+            val result = supabaseClient.auth.sessionManager.loadSession()
+            val session = result?.takeIf {
+                it.user != null
+            }
 
+            if (session != null) {
+                emit(SupabaseOperation.Success(data = session))
+            } else {
+                emit(SupabaseOperation.Failure(NullPointerException("Session not found")))
+            }
+
+        } catch (e: Exception) {
+            emit(SupabaseOperation.Failure(e))
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
