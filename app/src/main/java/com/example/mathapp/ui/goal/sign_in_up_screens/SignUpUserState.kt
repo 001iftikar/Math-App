@@ -1,4 +1,4 @@
-package com.example.mathapp.ui.goal
+package com.example.mathapp.ui.goal.sign_in_up_screens
 
 data class SignUpUserState(
     val email: String = "",

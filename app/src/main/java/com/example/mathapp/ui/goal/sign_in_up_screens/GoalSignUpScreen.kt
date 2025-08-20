@@ -1,4 +1,4 @@
-package com.example.mathapp.ui.goal
+package com.example.mathapp.ui.goal.sign_in_up_screens
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable

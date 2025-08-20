@@ -1,9 +1,7 @@
-package com.example.mathapp.ui.goal
+package com.example.mathapp.ui.goal.sign_in_up_screens
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mathapp.data.ResultState
 import com.example.mathapp.domain.repository.SupabaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -141,6 +139,44 @@ class SupabaseUserCreateViewModel @Inject constructor(
                            SignUpEvent.Success(userId = user.userId)
                        )
                    }
+                }.onFailure { exception ->
+                    _createUserState.update {
+                        it.copy(
+                            error = exception.message,
+                            isLoading = false
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun signIn() {
+        viewModelScope.launch {
+            _createUserState.update {
+                it.copy(
+                    isLoading = true,
+                    error = null
+                )
+            }
+            supabaseRepository.signIn(
+                emailValue = _createUserState.value.email,
+                passwordValue = _createUserState.value.password
+            ).collect { supabaseOperation ->
+                supabaseOperation.onSuccess { user ->
+                    _createUserState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+
+                    viewModelScope.launch(Dispatchers.IO) {
+                        _eventState.send(
+                            SignUpEvent.Success(
+                                userId = user.userId
+                            )
+                        )
+                    }
                 }.onFailure { exception ->
                     _createUserState.update {
                         it.copy(

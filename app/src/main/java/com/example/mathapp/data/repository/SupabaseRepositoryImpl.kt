@@ -1,7 +1,6 @@
 package com.example.mathapp.data.repository
 
 import android.util.Log
-import com.example.mathapp.data.ResultState
 import com.example.mathapp.data.SupabaseOperation
 import com.example.mathapp.domain.model.SupabaseUser
 import com.example.mathapp.domain.repository.SupabaseRepository
@@ -66,26 +65,55 @@ class SupabaseRepositoryImpl @Inject constructor(
                 e.localizedMessage?.contains("validation_failed", ignoreCase = true) == true -> {
                     emit(SupabaseOperation.Failure(Exception("Please provide a valid email!")))
                 }
+
                 else -> {
                     emit(SupabaseOperation.Failure(Exception("Some error occurred!")))
                 }
             }
         }
-        }
+    }
 
     override fun signIn(
         emailValue: String,
         passwordValue: String
     ): Flow<SupabaseOperation<SupabaseUser>> = flow {
         try {
-            val result = supabaseClient.auth.signInWith(Email) {
+            supabaseClient.auth.signInWith(Email) {
                 email = emailValue
                 password = passwordValue
             }
-        } catch (e: Exception) {
 
+            val user = supabaseClient.auth.currentUserOrNull()
+            val name = user?.userMetadata
+                ?.get("display_name")
+                ?.jsonPrimitive
+                ?.contentOrNull
+            if (user != null) {
+                val supabaseUser = SupabaseUser(
+                    userId = user.id,
+                    email = user.email ?: "",
+                    name = name ?: "User"
+                )
+                emit(SupabaseOperation.Success(data = supabaseUser))
+            } else {
+                emit(SupabaseOperation.Failure(NullPointerException("Log in failed")))
+            }
+        } catch (e: IOException) {
+            emit(SupabaseOperation.Failure(Exception("Please check your internet connection")))
+        } catch (e: Exception) {
+            when {
+                e.localizedMessage?.contains("invalid_credentials", ignoreCase = true) == true -> {
+                    emit(SupabaseOperation.Failure(Exception("Invalid email or password.")))
+                }
+
+                else -> {
+                    emit(SupabaseOperation.Failure(Exception("Some error happened!")))
+                }
+            }
         }
     }
-    }
+
+
+}
 
 

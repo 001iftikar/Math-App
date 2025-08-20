@@ -8,4 +8,6 @@ interface SupabaseRepository {
     fun signUp(emailValue: String, passwordValue: String, name: String): Flow<SupabaseOperation<SupabaseUser>>
 
     fun signIn(emailValue: String, passwordValue: String): Flow<SupabaseOperation<SupabaseUser>>
+
+    suspend fun checkUserLogin(): Boolean
 }

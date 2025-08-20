@@ -45,5 +45,8 @@ sealed class Routes {
 
     // Routes for Goals
     @Serializable
-    object GoalMainScreen
+    object GoalSignUpScreen
+
+    @Serializable
+    object GoalSignInScreen
 }
