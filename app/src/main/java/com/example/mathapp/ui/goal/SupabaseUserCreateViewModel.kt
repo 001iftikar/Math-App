@@ -65,17 +65,77 @@ class SupabaseUserCreateViewModel @Inject constructor(
                     }
                 }
             }
+
+            is SignUpEvent.EmailEmptyError -> {
+                if (_createUserState.value.email.isEmpty()) {
+                    _createUserState.update {
+                        it.copy(
+                            emailEmptyError = event.emailEmptyError
+                        )
+                    }
+                } else {
+                    _createUserState.update {
+                        it.copy(
+                            emailEmptyError = null
+                        )
+                    }
+                }
+            }
+
+            is SignUpEvent.PasswordEmptyError -> {
+                if (_createUserState.value.password.isEmpty()) {
+                    _createUserState.update {
+                        it.copy(
+                            passwordEmptyError = event.passwordEmptyError
+                        )
+                    }
+                } else {
+                    _createUserState.update {
+                        it.copy(
+                            passwordEmptyError = null
+                        )
+                    }
+                }
+            }
+
+            is SignUpEvent.NameEmptyError -> {
+                if (_createUserState.value.name.isEmpty()) {
+                    _createUserState.update {
+                        it.copy(
+                            nameEmptyError = event.nameEmptyError
+                        )
+                    }
+                } else {
+                    _createUserState.update {
+                        it.copy(
+                            nameEmptyError = null
+                        )
+                    }
+                }
+            }
+
             else -> {}
         }
     }
     fun signUp() {
         viewModelScope.launch {
+            _createUserState.update {
+                it.copy(
+                    isLoading = true,
+                    error = null
+                )
+            }
             supabaseRepository.signUp(
                 emailValue = _createUserState.value.email,
                 passwordValue = _createUserState.value.password,
                 name = _createUserState.value.name
             ).collect { supabaseOperation ->
                 supabaseOperation.onSuccess {user ->
+                    _createUserState.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
                    viewModelScope.launch(Dispatchers.IO) {
                        _eventState.send(
                            SignUpEvent.Success(userId = user.userId)
@@ -84,7 +144,8 @@ class SupabaseUserCreateViewModel @Inject constructor(
                 }.onFailure { exception ->
                     _createUserState.update {
                         it.copy(
-                            error = exception.message
+                            error = exception.message,
+                            isLoading = false
                         )
                     }
                 }

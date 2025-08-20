@@ -10,7 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.mathapp.ui.chatbot.ChatBotScreen
-import com.example.mathapp.ui.goal.GoalMainScreen
+import com.example.mathapp.ui.goal.GoalSignUpScreen
 import com.example.mathapp.ui.home.HomeScreen
 import com.example.mathapp.ui.study.BookPdfViewer
 import com.example.mathapp.ui.study.BooksByPaperScreen
@@ -130,7 +130,7 @@ fun NavApp(ketch: Ketch) {
         }
 
         composable<Routes.GoalMainScreen> {
-            GoalMainScreen()
+            GoalSignUpScreen()
         }
     }
 

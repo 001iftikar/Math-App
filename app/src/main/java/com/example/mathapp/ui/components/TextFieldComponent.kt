@@ -13,7 +13,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 fun TextFieldComponent(
     modifier: Modifier = Modifier,
     value: String,
-    label: String,
+    label: String? = null,
     onValueChange: (String) -> Unit,
     labelColor: Color = Color.Unspecified,
     supportingText: @Composable (() -> Unit)? = null,
@@ -34,7 +34,11 @@ fun TextFieldComponent(
         OutlinedTextField(
             value = value,
             onValueChange = { onValueChange(it) },
-            label = { Text(label, color = labelColor) },
+            label = {
+                if (label != null) {
+                    Text(label, color = labelColor)
+                }
+            },
             modifier = modifier.fillMaxWidth(),
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,

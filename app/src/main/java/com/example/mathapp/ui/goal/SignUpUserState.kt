@@ -6,5 +6,10 @@ data class SignUpUserState(
     val name: String = "",
     val isPasswordVisible: Boolean = false,
     var passwordError: String? = null,
-    val error: String? = null
+    val passwordEmptyError: String? = null,
+    val emailEmptyError: String? = null,
+    val nameEmptyError: String? = null,
+    val buttonText: String = "Sign up",
+    val error: String? = null,
+    val isLoading: Boolean = false
 )

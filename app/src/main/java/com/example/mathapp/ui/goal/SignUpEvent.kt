@@ -8,4 +8,8 @@ sealed class SignUpEvent {
     data class Success(val userId: String) : SignUpEvent()
     object PasswordVisibilityChange : SignUpEvent()
     data class PasswordError(val passwordError: String) : SignUpEvent()
+
+    data class PasswordEmptyError(val passwordEmptyError: String) : SignUpEvent()
+    data class EmailEmptyError(val emailEmptyError: String) : SignUpEvent()
+    data class NameEmptyError(val nameEmptyError: String) : SignUpEvent()
 }

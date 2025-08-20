@@ -63,50 +63,29 @@ class SupabaseRepositoryImpl @Inject constructor(
                     emit(SupabaseOperation.Failure(Exception("This email is already registered.")))
                 }
 
-                e.localizedMessage?.contains("invalid_credentials", ignoreCase = true) == true -> {
-                    emit(SupabaseOperation.Failure(Exception("Invalid email or password.")))
+                e.localizedMessage?.contains("validation_failed", ignoreCase = true) == true -> {
+                    emit(SupabaseOperation.Failure(Exception("Please provide a valid email!")))
                 }
                 else -> {
-                    emit(SupabaseOperation.Failure(Exception("Unexpected error: ${e.localizedMessage}")))
+                    emit(SupabaseOperation.Failure(Exception("Some error occurred!")))
                 }
             }
         }
         }
+
+    override fun signIn(
+        emailValue: String,
+        passwordValue: String
+    ): Flow<SupabaseOperation<SupabaseUser>> = flow {
+        try {
+            val result = supabaseClient.auth.signInWith(Email) {
+                email = emailValue
+                password = passwordValue
+            }
+        } catch (e: Exception) {
+
+        }
+    }
     }
 
-//    override fun signIn(
-//        emailValue: String,
-//        passwordValue: String
-//    ): Flow<ResultState<String>> = flow {
-//        try {
-//            val result = supabaseClient.auth.signUpWith(Email) {
-//                email = emailValue
-//                password = passwordValue
-//            }
-//            val userId = result?.id
-//            if (userId != null) {
-//                emit(ResultState.Success(userId))
-//            } else {
-//                emit(ResultState.Error(NullPointerException("Sign in not successful")))
-//            }
-//        } catch (e: IOException) {
-//            Log.e("Supabase-Repo", "signUp: IO Exception: ${e.localizedMessage}")
-//            emit(ResultState.Error(IOException("Network error, please check your connection.")))
-//        } catch (e: Exception) {
-//            Log.e("Supabase-Repo", "signUp: Exception: ${e.localizedMessage}")
-//
-//            when {
-//                e.localizedMessage?.contains("user_already_exists", ignoreCase = true) == true -> {
-//                    emit(ResultState.Error(Exception("This email is already registered.")))
-//                }
-//
-//                e.localizedMessage?.contains("invalid_credentials", ignoreCase = true) == true -> {
-//                    emit(ResultState.Error(Exception("Invalid email or password.")))
-//                }
-//
-//                else -> {
-//                    emit(ResultState.Error(Exception("Unexpected error: ${e.localizedMessage}")))
-//                }
-//            }
-//        }
-//    }
+
