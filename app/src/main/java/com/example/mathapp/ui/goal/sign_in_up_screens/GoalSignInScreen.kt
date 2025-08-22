@@ -1,6 +1,5 @@
 package com.example.mathapp.ui.goal.sign_in_up_screens
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -47,7 +45,6 @@ fun GoalSignInScreen(
     supabaseUserCreateViewModel: SupabaseUserCreateViewModel = hiltViewModel(),
     navHostController: NavHostController
 ) {
-    val context = LocalContext.current
     val state by supabaseUserCreateViewModel.createUserState.collectAsState()
     val eventState by supabaseUserCreateViewModel.eventState.collectAsState(initial = SignUpEvent.Idle)
     val onEvent = supabaseUserCreateViewModel::onEvent
@@ -56,7 +53,12 @@ fun GoalSignInScreen(
     LaunchedEffect(eventState) {
         when (eventState) {
             is SignUpEvent.Success -> {
-                navHostController.navigate(Routes.RedirectingScreen)
+                navHostController.navigate(Routes.DashboardScreen) {
+                    popUpTo<Routes.GoalSignUpScreen> {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
             }
             else -> {}
         }
@@ -186,7 +188,7 @@ fun GoalSignInScreen(
                     } else if (state.error != null) {
                         "Try again!"
                     } else {
-                        state.buttonText
+                       "Log in"
                     }
                 )
             }
@@ -202,7 +204,12 @@ fun GoalSignInScreen(
                 Text("Create an account", color = Color.Green,
                     modifier = Modifier.clickable(
                         onClick = {
-
+                            navHostController.navigate(Routes.GoalSignUpScreen) {
+                                popUpTo<Routes.GoalSignUpScreen> {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
                         }
                     ))
 

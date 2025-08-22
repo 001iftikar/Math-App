@@ -5,7 +5,7 @@ sealed class SignUpEvent {
     data class EnterEmail(val email: String) : SignUpEvent()
     data class EnterPassword(val password: String) : SignUpEvent()
     data class EnterName(val name: String) : SignUpEvent()
-    data class Success(val userId: String) : SignUpEvent()
+    data object Success : SignUpEvent()
     object PasswordVisibilityChange : SignUpEvent()
     data class PasswordError(val passwordError: String) : SignUpEvent()
 

@@ -1,6 +1,5 @@
 package com.example.mathapp.ui.goal.sign_in_up_screens
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,21 +29,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.mathapp.ui.components.LoginBackgroundComponent
 import com.example.mathapp.ui.components.TextFieldComponent
+import com.example.mathapp.ui.navigation.Routes
 import com.example.mathapp.ui.theme.Orange
 import com.example.mathapp.ui.theme.PurpleGrey40
 
 @Composable
 fun GoalSignUpScreen(
-    supabaseUserCreateViewModel: SupabaseUserCreateViewModel = hiltViewModel()
+    supabaseUserCreateViewModel: SupabaseUserCreateViewModel = hiltViewModel(),
+    navHostController: NavHostController
 ) {
-    val context = LocalContext.current
     val state by supabaseUserCreateViewModel.createUserState.collectAsState()
     val eventState by supabaseUserCreateViewModel.eventState.collectAsState(initial = SignUpEvent.Idle)
     val onEvent = supabaseUserCreateViewModel::onEvent
@@ -53,13 +53,12 @@ fun GoalSignUpScreen(
     LaunchedEffect(eventState) {
         when (eventState) {
             is SignUpEvent.Success -> {
-                Toast
-                    .makeText(
-                        context,
-                        (eventState as SignUpEvent.Success).userId,
-                        Toast.LENGTH_LONG
-                    )
-                    .show()
+                navHostController.navigate(Routes.DashboardScreen) {
+                    popUpTo<Routes.GoalSignUpScreen> {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
             }
 
             else -> {}
@@ -233,13 +232,18 @@ fun GoalSignUpScreen(
                 Text("Already have an account?", color = Color.Green.copy(alpha = 0.8f))
                 Spacer(Modifier.width(4.dp))
 
-                Text("Log in", color = Color.Green,
+                Text(
+                    "Log in", color = Color.Green,
                     modifier = Modifier.clickable(
                         onClick = {
-
+                            navHostController.navigate(Routes.GoalSignInScreen) {
+                                popUpTo<Routes.GoalSignInScreen> {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
                         }
                     ))
-
             }
 
             Text(

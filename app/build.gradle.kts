@@ -44,12 +44,15 @@ android {
 }
 
 dependencies {
-//    // Supabase
+    // Supabase
     implementation(platform("io.github.jan-tennert.supabase:bom:3.2.2"))
-//    //implementation("io.github.jan-tennert.supabase:postgrest-kt")
-//    implementation("io.github.jan-tennert.supabase:auth-kt:3.2.2")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:3.2.2")
+
     implementation("io.github.jan-tennert.supabase:auth-kt:3.2.2")
     implementation("io.ktor:ktor-client-android:3.2.3")
+
+    // date time
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
     // pdf
     implementation("com.github.mhiew:android-pdf-viewer:3.2.0-beta.3")
@@ -58,7 +61,7 @@ dependencies {
     // Download manager
     implementation("com.github.khushpanchal:Ketch:2.0.5")
 
-    implementation ("androidx.constraintlayout:constraintlayout-compose:1.1.1")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.1")
 
     //Room
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.21")

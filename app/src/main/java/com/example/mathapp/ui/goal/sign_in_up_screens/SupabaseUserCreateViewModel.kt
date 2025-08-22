@@ -2,7 +2,7 @@ package com.example.mathapp.ui.goal.sign_in_up_screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mathapp.domain.repository.SupabaseRepository
+import com.example.mathapp.domain.repository.SupabaseAuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SupabaseUserCreateViewModel @Inject constructor(
-    private val supabaseRepository: SupabaseRepository
+    private val supabaseRepository: SupabaseAuthRepository
 ) : ViewModel() {
     private val _createUserState = MutableStateFlow<SignUpUserState>(SignUpUserState())
     val createUserState = _createUserState.asStateFlow()
@@ -136,7 +136,7 @@ class SupabaseUserCreateViewModel @Inject constructor(
                     }
                    viewModelScope.launch(Dispatchers.IO) {
                        _eventState.send(
-                           SignUpEvent.Success(userId = user.userId)
+                           SignUpEvent.Success
                        )
                    }
                 }.onFailure { exception ->
@@ -172,9 +172,7 @@ class SupabaseUserCreateViewModel @Inject constructor(
 
                     viewModelScope.launch(Dispatchers.IO) {
                         _eventState.send(
-                            SignUpEvent.Success(
-                                userId = user.userId
-                            )
+                            SignUpEvent.Success
                         )
                     }
                 }.onFailure { exception ->

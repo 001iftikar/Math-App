@@ -51,5 +51,8 @@ sealed class Routes {
     object GoalSignInScreen
 
     @Serializable
-    object RedirectingScreen
+    object DashboardScreen
+
+    @Serializable
+    object AddGoalScreen
 }

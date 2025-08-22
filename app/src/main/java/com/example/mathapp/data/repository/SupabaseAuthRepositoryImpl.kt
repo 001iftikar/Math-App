@@ -3,7 +3,7 @@ package com.example.mathapp.data.repository
 import android.util.Log
 import com.example.mathapp.data.SupabaseOperation
 import com.example.mathapp.domain.model.SupabaseUser
-import com.example.mathapp.domain.repository.SupabaseRepository
+import com.example.mathapp.domain.repository.SupabaseAuthRepository
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -17,9 +17,9 @@ import kotlinx.serialization.json.put
 import okio.IOException
 import javax.inject.Inject
 
-class SupabaseRepositoryImpl @Inject constructor(
+class SupabaseAuthRepositoryImpl @Inject constructor(
     private val supabaseClient: SupabaseClient
-) : SupabaseRepository {
+) : SupabaseAuthRepository {
     override fun signUp(
         emailValue: String,
         passwordValue: String,

@@ -1,5 +1,6 @@
 package com.example.mathapp.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -36,7 +37,8 @@ fun TextFieldComponent(
             onValueChange = { onValueChange(it) },
             label = {
                 if (label != null) {
-                    Text(label, color = labelColor)
+                    Text(label, color = labelColor,
+                        )
                 }
             },
             modifier = modifier.fillMaxWidth(),

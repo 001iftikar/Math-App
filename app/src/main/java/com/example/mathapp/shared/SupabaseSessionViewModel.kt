@@ -2,8 +2,8 @@ package com.example.mathapp.shared
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mathapp.domain.repository.SupabaseRepository
-import com.example.mathapp.ui.goal.redirecting_screen.RedirectingScreenState
+import com.example.mathapp.domain.repository.SupabaseAuthRepository
+import com.example.mathapp.ui.goal.dashboard_screen.DashboardScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,9 +13,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SupabaseSessionViewModel @Inject constructor(
-    private val supabaseRepository: SupabaseRepository
+    private val supabaseRepository: SupabaseAuthRepository
 ) : ViewModel() {
-    private val _userSessionState = MutableStateFlow(RedirectingScreenState())
+    private val _userSessionState = MutableStateFlow(DashboardScreenState())
     val userSessionState = _userSessionState.asStateFlow()
 
     init {

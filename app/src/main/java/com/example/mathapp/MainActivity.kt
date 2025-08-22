@@ -8,6 +8,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.mathapp.ui.goal.dashboard_screen.DashBoardScreen
+import com.example.mathapp.ui.goal.insert_goal_screen.AddGoalScreen
 import com.example.mathapp.ui.navigation.NavApp
 import com.example.mathapp.ui.theme.MathAppTheme
 import com.ketch.DownloadConfig
@@ -20,6 +22,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var ketch: Ketch
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         if (ContextCompat.checkSelfPermission(
             this,
             android.Manifest.permission.POST_NOTIFICATIONS
@@ -51,7 +54,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MathAppTheme {
-                NavApp(ketch)
+//                NavApp(ketch)
+                DashBoardScreen()
             }
         }
     }
