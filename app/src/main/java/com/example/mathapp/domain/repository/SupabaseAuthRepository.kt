@@ -1,6 +1,6 @@
 package com.example.mathapp.domain.repository
 
-import com.example.mathapp.data.SupabaseOperation
+import com.example.mathapp.data.remote.SupabaseOperation
 import com.example.mathapp.domain.model.SupabaseUser
 import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.coroutines.flow.Flow

@@ -4,12 +4,13 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.mathapp.ui.goal.dashboard_screen.DashBoardScreen
-import com.example.mathapp.ui.goal.insert_goal_screen.AddGoalScreen
 import com.example.mathapp.ui.navigation.NavApp
 import com.example.mathapp.ui.theme.MathAppTheme
 import com.ketch.DownloadConfig
@@ -51,11 +52,12 @@ class MainActivity : ComponentActivity() {
                 )
             )
             .build(this)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.Transparent.toArgb())
+        )
         setContent {
-            MathAppTheme {
-//                NavApp(ketch)
-                DashBoardScreen()
+            MathAppTheme(darkTheme = true, dynamicColor = false) {
+                NavApp(ketch)
             }
         }
     }

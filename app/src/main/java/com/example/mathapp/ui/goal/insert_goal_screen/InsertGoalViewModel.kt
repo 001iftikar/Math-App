@@ -3,7 +3,7 @@ package com.example.mathapp.ui.goal.insert_goal_screen
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mathapp.data.remote.GoalRequestDto
+import com.example.mathapp.data.remote.model.GoalRequestDto
 import com.example.mathapp.domain.repository.UserGoalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel

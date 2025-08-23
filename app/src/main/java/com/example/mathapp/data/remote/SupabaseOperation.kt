@@ -1,4 +1,4 @@
-package com.example.mathapp.data
+package com.example.mathapp.data.remote
 
 sealed interface SupabaseOperation<T> {
     data class Success<T>(val data: T) : SupabaseOperation<T>

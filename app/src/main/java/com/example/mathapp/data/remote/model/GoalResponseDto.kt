@@ -1,17 +1,17 @@
-package com.example.mathapp.data.remote
+package com.example.mathapp.data.remote.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class GoalResponseDto(
-    val id: String,  // uuid → String
+    val id: String,
     @SerialName("created_at")
-    val createdAt: String,  // timestamp with time zone → ISO 8601 string
+    val createdAt: String,
     val title: String,
     val description: String,
     @SerialName("end_by")
-    val endBy: String? = null,  // nullable timestamp → String?
+    val endBy: String,
     @SerialName("is_completed")
     val isCompleted: Boolean,
     @SerialName("user_id")

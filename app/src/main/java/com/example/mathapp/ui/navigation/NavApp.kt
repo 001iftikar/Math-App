@@ -141,7 +141,9 @@ fun NavApp(ketch: Ketch) {
         }
 
         composable<Routes.DashboardScreen> {
-            DashBoardScreen()
+            DashBoardScreen(
+                navHostController = navController
+            )
         }
 
         composable<Routes.AddGoalScreen> {

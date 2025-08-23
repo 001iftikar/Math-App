@@ -1,12 +1,10 @@
 package com.example.mathapp.domain.model
 
-import kotlinx.datetime.LocalDateTime
-
 data class GoalModel (
     val id: String,
-    val createdAt: LocalDateTime,
+    val createdAt: String,
     val title: String,
     val description: String,
-    val endBy: LocalDateTime,
+    val endBy: String,
     val isCompleted: Boolean
 )

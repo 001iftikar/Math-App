@@ -67,6 +67,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.21")
     implementation("androidx.room:room-runtime:2.7.2")
     implementation(libs.material)
+    implementation(libs.androidx.animation.core)
     ksp("androidx.room:room-compiler:2.7.2")
     implementation("androidx.room:room-ktx:2.7.2")
 

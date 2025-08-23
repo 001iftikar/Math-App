@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.mathapp.domain.repository.SupabaseAuthRepository
 import com.example.mathapp.ui.goal.dashboard_screen.DashboardScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -15,7 +16,7 @@ import javax.inject.Inject
 class SupabaseSessionViewModel @Inject constructor(
     private val supabaseRepository: SupabaseAuthRepository
 ) : ViewModel() {
-    private val _userSessionState = MutableStateFlow(DashboardScreenState())
+    private val _userSessionState = MutableStateFlow(SupabaseSessionState())
     val userSessionState = _userSessionState.asStateFlow()
 
     init {
@@ -38,3 +39,7 @@ class SupabaseSessionViewModel @Inject constructor(
         }
     }
 }
+
+data class SupabaseSessionState(
+    val userSession: UserSession? = null
+)

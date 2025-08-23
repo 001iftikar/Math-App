@@ -1,7 +1,7 @@
 package com.example.mathapp.data.repository
 
 import android.util.Log
-import com.example.mathapp.data.SupabaseOperation
+import com.example.mathapp.data.remote.SupabaseOperation
 import com.example.mathapp.domain.model.SupabaseUser
 import com.example.mathapp.domain.repository.SupabaseAuthRepository
 import io.github.jan.supabase.SupabaseClient
