@@ -5,8 +5,10 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -17,42 +19,44 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,8 +65,8 @@ import androidx.navigation.NavHostController
 import com.example.mathapp.domain.model.GoalModel
 import com.example.mathapp.ui.components.BlackBackGround
 import com.example.mathapp.ui.components.GoalTopAppBarComp
-import com.example.mathapp.ui.navigation.Routes
-import com.example.mathapp.ui.navigation.Routes.*
+import com.example.mathapp.ui.navigation.Routes.AddGoalScreen
+import com.example.mathapp.ui.navigation.Routes.SpecificGoalScreen
 import com.example.mathapp.ui.theme.GoalCardColor
 import com.example.mathapp.utils.FAB_EXPLODE_BOUNDS_KEY
 
@@ -107,7 +111,7 @@ fun SharedTransitionScope.DashBoardScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navHostController.navigate(Routes.AddGoalScreen)
+                    navHostController.navigate(AddGoalScreen)
                 },
                 modifier = Modifier
                     .sharedBounds(
@@ -173,30 +177,90 @@ fun SharedTransitionScope.DashBoardScreen(
         }
     }
 }
-
 @Composable
 private fun GoalList(
     modifier: Modifier = Modifier,
     goals: List<GoalModel>,
     onClick: (String) -> Unit
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        items(goals) {goal ->
-            HorizontalDivider(modifier = Modifier.fillMaxWidth(),
-                color = Color(0xFF0D0B1E))
-            GoalItem(
-                goalTitle = goal.title,
-                goalDescription = goal.description,
-                endBy = goal.endBy,
-                onClick = {onClick(goal.id)}
+    val listState = rememberLazyListState()
+
+    Box(modifier = modifier) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 4.dp),
+            state = listState
+        ) {
+            items(items = goals, key = { it.id }) { goal ->
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color(0xFF0D0B1E)
+                )
+                GoalItem(
+                    goalTitle = goal.title,
+                    goalDescription = goal.description,
+                    endBy = goal.endBy,
+                    onClick = { onClick(goal.id) }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color(0xFF0D0B1E)
+                )
+            }
+        }
+
+        // Overlay scrollbar
+        val totalItems = goals.size
+        val firstVisible = listState.firstVisibleItemIndex
+        val offset = listState.firstVisibleItemScrollOffset
+
+        // Use viewport fraction instead of hard-coded dp
+        val scrollProgress = remember(firstVisible, offset, totalItems) {
+            if (totalItems == 0) 0f
+            else {
+                // Approximate fractional scroll progress
+                val visibleItems = listState.layoutInfo.visibleItemsInfo.size.coerceAtLeast(1)
+                (firstVisible + offset / 1000f) / (totalItems - visibleItems).coerceAtLeast(1)
+            }
+        }
+
+        val animatedProgress by animateFloatAsState(
+            targetValue = scrollProgress.coerceIn(0f, 1f),
+            animationSpec = tween(durationMillis = 250, easing = LinearOutSlowInEasing)
+        )
+
+        // Scrollbar track
+        var trackHeightPx by remember { mutableStateOf(0) }
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .fillMaxHeight()
+                .width(8.dp)
+                .background(Color.LightGray.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
+                .onGloballyPositioned { coordinates ->
+                    trackHeightPx = coordinates.size.height
+                }
+        ) {
+            // Scrollbar thumb
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .padding(2.dp)
+                    .offset {
+                        IntOffset(
+                            x = 0,
+                            y = (animatedProgress * (trackHeightPx - 80.dp.roundToPx())).toInt()
+                        )
+                    }
+                    .height(80.dp)
+                    .background(GoalCardColor, RoundedCornerShape(4.dp))
             )
-            HorizontalDivider(modifier = Modifier.fillMaxWidth(),
-                color = Color(0xFF0D0B1E))
         }
     }
 }
+
 
 @Composable
 fun GoalItem(
@@ -214,7 +278,7 @@ fun GoalItem(
         ElevatedCard(
             modifier = Modifier.background(
                 color = GoalCardColor,
-                   shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp)
             ),
             elevation = CardDefaults.elevatedCardElevation(
                 defaultElevation = 50.dp

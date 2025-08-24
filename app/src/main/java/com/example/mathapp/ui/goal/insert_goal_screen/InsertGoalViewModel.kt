@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.mathapp.data.remote.model.GoalRequestDto
 import com.example.mathapp.domain.repository.UserGoalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -26,7 +28,7 @@ class InsertGoalViewModel @Inject constructor(
     val eventState = _eventState.receiveAsFlow()
 
     fun onEvent(event: AddGoalScreenEvent) {
-        when(event) {
+        when (event) {
             is AddGoalScreenEvent.EnterTitle -> {
                 _insertGoalState.update {
                     it.copy(title = event.title)
@@ -50,7 +52,8 @@ class InsertGoalViewModel @Inject constructor(
 
             AddGoalScreenEvent.OnPickDateButtonClick -> {
                 _insertGoalState.update {
-                    it.copy(isDatePickerOpen = true
+                    it.copy(
+                        isDatePickerOpen = true
                     )
                 }
             }
@@ -70,6 +73,15 @@ class InsertGoalViewModel @Inject constructor(
                     )
                 }
             }
+
+            AddGoalScreenEvent.OnDialogDismissRequest -> {
+                _insertGoalState.update {
+                    it.copy(
+                        isDialogOpen = false
+                    )
+                }
+            }
+            else -> Unit
         }
     }
 
@@ -85,8 +97,23 @@ class InsertGoalViewModel @Inject constructor(
             ).collect { supabaseOperation ->
                 supabaseOperation.onSuccess {
                     Log.d("Goal-View", "insertGoal: $it")
+                    viewModelScope.launch(Dispatchers.IO) {
+                        _insertGoalState.update {state ->
+                            state.copy(isDialogOpen = true, goalAddMessage = it)
+                        }
+                        delay(1500L)
+                        _insertGoalState.update { state ->
+                            state.copy(
+                                isDialogOpen = false, goalAddMessage = ""
+                            )
+                        }
+                        _eventState.send(
+                            AddGoalScreenEvent.OnAddedSuccess
+                        )
+                    }
+
                 }.onFailure { exception ->
-                    Log.e("Goal-View-Error", "insertGoal: ${exception.message}", )
+                    Log.e("Goal-View-Error", "insertGoal: ${exception.message}")
                 }
             }
         }
