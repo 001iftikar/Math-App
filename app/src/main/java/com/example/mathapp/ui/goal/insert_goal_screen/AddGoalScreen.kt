@@ -45,6 +45,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddGoalScreen(
+    modifier: Modifier,
     insertGoalViewModel: InsertGoalViewModel = hiltViewModel(),
     navHostController: NavHostController
 ) {
@@ -56,7 +57,7 @@ fun AddGoalScreen(
     val onEvent = insertGoalViewModel::onEvent
 
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) { innerPadding ->
         DarkGradientBackground {
             AddGoalLayer(

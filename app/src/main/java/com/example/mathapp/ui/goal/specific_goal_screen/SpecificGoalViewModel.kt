@@ -1,4 +1,4 @@
-package com.example.mathapp.ui.goal.dashboard_screen
+package com.example.mathapp.ui.goal.specific_goal_screen
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -14,44 +14,44 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DashboardViewModel @Inject constructor(
+class SpecificGoalViewModel @Inject constructor(
     private val userGoalRepository: UserGoalRepository
 ) : ViewModel() {
 
-    private val _goalsState = MutableStateFlow(DashboardScreenState())
-    val goalState = _goalsState.asStateFlow()
+    private val _specificGoalState = MutableStateFlow(SpecificGoalScreenState())
+    val specificGoalState = _specificGoalState.asStateFlow()
 
-    private val _dashboardEvent: Channel<DashboardEvent> = Channel()
-    val dashboardEvent = _dashboardEvent.receiveAsFlow()
+    private val _specificGoalEvent: Channel<SpecificGoalEvent> = Channel()
+    val specificGoalEvent = _specificGoalEvent.receiveAsFlow()
 
-    init {
-        getAllGoals()
-    }
-
-    fun onEvent(event: DashboardEvent) {
+    fun onEvent(event: SpecificGoalEvent) {
         when(event) {
-            DashboardEvent.Refresh -> getAllGoals()
-            is DashboardEvent.NavigateToSpecificGoal -> navigateToSpecificGoal(event.goalId)
-            DashboardEvent.NavigateBack -> navigateBack()
+           is SpecificGoalEvent.GetSpecificGoal -> {
+                getSpecificGoal(event.goalId)
+            }
+            SpecificGoalEvent.NavigateBack -> navigateBack()
             else -> Unit
         }
     }
-    private fun getAllGoals() {
-        _goalsState.update {
+
+    private fun getSpecificGoal(goalId: String) {
+        _specificGoalState.update {
             it.copy(isLoading = true, error = null)
         }
+
         viewModelScope.launch {
-            userGoalRepository.getAllGoals().collect { supabaseOperation ->
-                supabaseOperation.onSuccess {goals ->
-                    _goalsState.update {
+            userGoalRepository.getSpecificGoal(goalId).collect { supabaseOperation ->
+                supabaseOperation.onSuccess { goalModel ->
+                    _specificGoalState.update {
                         it.copy(
                             isLoading = false,
-                            goals = goals,
+                            goalModel = goalModel,
                             error = null
                         )
                     }
+                    Log.d("Goal-View", "getSpecificGoal: $goalModel")
                 }.onFailure { exception ->
-                    _goalsState.update {
+                    _specificGoalState.update {
                         it.copy(
                             isLoading = false,
                             error = exception.message
@@ -62,15 +62,34 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    private fun navigateToSpecificGoal(goalId: String) {
-        viewModelScope.launch {
-            _dashboardEvent.send(DashboardEvent.NavigateToSpecificGoal(goalId))
-        }
-    }
-
     private fun navigateBack() {
         viewModelScope.launch {
-            _dashboardEvent.send(DashboardEvent.NavigateBack)
+            _specificGoalEvent.send(SpecificGoalEvent.NavigateBack)
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

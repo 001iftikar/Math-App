@@ -55,4 +55,7 @@ sealed class Routes {
 
     @Serializable
     object AddGoalScreen
+
+    @Serializable
+    data class SpecificGoalScreen(val goalId: String)
 }

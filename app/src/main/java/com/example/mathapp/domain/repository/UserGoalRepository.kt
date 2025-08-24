@@ -9,4 +9,6 @@ interface UserGoalRepository {
     suspend fun insertGoal(goalRequestDto: GoalRequestDto): Flow<SupabaseOperation<String>>
     fun getAllGoals(): Flow<SupabaseOperation<List<GoalModel>>>
 
+    fun getSpecificGoal(goalId: String): Flow<SupabaseOperation<GoalModel>>
+
 }

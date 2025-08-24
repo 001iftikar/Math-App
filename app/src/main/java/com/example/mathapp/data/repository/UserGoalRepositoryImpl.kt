@@ -71,4 +71,53 @@ class UserGoalRepositoryImpl @Inject constructor(
             emit(SupabaseOperation.Failure(Exception("Error occurred!")))
         }
     }
+
+    override fun getSpecificGoal(goalId: String): Flow<SupabaseOperation<GoalModel>> = flow{
+        try {
+            val goal = supabaseClient.postgrest[SupabaseConstants.GOAL_TABLE]
+                .select {
+                    filter {
+                        eq("id", goalId)
+                    }
+                }
+                .decodeSingle<GoalResponseDto>()
+            emit(SupabaseOperation.Success(
+                data = goal.toGoalModel()
+            ))
+
+        } catch (e: HttpRequestException) {
+            Log.e("Goal-Repo-Http", "getAGoal: ${e.localizedMessage}")
+            emit(SupabaseOperation.Failure(Exception("Please check your internet connection!")))
+        } catch (e: IOException) {
+            Log.e("Goal-Repo-IO", "getAGoal: ${e.localizedMessage}")
+            emit(SupabaseOperation.Failure(Exception("Error getting Goal!")))
+        } catch (e: Exception) {
+            Log.e("Goal-Repo-all", "getAGoal: ${e.localizedMessage}")
+            emit(SupabaseOperation.Failure(Exception("Error occurred!")))
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

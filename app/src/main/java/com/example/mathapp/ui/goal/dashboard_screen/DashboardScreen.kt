@@ -1,5 +1,9 @@
 package com.example.mathapp.ui.goal.dashboard_screen
 
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -21,17 +25,26 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,26 +59,70 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.mathapp.domain.model.GoalModel
-import com.example.mathapp.ui.components.TopAppBarNavIcon
-import com.example.mathapp.utils.SupabaseTimeCast.formattedTimestampZ
+import com.example.mathapp.ui.components.BlackBackGround
+import com.example.mathapp.ui.components.GoalTopAppBarComp
+import com.example.mathapp.ui.navigation.Routes
+import com.example.mathapp.ui.navigation.Routes.*
+import com.example.mathapp.ui.theme.GoalCardColor
+import com.example.mathapp.utils.FAB_EXPLODE_BOUNDS_KEY
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun DashBoardScreen(
+fun SharedTransitionScope.DashBoardScreen(
     dashboardViewModel: DashboardViewModel = hiltViewModel(),
+    animatedVisibilityScope: AnimatedVisibilityScope,
     navHostController: NavHostController
 ) {
 
     val state = dashboardViewModel.goalState.collectAsStateWithLifecycle()
-
+    val dashboardEvent by dashboardViewModel.dashboardEvent.collectAsState(DashboardEvent.Idle)
     val onEvent = dashboardViewModel::onEvent
+
+    LaunchedEffect(dashboardEvent) {
+        when(val event = dashboardEvent) { // To avoid casting using 'as'
+            is DashboardEvent.NavigateToSpecificGoal -> {
+                navHostController.navigate(SpecificGoalScreen(event.goalId))
+            }
+            DashboardEvent.NavigateBack -> {
+                navHostController.popBackStack()
+            }
+            else -> Unit
+        }
+    }
+
+    LaunchedEffect(state) {
+        Log.d("Goal-Refresh", "DashBoardScreen: Refresh")
+        onEvent(DashboardEvent.Refresh)
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = { Text("Goals") }
-            )
+            GoalTopAppBarComp(title = "Goals",
+                onClick = {
+                    onEvent(DashboardEvent.NavigateBack)
+                })
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    navHostController.navigate(Routes.AddGoalScreen)
+                },
+                modifier = Modifier
+                    .sharedBounds(
+                        sharedContentState = rememberSharedContentState(
+                            key = FAB_EXPLODE_BOUNDS_KEY
+                        ),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    ),
+                containerColor = Color(0xFF0D0B1E)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add item"
+                )
+            }
         }
     ) { innerPadding ->
         BlackBackGround {
@@ -73,15 +130,22 @@ fun DashBoardScreen(
                 state.value.goals != null -> {
                     if (state.value.goals != null) {
                         GoalList(
-                            modifier = Modifier.fillMaxSize().padding(innerPadding),
-                            goals = state.value.goals!!
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding),
+                            goals = state.value.goals!!,
+                            onClick = {
+                                onEvent(DashboardEvent.NavigateToSpecificGoal(it))
+                            }
                         )
                     }
                 }
 
                 state.value.isLoading -> {
                     LoadingList(
-                        modifier = Modifier.fillMaxSize().padding(innerPadding)
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
                     )
                 }
 
@@ -113,7 +177,8 @@ fun DashBoardScreen(
 @Composable
 private fun GoalList(
     modifier: Modifier = Modifier,
-    goals: List<GoalModel>
+    goals: List<GoalModel>,
+    onClick: (String) -> Unit
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth()
@@ -124,17 +189,14 @@ private fun GoalList(
             GoalItem(
                 goalTitle = goal.title,
                 goalDescription = goal.description,
-                endBy = goal.endBy.formattedTimestampZ(),
-                onClick = {}
+                endBy = goal.endBy,
+                onClick = {onClick(goal.id)}
             )
             HorizontalDivider(modifier = Modifier.fillMaxWidth(),
                 color = Color(0xFF0D0B1E))
         }
     }
 }
-
-
-
 
 @Composable
 fun GoalItem(
@@ -144,13 +206,14 @@ fun GoalItem(
     onClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(6.dp)
             .clickable(onClick = onClick)
     ) {
         ElevatedCard(
             modifier = Modifier.background(
-                color = Color(0xFF0D0B1E),
+                color = GoalCardColor,
                    shape = RoundedCornerShape(12.dp)
             ),
             elevation = CardDefaults.elevatedCardElevation(
@@ -194,17 +257,6 @@ fun GoalItem(
 }
 
 
-@Composable
-private fun BlackBackGround(
-    content: @Composable () -> Unit
-) {
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .background(Color.Black)
-    ) {
-        content()
-    }
-}
 
 @Composable
 fun GoalItemShimmer(
