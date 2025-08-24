@@ -194,7 +194,7 @@ private fun GoalList(
         ) {
             items(items = goals, key = { it.id }) { goal ->
                 HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(end = 4.dp),
                     color = Color(0xFF0D0B1E)
                 )
                 GoalItem(
@@ -204,7 +204,7 @@ private fun GoalList(
                     onClick = { onClick(goal.id) }
                 )
                 HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(end = 4.dp),
                     color = Color(0xFF0D0B1E)
                 )
             }
