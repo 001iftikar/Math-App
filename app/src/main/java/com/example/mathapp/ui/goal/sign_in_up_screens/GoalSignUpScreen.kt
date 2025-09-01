@@ -53,7 +53,7 @@ fun GoalSignUpScreen(
     LaunchedEffect(eventState) {
         when (eventState) {
             is SignUpEvent.Success -> {
-                navHostController.navigate(Routes.UnfinishedGoalScreen) {
+                navHostController.navigate(Routes.GoalHomeScreen) {
                     popUpTo<Routes.GoalSignUpScreen> {
                         inclusive = true
                     }

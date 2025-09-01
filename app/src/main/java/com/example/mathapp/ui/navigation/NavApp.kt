@@ -183,7 +183,7 @@ fun NavApp(ketch: Ketch) {
             }
 
             composable<Routes.ProfileScreen> {
-                ProfileScreen()
+                ProfileScreen(navHostController = navController)
             }
         }
     }

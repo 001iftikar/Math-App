@@ -53,7 +53,7 @@ fun GoalSignInScreen(
     LaunchedEffect(eventState) {
         when (eventState) {
             is SignUpEvent.Success -> {
-                navHostController.navigate(Routes.UnfinishedGoalScreen) {
+                navHostController.navigate(Routes.GoalHomeScreen) {
                     popUpTo<Routes.GoalSignUpScreen> {
                         inclusive = true
                     }
@@ -184,7 +184,7 @@ fun GoalSignInScreen(
             ) {
                 Text(
                     text = if (state.isLoading) {
-                        "Signing up"
+                        "Signing in..."
                     } else if (state.error != null) {
                         "Try again!"
                     } else {

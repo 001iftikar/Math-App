@@ -114,6 +114,16 @@ class SupabaseAuthRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun signOut(): SupabaseOperation<Unit> {
+        return try {
+            supabaseClient.auth.signOut()
+            SupabaseOperation.Success(Unit)
+        } catch (e: Exception) {
+            Log.e("Auth-Logout", e.localizedMessage ?: "unknown error" )
+            SupabaseOperation.Failure(Exception("please try again!"))
+        }
+    }
+
     override fun loadUserSession(): Flow<SupabaseOperation<UserSession>> = flow {
         try {
             val result = supabaseClient.auth.sessionManager.loadSession()
