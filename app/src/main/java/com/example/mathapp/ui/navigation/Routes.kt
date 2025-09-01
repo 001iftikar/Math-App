@@ -45,13 +45,15 @@ sealed class Routes {
 
     // Routes for Goals
     @Serializable
+    object GoalHomeScreen
+    @Serializable
     object GoalSignUpScreen
 
     @Serializable
     object GoalSignInScreen
 
     @Serializable
-    object DashboardScreen
+    object UnfinishedGoalScreen
 
     @Serializable
     object AddGoalScreen

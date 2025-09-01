@@ -27,20 +27,28 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -53,6 +61,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -69,19 +78,21 @@ import com.example.mathapp.ui.navigation.Routes.AddGoalScreen
 import com.example.mathapp.ui.navigation.Routes.SpecificGoalScreen
 import com.example.mathapp.ui.theme.GoalCardColor
 import com.example.mathapp.utils.FAB_EXPLODE_BOUNDS_KEY
+import com.example.mathapp.utils.SupabaseTimeCast.toEpochMillisFromFormatted
 
-
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SharedTransitionScope.DashBoardScreen(
     dashboardViewModel: DashboardViewModel = hiltViewModel(),
     animatedVisibilityScope: AnimatedVisibilityScope,
     navHostController: NavHostController
 ) {
-
     val state = dashboardViewModel.goalState.collectAsStateWithLifecycle()
     val dashboardEvent by dashboardViewModel.dashboardEvent.collectAsState(DashboardEvent.Idle)
     val onEvent = dashboardViewModel::onEvent
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    val listState = rememberLazyListState()
 
     LaunchedEffect(dashboardEvent) {
         when(val event = dashboardEvent) { // To avoid casting using 'as'
@@ -101,11 +112,21 @@ fun SharedTransitionScope.DashBoardScreen(
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             GoalTopAppBarComp(title = "Goals",
+                scrollBehavior = scrollBehavior,
                 onClick = {
                     onEvent(DashboardEvent.NavigateBack)
+                },
+                action = {
+                    DropDown(
+                        onClick = {
+                            onEvent(DashboardEvent.SortByEvent(sortBy = it))
+                        }
+                    )
                 })
         },
         floatingActionButton = {
@@ -133,11 +154,37 @@ fun SharedTransitionScope.DashBoardScreen(
             when {
                 state.value.goals != null -> {
                     if (state.value.goals != null) {
+                        val sortedList = when(state.value.sortBy) {
+                            SortBy.NAMEASC -> {
+                                state.value.goals!!.sortedBy {
+                                    it.title.lowercase()
+                                }
+                            }
+                            SortBy.NAMEDSC -> {
+                                state.value.goals!!.sortedByDescending {
+                                    it.title.lowercase()
+                                }
+                            }
+
+                            SortBy.CREATEDAT -> {
+                                state.value.goals!!.sortedBy {
+                                    it.createdAt.toEpochMillisFromFormatted()
+                                }
+                            }
+                            SortBy.ENDBY -> {
+                                state.value.goals!!.sortedBy {
+                                    it.endBy.toEpochMillisFromFormatted()
+                                }
+                            }
+                        }
+
+                        Log.d("Sorting", "DashBoardScreen: $sortedList")
                         GoalList(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(innerPadding),
-                            goals = state.value.goals!!,
+                            goals = sortedList,
+                            listState = listState,
                             onClick = {
                                 onEvent(DashboardEvent.NavigateToSpecificGoal(it))
                             }
@@ -177,14 +224,59 @@ fun SharedTransitionScope.DashBoardScreen(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DropDown(
+    onClick: (SortBy) -> Unit,
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = isExpanded,
+        onExpandedChange = {
+            isExpanded = it
+        }
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Default.Sort,
+            contentDescription = null,
+            modifier = Modifier.menuAnchor(
+                type = MenuAnchorType.PrimaryNotEditable,
+                enabled = true
+            )
+        )
+
+        ExposedDropdownMenu(
+            modifier = Modifier
+                .width(120.dp)
+            ,
+            expanded = isExpanded,
+            onDismissRequest = {isExpanded = false}
+        ) {
+            SortBy.entries.forEach {
+                DropdownMenuItem(
+                    text = {
+                        Text(it.title)
+                    },
+                    onClick = {
+                        onClick(it)
+                        isExpanded = false
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun GoalList(
     modifier: Modifier = Modifier,
     goals: List<GoalModel>,
+    listState: LazyListState,
     onClick: (String) -> Unit
 ) {
-    val listState = rememberLazyListState()
-
     Box(modifier = modifier) {
         LazyColumn(
             modifier = Modifier
@@ -192,9 +284,11 @@ private fun GoalList(
                 .padding(end = 4.dp),
             state = listState
         ) {
-            items(items = goals, key = { it.id }) { goal ->
+            items(items = goals) { goal -> // if I give key here, the scroll position changes when sorted, so it lags a little when scrolled after sorting
                 HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth().padding(end = 4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 4.dp),
                     color = Color(0xFF0D0B1E)
                 )
                 GoalItem(
@@ -204,7 +298,9 @@ private fun GoalList(
                     onClick = { onClick(goal.id) }
                 )
                 HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth().padding(end = 4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 4.dp),
                     color = Color(0xFF0D0B1E)
                 )
             }

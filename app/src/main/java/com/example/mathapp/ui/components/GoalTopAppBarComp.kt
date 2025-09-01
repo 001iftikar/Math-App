@@ -8,6 +8,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
@@ -15,13 +16,17 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun GoalTopAppBarComp(
     title: String,
-    onClick: () -> Unit
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    onClick: () -> Unit,
+    action: @Composable (() -> Unit)? = null
 ) {
     TopAppBar(
         title = { Text(title) },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Black
+            containerColor = Color.Transparent,
+            scrolledContainerColor = Color.Transparent
         ),
+        scrollBehavior = scrollBehavior,
         navigationIcon = {
             IconButton(
                 onClick = onClick
@@ -31,7 +36,9 @@ fun GoalTopAppBarComp(
                     contentDescription = null
                 )
             }
-
+        },
+        actions = {
+            action?.invoke()
         }
     )
 }

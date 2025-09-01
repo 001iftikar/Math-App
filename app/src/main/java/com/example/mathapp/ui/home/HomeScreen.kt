@@ -60,12 +60,11 @@ fun HomeScreen(
     val urlHandler = LocalUriHandler.current
 
     val user = supabaseSession.userSession
-    val route = if (user != null) Routes.DashboardScreen else Routes.GoalSignUpScreen
+    val route = if (user != null) Routes.GoalHomeScreen else Routes.GoalSignUpScreen
 
     LaunchedEffect(Unit) {
         supabaseSessionViewModel.loadUserSession() // state was not updating when logged in and then navigate back and then navigate to Goals Dashboard
     }
-
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -131,16 +130,11 @@ fun HomeScreen(
                 item {
                     SecondLayer(
                         goToStudySmart = {navHostController.navigate(Routes.StudySmartScreen)},
-                        goToAiChat = {
-                            navHostController.navigate(Routes.ChatBotScreen)
+                        goToGoals = {
+                            navHostController.navigate(route)
                         }
                     )
                 }
-
-                item { Goals {
-
-                    navHostController.navigate(route)
-                } }
             }
         }
     }
@@ -253,7 +247,7 @@ private fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
 
 @Composable
 private fun SecondLayer(goToStudySmart: () -> Unit,
-                goToAiChat: () -> Unit
+                        goToGoals: () -> Unit
                ) {
     Row(
         modifier = Modifier
@@ -313,22 +307,22 @@ private fun SecondLayer(goToStudySmart: () -> Unit,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 SubcomposeAsyncImage(
-                    model = R.drawable.ai_assistance,
+                    model = R.drawable.goal_per,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
                         .weight(1f)
                         .clickable(
-                            onClick = goToAiChat
+                            onClick = goToGoals
                         )
                 )
                 Text(
-                    text = "Ai",
+                    text = "Goals",
                     modifier = Modifier
                         .padding(8.dp)
                         .clickable(
-                            onClick = goToAiChat
+                            onClick = goToGoals
                         ),
                     style = MaterialTheme.typography.titleMedium,
                 )

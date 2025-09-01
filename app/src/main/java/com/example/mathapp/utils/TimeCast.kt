@@ -3,6 +3,7 @@ package com.example.mathapp.utils
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SelectableDates
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
@@ -41,6 +42,8 @@ object SupabaseTimeCast {
             .toString()
     }
 
+
+
     // TO DISPLAY THE SUPABASE FORMATTED DATE TO USER READABLE FORMAT
     fun String.formattedTimestampZ(): String {
         val instant = Instant.parse(this)
@@ -57,6 +60,26 @@ object SupabaseTimeCast {
         }
 
         return formatter.format(localDate)
+    }
+
+    fun String.toEpochMillisFromFormatted(): Long {
+        // Define the formatter for "22 Aug 2025"
+        val formatter = kotlinx.datetime.LocalDate.Format {
+            day(padding = Padding.ZERO)
+            char(' ')
+            monthName(MonthNames.ENGLISH_ABBREVIATED)
+            char(' ')
+            year()
+        }
+
+        // Parse the string to LocalDate
+        val localDate = formatter.parse(this)
+
+        // Convert LocalDate to LocalDateTime (midnight)
+        val localDateTime = localDate.atStartOfDayIn(TimeZone.currentSystemDefault())
+
+        // Return as epoch millis
+        return localDateTime.toEpochMilliseconds()
     }
 }
 

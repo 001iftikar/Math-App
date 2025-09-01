@@ -33,6 +33,15 @@ class DashboardViewModel @Inject constructor(
             DashboardEvent.Refresh -> getAllGoals()
             is DashboardEvent.NavigateToSpecificGoal -> navigateToSpecificGoal(event.goalId)
             DashboardEvent.NavigateBack -> navigateBack()
+
+            is DashboardEvent.SortByEvent -> {
+                _goalsState.update {
+                    it.copy(
+                        sortBy = event.sortBy
+                    )
+                }
+            }
+
             else -> Unit
         }
     }

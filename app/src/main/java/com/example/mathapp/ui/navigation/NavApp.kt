@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.mathapp.ui.chatbot.ChatBotScreen
 import com.example.mathapp.ui.goal.dashboard_screen.DashBoardScreen
+import com.example.mathapp.ui.goal.homescreen.GoalsHomeScreen
 import com.example.mathapp.ui.goal.insert_goal_screen.AddGoalScreen
 import com.example.mathapp.ui.goal.sign_in_up_screens.GoalSignInScreen
 import com.example.mathapp.ui.goal.sign_in_up_screens.GoalSignUpScreen
@@ -149,7 +150,13 @@ fun NavApp(ketch: Ketch) {
                 GoalSignInScreen(navHostController = navController)
             }
 
-            composable<Routes.DashboardScreen> {
+            composable<Routes.GoalHomeScreen> {
+                GoalsHomeScreen(
+                    navHostController = navController
+                )
+            }
+
+            composable<Routes.UnfinishedGoalScreen> {
                 DashBoardScreen(
                     navHostController = navController,
                     animatedVisibilityScope = this,

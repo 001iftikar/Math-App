@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.mathapp.ui.goal.homescreen.GoalsHomeScreen
 import com.example.mathapp.ui.navigation.NavApp
 import com.example.mathapp.ui.theme.MathAppTheme
 import com.ketch.DownloadConfig
@@ -58,6 +59,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MathAppTheme(darkTheme = true, dynamicColor = false) {
                 NavApp(ketch)
+//                GoalsHomeScreen()
             }
         }
     }
