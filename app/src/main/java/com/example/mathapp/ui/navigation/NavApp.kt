@@ -18,6 +18,7 @@ import com.example.mathapp.ui.chatbot.ChatBotScreen
 import com.example.mathapp.ui.goal.dashboard_screen.DashBoardScreen
 import com.example.mathapp.ui.goal.homescreen.GoalsHomeScreen
 import com.example.mathapp.ui.goal.insert_goal_screen.AddGoalScreen
+import com.example.mathapp.ui.goal.profile_screen.ProfileScreen
 import com.example.mathapp.ui.goal.sign_in_up_screens.GoalSignInScreen
 import com.example.mathapp.ui.goal.sign_in_up_screens.GoalSignUpScreen
 import com.example.mathapp.ui.goal.specific_goal_screen.SpecificGoalScreen
@@ -180,7 +181,10 @@ fun NavApp(ketch: Ketch) {
                 val goalId = it.toRoute<Routes.SpecificGoalScreen>().goalId
                 SpecificGoalScreen(goalId = goalId, navHostController = navController)
             }
+
+            composable<Routes.ProfileScreen> {
+                ProfileScreen()
+            }
         }
     }
-
 }

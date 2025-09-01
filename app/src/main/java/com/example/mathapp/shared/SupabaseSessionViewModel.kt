@@ -33,7 +33,11 @@ class SupabaseSessionViewModel @Inject constructor(
                         )
                     }
                 }.onFailure { exception ->
-                    // todo handle error
+                    _userSessionState.update {
+                        it.copy(
+                            error = exception.message
+                        )
+                    }
                 }
             }
         }
@@ -41,5 +45,6 @@ class SupabaseSessionViewModel @Inject constructor(
 }
 
 data class SupabaseSessionState(
-    val userSession: UserSession? = null
+    val userSession: UserSession? = null,
+    val error: String? = null
 )
