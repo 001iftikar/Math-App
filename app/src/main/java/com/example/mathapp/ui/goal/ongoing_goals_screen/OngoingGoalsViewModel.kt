@@ -1,6 +1,5 @@
-package com.example.mathapp.ui.goal.dashboard_screen
+package com.example.mathapp.ui.goal.ongoing_goals_screen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mathapp.domain.repository.UserGoalRepository
@@ -14,27 +13,27 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DashboardViewModel @Inject constructor(
+class OngoingGoalsViewModel @Inject constructor(
     private val userGoalRepository: UserGoalRepository
 ) : ViewModel() {
 
     private val _goalsState = MutableStateFlow(DashboardScreenState())
     val goalState = _goalsState.asStateFlow()
 
-    private val _dashboardEvent: Channel<DashboardEvent> = Channel()
-    val dashboardEvent = _dashboardEvent.receiveAsFlow()
+    private val _ongoingGoalsScreenEvent: Channel<OngoingGoalsScreenEvent> = Channel()
+    val dashboardEvent = _ongoingGoalsScreenEvent.receiveAsFlow()
 
     init {
         getAllGoals()
     }
 
-    fun onEvent(event: DashboardEvent) {
+    fun onEvent(event: OngoingGoalsScreenEvent) {
         when(event) {
-            DashboardEvent.Refresh -> getAllGoals()
-            is DashboardEvent.NavigateToSpecificGoal -> navigateToSpecificGoal(event.goalId)
-            DashboardEvent.NavigateBack -> navigateBack()
+            OngoingGoalsScreenEvent.Refresh -> getAllGoals()
+            is OngoingGoalsScreenEvent.NavigateToSpecificGoal -> navigateToSpecificGoal(event.goalId)
+            OngoingGoalsScreenEvent.NavigateBack -> navigateBack()
 
-            is DashboardEvent.SortByEvent -> {
+            is OngoingGoalsScreenEvent.SortByEvent -> {
                 _goalsState.update {
                     it.copy(
                         sortBy = event.sortBy
@@ -73,13 +72,13 @@ class DashboardViewModel @Inject constructor(
 
     private fun navigateToSpecificGoal(goalId: String) {
         viewModelScope.launch {
-            _dashboardEvent.send(DashboardEvent.NavigateToSpecificGoal(goalId))
+            _ongoingGoalsScreenEvent.send(OngoingGoalsScreenEvent.NavigateToSpecificGoal(goalId))
         }
     }
 
     private fun navigateBack() {
         viewModelScope.launch {
-            _dashboardEvent.send(DashboardEvent.NavigateBack)
+            _ongoingGoalsScreenEvent.send(OngoingGoalsScreenEvent.NavigateBack)
         }
     }
 }

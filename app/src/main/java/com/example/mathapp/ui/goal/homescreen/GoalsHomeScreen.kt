@@ -42,7 +42,7 @@ fun GoalsHomeScreen(
                         onFirstItemClick = {
                             navHostController.navigate(Routes.UnfinishedGoalScreen)
                         },
-                        onSecondItemClick = {}
+                        onSecondItemClick = {navHostController.navigate(Routes.FinishedGoalsScreen)}
                     )
 
                     Spacer(Modifier.height(8.dp))

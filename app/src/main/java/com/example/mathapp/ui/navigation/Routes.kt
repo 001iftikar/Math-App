@@ -63,4 +63,7 @@ sealed class Routes {
 
     @Serializable
     data object ProfileScreen
+
+    @Serializable
+    data object FinishedGoalsScreen
 }

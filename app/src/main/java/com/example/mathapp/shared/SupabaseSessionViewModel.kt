@@ -3,7 +3,6 @@ package com.example.mathapp.shared
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mathapp.domain.repository.SupabaseAuthRepository
-import com.example.mathapp.ui.goal.dashboard_screen.DashboardScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.coroutines.flow.MutableStateFlow

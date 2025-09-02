@@ -15,9 +15,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.mathapp.ui.chatbot.ChatBotScreen
-import com.example.mathapp.ui.goal.dashboard_screen.DashBoardScreen
+import com.example.mathapp.ui.goal.finished_goals_screen.FinishedGoalsScreen
 import com.example.mathapp.ui.goal.homescreen.GoalsHomeScreen
 import com.example.mathapp.ui.goal.insert_goal_screen.AddGoalScreen
+import com.example.mathapp.ui.goal.ongoing_goals_screen.OngoingGoalsScreen
 import com.example.mathapp.ui.goal.profile_screen.ProfileScreen
 import com.example.mathapp.ui.goal.sign_in_up_screens.GoalSignInScreen
 import com.example.mathapp.ui.goal.sign_in_up_screens.GoalSignUpScreen
@@ -158,7 +159,7 @@ fun NavApp(ketch: Ketch) {
             }
 
             composable<Routes.UnfinishedGoalScreen> {
-                DashBoardScreen(
+                OngoingGoalsScreen(
                     navHostController = navController,
                     animatedVisibilityScope = this,
                 )
@@ -180,6 +181,12 @@ fun NavApp(ketch: Ketch) {
             composable<Routes.SpecificGoalScreen> {
                 val goalId = it.toRoute<Routes.SpecificGoalScreen>().goalId
                 SpecificGoalScreen(goalId = goalId, navHostController = navController)
+            }
+
+            composable<Routes.FinishedGoalsScreen> {
+                FinishedGoalsScreen(
+                    navHostController = navController
+                )
             }
 
             composable<Routes.ProfileScreen> {
