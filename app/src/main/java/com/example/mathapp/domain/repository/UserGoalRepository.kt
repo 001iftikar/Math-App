@@ -6,7 +6,7 @@ import com.example.mathapp.domain.model.GoalModel
 import kotlinx.coroutines.flow.Flow
 
 interface UserGoalRepository {
-    suspend fun insertGoal(goalRequestDto: GoalRequestDto): Flow<SupabaseOperation<String>>
+    suspend fun upsertGoal(goalRequestDto: GoalRequestDto): Flow<SupabaseOperation<String>>
     fun getAllGoals(): Flow<SupabaseOperation<List<GoalModel>>>
 
     fun getSpecificGoal(goalId: String): Flow<SupabaseOperation<GoalModel>>

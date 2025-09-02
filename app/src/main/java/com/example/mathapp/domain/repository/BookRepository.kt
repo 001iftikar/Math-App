@@ -1,7 +1,7 @@
 package com.example.mathapp.domain.repository
 
-import com.example.mathapp.domain.model.Book
 import com.example.mathapp.data.ResultState
+import com.example.mathapp.domain.model.Book
 import kotlinx.coroutines.flow.Flow
 
 interface BookRepository {

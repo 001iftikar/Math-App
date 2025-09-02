@@ -1,8 +1,8 @@
 package com.example.mathapp.data.repository
 
+import com.example.mathapp.data.ResultState
 import com.example.mathapp.domain.model.Teacher
 import com.example.mathapp.domain.repository.TeacherRepository
-import com.example.mathapp.data.ResultState
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase

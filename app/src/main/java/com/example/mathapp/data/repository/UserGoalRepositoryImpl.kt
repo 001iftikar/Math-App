@@ -20,13 +20,13 @@ import javax.inject.Inject
 class UserGoalRepositoryImpl @Inject constructor(
     private val supabaseClient: SupabaseClient
 ) : UserGoalRepository {
-    override suspend fun insertGoal(goalRequestDto: GoalRequestDto): Flow<SupabaseOperation<String>> =
+    override suspend fun upsertGoal(goalRequestDto: GoalRequestDto): Flow<SupabaseOperation<String>> =
         flow {
             try {
                 val userId = supabaseClient.auth.currentUserOrNull()?.id
                 if (userId != null) {
                     val goal = goalRequestDto.copy(userId = userId)
-                    supabaseClient.postgrest[SupabaseConstants.GOAL_TABLE].insert(
+                    supabaseClient.postgrest[SupabaseConstants.GOAL_TABLE].upsert(
                         goal
                     )
                 }

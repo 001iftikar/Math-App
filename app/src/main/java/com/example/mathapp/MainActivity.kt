@@ -1,5 +1,6 @@
 package com.example.mathapp
 
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -7,18 +8,21 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.mathapp.ui.goal.homescreen.GoalsHomeScreen
-import com.example.mathapp.ui.navigation.NavApp
+import com.example.mathapp.presentation.navigation.NavApp
 import com.example.mathapp.ui.theme.MathAppTheme
 import com.ketch.DownloadConfig
 import com.ketch.Ketch
 import com.ketch.NotificationConfig
 import dagger.hilt.android.AndroidEntryPoint
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var ketch: Ketch
@@ -58,8 +62,11 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             MathAppTheme(darkTheme = true, dynamicColor = false) {
-                NavApp(ketch)
-//                GoalsHomeScreen()
+                Scaffold(
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
+                    NavApp(ketch)
+                }
             }
         }
     }

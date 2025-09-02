@@ -11,5 +11,7 @@ data class GoalRequestDto(
     val title: String = "",
     val description: String = "",
     @SerialName("end_by")
-    val endBy: String
+    val endBy: String = "",
+    @SerialName("is_completed")
+    val isCompleted: Boolean = false
 )

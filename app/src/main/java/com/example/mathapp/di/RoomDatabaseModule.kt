@@ -3,7 +3,6 @@ package com.example.mathapp.di
 import android.app.Application
 import androidx.room.Room
 import com.example.mathapp.data.local.AppLocalDatabase
-import com.example.mathapp.data.local.SessionDao
 import com.example.mathapp.data.local.SubjectDao
 import com.example.mathapp.data.local.TaskDao
 import dagger.Module
