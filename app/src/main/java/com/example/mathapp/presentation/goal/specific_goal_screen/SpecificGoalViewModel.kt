@@ -5,6 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mathapp.data.remote.model.GoalRequestDto
 import com.example.mathapp.domain.repository.UserGoalRepository
+import com.example.mathapp.presentation.navigation.Routes
+import com.example.mathapp.presentation.snackbar.SnackbarAction
+import com.example.mathapp.presentation.snackbar.SnackbarController
+import com.example.mathapp.presentation.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -90,8 +94,24 @@ class SpecificGoalViewModel @Inject constructor(
                 supabaseOperation
                     .onSuccess { text ->
                         _specificGoalState.update {
-                            it.copy(markAsCompletedMessage = "Mark as completed")
+                            it.copy(markAsCompletedMessage = "Awesome,you did it!" +
+                                    "\nYou deserve a celebration!" +
+                                    "\nTreat yourself with something good")
                         }
+
+                        this.launch {
+                            SnackbarController.sendEvent(
+                                event = SnackbarEvent(
+                                    message = _specificGoalState.value.markAsCompletedMessage,
+                                    action = SnackbarAction(
+                                        name = "Saved as Achieved",
+                                        route = Routes.FinishedGoalsScreen
+                                    )
+                                )
+                            )
+                        }
+
+                        navigateBack()
                     }
                     .onFailure { exception ->
                         _specificGoalState.update {

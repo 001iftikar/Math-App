@@ -10,9 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.mathapp.presentation.chatbot.ChatBotScreen
 import com.example.mathapp.presentation.goal.finished_goals_screen.FinishedGoalsScreen
@@ -41,8 +41,9 @@ import com.ketch.Ketch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun NavApp(ketch: Ketch) {
-    val navController = rememberNavController()
+fun NavApp(
+    navController: NavHostController,
+    ketch: Ketch) {
     SharedTransitionLayout {
         NavHost(
             navController = navController, startDestination = Routes.HomeScreenRoute,
