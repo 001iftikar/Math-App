@@ -10,7 +10,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -87,7 +86,7 @@ class MainActivity : ComponentActivity() {
                         val result = snackbarHostState.showSnackbar(
                             message = event.message,
                             actionLabel = event.action?.name,
-                            duration = SnackbarDuration.Long
+                            duration = event.duration
                         )
 
                         if (result == SnackbarResult.ActionPerformed) {

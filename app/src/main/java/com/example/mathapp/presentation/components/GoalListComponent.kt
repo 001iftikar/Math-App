@@ -27,7 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,7 +48,9 @@ fun GoalListComponent(
     modifier: Modifier = Modifier,
     goals: List<GoalModel>,
     listState: LazyListState,
-    onClick: ((String) -> Unit)? = null
+    onClick: ((String) -> Unit)? = null,
+    // to pass the goal id to the alert dialog confirm lambda, since I have to delete the goal without going to the specific screen where I could get the goal id easily
+    deleteIcon: @Composable ((goalId: String) -> Unit)? = null // catch the goal id here, then pass to the confirm lambda of the alert box
 ) {
     Box(modifier = modifier) {
         LazyColumn(
@@ -69,7 +71,8 @@ fun GoalListComponent(
                     goalDescription = goal.description,
                     endBy = goal.endBy,
                     clickable = onClick != null,
-                    onClick = { onClick?.invoke(goal.id) }
+                    onClick = { onClick?.invoke(goal.id) },
+                    deleteIcon = { deleteIcon?.invoke(goal.id) } // here we pass the goal id
                 )
                 HorizontalDivider(
                     modifier = Modifier
@@ -101,7 +104,7 @@ fun GoalListComponent(
         )
 
         // Scrollbar track
-        var trackHeightPx by remember { mutableStateOf(0) }
+        var trackHeightPx by remember { mutableIntStateOf(0) }
         Box(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
@@ -138,7 +141,8 @@ private fun GoalItem(
     goalDescription: String,
     endBy: String,
     clickable: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    deleteIcon: @Composable () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -146,25 +150,34 @@ private fun GoalItem(
             .padding(6.dp)
             .clickable(onClick = onClick, enabled = clickable)
     ) {
-        ElevatedCard(
-            modifier = Modifier.background(
-                color = GoalCardColor,
-                shape = RoundedCornerShape(12.dp)
-            ),
-            elevation = CardDefaults.elevatedCardElevation(
-                defaultElevation = 50.dp
-            ),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.Transparent, // to make the background color visible
-                contentColor = Color(0xDFFF5722)
-            )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = goalTitle,
-                modifier = Modifier.padding(vertical = 3.dp, horizontal = 5.dp),
-                style = MaterialTheme.typography.headlineMedium
-            )
+            ElevatedCard(
+                modifier = Modifier.background(
+                    color = GoalCardColor,
+                    shape = RoundedCornerShape(12.dp)
+                ),
+                elevation = CardDefaults.elevatedCardElevation(
+                    defaultElevation = 50.dp
+                ),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.Transparent, // to make the background color visible
+                    contentColor = Color(0xDFFF5722)
+                )
+            ) {
+                Text(
+                    text = goalTitle,
+                    modifier = Modifier.padding(vertical = 3.dp, horizontal = 5.dp),
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
+
+            deleteIcon()
         }
+
         Spacer(Modifier.height(12.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),

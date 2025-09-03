@@ -1,6 +1,7 @@
 package com.example.mathapp.presentation.goal.specific_goal_screen
 
 import android.util.Log
+import androidx.compose.material3.SnackbarDuration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mathapp.data.remote.model.GoalRequestDto
@@ -105,8 +106,9 @@ class SpecificGoalViewModel @Inject constructor(
                                     message = _specificGoalState.value.markAsCompletedMessage,
                                     action = SnackbarAction(
                                         name = "Saved as Achieved",
-                                        route = Routes.FinishedGoalsScreen
-                                    )
+                                        route = Routes.FinishedGoalsScreen,
+                                    ),
+                                    duration = SnackbarDuration.Long
                                 )
                             )
                         }

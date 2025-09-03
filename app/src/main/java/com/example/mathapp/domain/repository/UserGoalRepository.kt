@@ -11,4 +11,6 @@ interface UserGoalRepository {
 
     fun getSpecificGoal(goalId: String): Flow<SupabaseOperation<GoalModel>>
 
+    suspend fun deleteFinishedGoal(goalId: String): Flow<SupabaseOperation<String>>
+
 }

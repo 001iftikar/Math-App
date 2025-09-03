@@ -1,8 +1,11 @@
 package com.example.mathapp.presentation.goal.finished_goals_screen
 
+import androidx.compose.material3.SnackbarDuration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mathapp.domain.repository.UserGoalRepository
+import com.example.mathapp.presentation.snackbar.SnackbarController
+import com.example.mathapp.presentation.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +28,29 @@ class FinishedGoalsViewModel @Inject constructor(
     fun onEvent(event: FinishedGoalsScreenEvent) {
         when(event) {
             FinishedGoalsScreenEvent.Retry -> getUnfinishedGoals()
+            is FinishedGoalsScreenEvent.OnDeleteButtonClick -> {
+                _goalsState.update {
+                    it.copy(
+                        alertDialogState = true
+                    )
+                }
+            }
+
+            FinishedGoalsScreenEvent.OnDismissClick -> {
+                _goalsState.update {
+                    it.copy(
+                        alertDialogState = false
+                    )
+                }
+            }
+
+            is FinishedGoalsScreenEvent.OnDeleteConfirmClick -> {
+                deleteGoal(event.goalId)
+                _goalsState.update {
+                    it.copy(alertDialogState = false)
+                }
+                getUnfinishedGoals()
+            }
         }
     }
 
@@ -49,6 +75,23 @@ class FinishedGoalsViewModel @Inject constructor(
                             it.copy(isLoading = false, error = exception.message)
                         }
                     }
+            }
+        }
+    }
+
+    private fun deleteGoal(goalId: String) {
+        viewModelScope.launch {
+            goalRepository.deleteFinishedGoal(goalId).collect { supabaseOperation ->
+                supabaseOperation.onSuccess {
+                    this.launch(Dispatchers.IO) {
+                        SnackbarController.sendEvent(
+                            event = SnackbarEvent(
+                                message = it,
+                                duration = SnackbarDuration.Short
+                            )
+                        )
+                    }
+                }
             }
         }
     }

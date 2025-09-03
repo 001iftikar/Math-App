@@ -96,6 +96,20 @@ class UserGoalRepositoryImpl @Inject constructor(
             emit(SupabaseOperation.Failure(Exception("Error occurred!")))
         }
     }
+
+    override suspend fun deleteFinishedGoal(goalId: String): Flow<SupabaseOperation<String>> = flow {
+        try {
+            supabaseClient.postgrest[SupabaseConstants.GOAL_TABLE]
+                .delete {
+                    filter {
+                        GoalRequestDto::id eq goalId
+                    }
+                }
+            emit(SupabaseOperation.Success("Goal deleted"))
+        } catch (e: Exception) {
+            emit(SupabaseOperation.Failure(Exception("Operation not failed!")))
+        }
+    }
 }
 
 
