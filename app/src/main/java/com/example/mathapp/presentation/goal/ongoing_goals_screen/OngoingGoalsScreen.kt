@@ -145,6 +145,16 @@ fun SharedTransitionScope.OngoingGoalsScreen(
                                 }
                             }
                         }
+                        if (state.value.goals!!.isEmpty()) {
+                            Column(
+                                modifier = Modifier.fillMaxSize()
+                                    .padding(innerPadding),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text("You currently have no goals, add some")
+                            }
+                        }
                         GoalListComponent(
                             modifier = Modifier
                                 .fillMaxSize()

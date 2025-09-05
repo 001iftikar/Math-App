@@ -3,6 +3,7 @@ package com.example.mathapp.di
 import com.example.mathapp.data.repository.BookRepositoryImpl
 import com.example.mathapp.data.repository.PaperRepositoryImpl
 import com.example.mathapp.data.repository.SessionRepositoryImpl
+import com.example.mathapp.data.repository.SharedGoalRepositoryImpl
 import com.example.mathapp.data.repository.SubjectRepositoryImpl
 import com.example.mathapp.data.repository.SupabaseAuthRepositoryImpl
 import com.example.mathapp.data.repository.TaskRepositoryImpl
@@ -11,6 +12,7 @@ import com.example.mathapp.data.repository.UserGoalRepositoryImpl
 import com.example.mathapp.domain.repository.BookRepository
 import com.example.mathapp.domain.repository.PaperRepository
 import com.example.mathapp.domain.repository.SessionRepository
+import com.example.mathapp.domain.repository.SharedGoalRepository
 import com.example.mathapp.domain.repository.SubjectRepository
 import com.example.mathapp.domain.repository.SupabaseAuthRepository
 import com.example.mathapp.domain.repository.TaskRepository
@@ -56,4 +58,8 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindUserGoalRepository(impl: UserGoalRepositoryImpl): UserGoalRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindSharedGoalRepository(impl: SharedGoalRepositoryImpl): SharedGoalRepository
 }

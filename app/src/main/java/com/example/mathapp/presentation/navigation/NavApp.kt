@@ -20,6 +20,7 @@ import com.example.mathapp.presentation.goal.homescreen.GoalsHomeScreen
 import com.example.mathapp.presentation.goal.insert_goal_screen.AddGoalScreen
 import com.example.mathapp.presentation.goal.ongoing_goals_screen.OngoingGoalsScreen
 import com.example.mathapp.presentation.goal.profile_screen.ProfileScreen
+import com.example.mathapp.presentation.goal.shared_goals.group.GroupViewModel
 import com.example.mathapp.presentation.goal.sign_in_up_screens.GoalSignInScreen
 import com.example.mathapp.presentation.goal.sign_in_up_screens.GoalSignUpScreen
 import com.example.mathapp.presentation.goal.specific_goal_screen.SpecificGoalScreen
@@ -154,6 +155,7 @@ fun NavApp(
             }
 
             composable<Routes.GoalHomeScreen> {
+                val viewModel: GroupViewModel = hiltViewModel()
                 GoalsHomeScreen(
                     navHostController = navController
                 )

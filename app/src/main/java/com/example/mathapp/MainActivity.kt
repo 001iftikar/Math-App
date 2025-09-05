@@ -111,8 +111,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
                     NavApp(
-                        navController,
-                        ketch)
+                        navController = navController,
+                       ketch =  ketch)
                 }
             }
         }

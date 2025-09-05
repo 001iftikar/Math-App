@@ -85,6 +85,16 @@ fun FinishedGoalsScreen(
                 }
 
                 state.value.goals != null -> {
+                    if (state.value.goals!!.isEmpty()) {
+                        Column(
+                            modifier = Modifier.fillMaxSize()
+                                .padding(innerPadding),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text("You have not finished any goals yet")
+                        }
+                    }
                     GoalListComponent(
                         modifier = Modifier.padding(innerPadding),
                         goals = state.value.goals!!,
