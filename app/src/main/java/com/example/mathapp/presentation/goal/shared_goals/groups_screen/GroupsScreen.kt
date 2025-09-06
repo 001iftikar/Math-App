@@ -130,7 +130,9 @@ private fun GroupList(
             items = groups,
             key = { it.id }) {group ->
             GroupItem(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .clickable(onClick = {})
+                ,
                 group = group
             )
         }

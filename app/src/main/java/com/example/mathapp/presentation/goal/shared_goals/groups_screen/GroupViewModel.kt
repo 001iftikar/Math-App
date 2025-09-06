@@ -52,11 +52,11 @@ class GroupViewModel @Inject constructor(
         }
     }
 
-    private fun createGroup() {
+    private fun createGroup(id: Int) {
         viewModelScope.launch { 
             sharedGoalRepository.createGroup(
                 GroupDto(
-                    name = "Hello",
+                    name = "Hello $id",
                     description = "world"
                 )
             ).collect { supabaseOperation -> 
