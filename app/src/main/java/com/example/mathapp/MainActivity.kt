@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
+import com.example.mathapp.presentation.goal.shared_goals.groups_screen.GroupsScreen
 import com.example.mathapp.presentation.navigation.NavApp
 import com.example.mathapp.presentation.navigation.Routes
 import com.example.mathapp.presentation.snackbar.ObserveAsEvents

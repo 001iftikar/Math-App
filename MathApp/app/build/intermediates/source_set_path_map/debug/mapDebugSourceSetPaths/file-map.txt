@@ -1,0 +1,69 @@
+com.example.mathapp-ui-tooling-preview-release-0 C:\Users\iftik\.gradle\caches\8.11.1\transforms\01a72fc9c29ac1bc0c84d3bcd1291b74\transformed\ui-tooling-preview-release\res
+com.example.mathapp-firebase-common-22.0.0-1 C:\Users\iftik\.gradle\caches\8.11.1\transforms\065320f3e3a8414671d89fe88bbac158\transformed\firebase-common-22.0.0\res
+com.example.mathapp-graphics-path-1.0.1-2 C:\Users\iftik\.gradle\caches\8.11.1\transforms\0933f637f4932cdc934b67fbfb9fba92\transformed\graphics-path-1.0.1\res
+com.example.mathapp-ui-unit-release-3 C:\Users\iftik\.gradle\caches\8.11.1\transforms\0bf35fd82e5cfb205ed93933cc5ca04f\transformed\ui-unit-release\res
+com.example.mathapp-hilt-navigation-compose-1.2.0-4 C:\Users\iftik\.gradle\caches\8.11.1\transforms\11cde9ed0f5319cd398b1cc5fa869d05\transformed\hilt-navigation-compose-1.2.0\res
+com.example.mathapp-core-ktx-1.16.0-5 C:\Users\iftik\.gradle\caches\8.11.1\transforms\1544b405bf94a74067778d5bf90b7ccc\transformed\core-ktx-1.16.0\res
+com.example.mathapp-ui-tooling-release-6 C:\Users\iftik\.gradle\caches\8.11.1\transforms\16eede1942099ac6eb49e734bf28f7d5\transformed\ui-tooling-release\res
+com.example.mathapp-play-services-base-18.1.0-7 C:\Users\iftik\.gradle\caches\8.11.1\transforms\18717d0634d552994d9d2fdbfffc3038\transformed\play-services-base-18.1.0\res
+com.example.mathapp-appcompat-resources-1.6.1-8 C:\Users\iftik\.gradle\caches\8.11.1\transforms\1d9089d5e466ee0d1c80bba52d8ee420\transformed\appcompat-resources-1.6.1\res
+com.example.mathapp-ui-geometry-release-9 C:\Users\iftik\.gradle\caches\8.11.1\transforms\1da909172ee1250c372b7c880d869f70\transformed\ui-geometry-release\res
+com.example.mathapp-emoji2-1.3.0-10 C:\Users\iftik\.gradle\caches\8.11.1\transforms\1ed26eac8c0377b1f0a434c02bea4239\transformed\emoji2-1.3.0\res
+com.example.mathapp-lifecycle-livedata-2.9.1-11 C:\Users\iftik\.gradle\caches\8.11.1\transforms\217a0544dc5a4900b988197ea60c7efc\transformed\lifecycle-livedata-2.9.1\res
+com.example.mathapp-savedstate-release-12 C:\Users\iftik\.gradle\caches\8.11.1\transforms\238254e965f2e7d12ca6ba0daf918705\transformed\savedstate-release\res
+com.example.mathapp-animation-core-release-13 C:\Users\iftik\.gradle\caches\8.11.1\transforms\2b219886c89adf5ef3818a6586432186\transformed\animation-core-release\res
+com.example.mathapp-material-icons-core-release-14 C:\Users\iftik\.gradle\caches\8.11.1\transforms\2da5f80c345a4ad01d06ce28434e7a41\transformed\material-icons-core-release\res
+com.example.mathapp-navigation-compose-release-15 C:\Users\iftik\.gradle\caches\8.11.1\transforms\2ddded7619cc0743cd637a9c82e25e50\transformed\navigation-compose-release\res
+com.example.mathapp-savedstate-ktx-1.3.0-16 C:\Users\iftik\.gradle\caches\8.11.1\transforms\2f6ae1543bc48dc7536f4baffff30025\transformed\savedstate-ktx-1.3.0\res
+com.example.mathapp-lifecycle-viewmodel-release-17 C:\Users\iftik\.gradle\caches\8.11.1\transforms\3632a7e45cd1716b045d48edaeeb0c6d\transformed\lifecycle-viewmodel-release\res
+com.example.mathapp-runtime-saveable-release-18 C:\Users\iftik\.gradle\caches\8.11.1\transforms\3b9104ace3e3f91920262c23ee31139f\transformed\runtime-saveable-release\res
+com.example.mathapp-annotation-experimental-1.4.1-19 C:\Users\iftik\.gradle\caches\8.11.1\transforms\477c1ece68ad434bffe01bf734e898e2\transformed\annotation-experimental-1.4.1\res
+com.example.mathapp-lifecycle-runtime-release-20 C:\Users\iftik\.gradle\caches\8.11.1\transforms\496bdbafc2d10a01339d085ac4065359\transformed\lifecycle-runtime-release\res
+com.example.mathapp-lifecycle-viewmodel-savedstate-release-21 C:\Users\iftik\.gradle\caches\8.11.1\transforms\4f3a6887f6cfe7bedfdb27cd9dfd4556\transformed\lifecycle-viewmodel-savedstate-release\res
+com.example.mathapp-datastore-preferences-release-22 C:\Users\iftik\.gradle\caches\8.11.1\transforms\5286f62ea9b3bebc2073d22b6314f3c5\transformed\datastore-preferences-release\res
+com.example.mathapp-ui-util-release-23 C:\Users\iftik\.gradle\caches\8.11.1\transforms\5cc8d38cde3e877c198e698d3de280a0\transformed\ui-util-release\res
+com.example.mathapp-ui-release-24 C:\Users\iftik\.gradle\caches\8.11.1\transforms\5d870c4dfe06c5368be5797426c031ab\transformed\ui-release\res
+com.example.mathapp-lifecycle-livedata-core-2.9.1-25 C:\Users\iftik\.gradle\caches\8.11.1\transforms\5e5e5862d50a5c43ceaca9e3cc2ab78c\transformed\lifecycle-livedata-core-2.9.1\res
+com.example.mathapp-ui-graphics-release-26 C:\Users\iftik\.gradle\caches\8.11.1\transforms\6052da2acd4aca93c063b3a624dfade1\transformed\ui-graphics-release\res
+com.example.mathapp-lifecycle-viewmodel-ktx-2.9.1-27 C:\Users\iftik\.gradle\caches\8.11.1\transforms\6b82a3c2b94dd84c98f454cff8361326\transformed\lifecycle-viewmodel-ktx-2.9.1\res
+com.example.mathapp-runtime-release-28 C:\Users\iftik\.gradle\caches\8.11.1\transforms\6deeb1b7140b47e7f8ba1f9a230384ce\transformed\runtime-release\res
+com.example.mathapp-lifecycle-viewmodel-compose-release-29 C:\Users\iftik\.gradle\caches\8.11.1\transforms\6f7f34e4c9c0d8aba28892e7f7c67f87\transformed\lifecycle-viewmodel-compose-release\res
+com.example.mathapp-profileinstaller-1.4.0-30 C:\Users\iftik\.gradle\caches\8.11.1\transforms\70668bc28edb6aebf6c946033d5fad1b\transformed\profileinstaller-1.4.0\res
+com.example.mathapp-material-release-31 C:\Users\iftik\.gradle\caches\8.11.1\transforms\70f28008706b5de322def917bef3c99a\transformed\material-release\res
+com.example.mathapp-lifecycle-runtime-compose-release-32 C:\Users\iftik\.gradle\caches\8.11.1\transforms\71229b985ca13b3a994f5a8c5bab06fd\transformed\lifecycle-runtime-compose-release\res
+com.example.mathapp-fragment-1.5.1-33 C:\Users\iftik\.gradle\caches\8.11.1\transforms\7391e9c6c68406465469edc574b1840d\transformed\fragment-1.5.1\res
+com.example.mathapp-savedstate-compose-release-34 C:\Users\iftik\.gradle\caches\8.11.1\transforms\7d31d006a37b09ac6c79fdea2627daf7\transformed\savedstate-compose-release\res
+com.example.mathapp-foundation-layout-release-35 C:\Users\iftik\.gradle\caches\8.11.1\transforms\84d7a920c5e7927f8074ceedd6fb7eaa\transformed\foundation-layout-release\res
+com.example.mathapp-tracing-1.2.0-36 C:\Users\iftik\.gradle\caches\8.11.1\transforms\85b9efdf65df34091574682b7f141dad\transformed\tracing-1.2.0\res
+com.example.mathapp-ui-text-release-37 C:\Users\iftik\.gradle\caches\8.11.1\transforms\8878a88f53bb0ea7abf582cfa0ef0a79\transformed\ui-text-release\res
+com.example.mathapp-core-1.16.0-38 C:\Users\iftik\.gradle\caches\8.11.1\transforms\8e4c231c4928850a06ea811b2166c7d4\transformed\core-1.16.0\res
+com.example.mathapp-material3-release-39 C:\Users\iftik\.gradle\caches\8.11.1\transforms\8f78540a578f21b06b44df3b487abe3f\transformed\material3-release\res
+com.example.mathapp-activity-1.10.1-40 C:\Users\iftik\.gradle\caches\8.11.1\transforms\96f805d92dd3ba5aabc9597b5b679014\transformed\activity-1.10.1\res
+com.example.mathapp-hilt-navigation-1.2.0-41 C:\Users\iftik\.gradle\caches\8.11.1\transforms\9d3cb5a20717a810e97fa9e3b6b3560f\transformed\hilt-navigation-1.2.0\res
+com.example.mathapp-coil-base-2.7.0-42 C:\Users\iftik\.gradle\caches\8.11.1\transforms\9f7f0e29f0c5ae7ecb6676fffaf8e998\transformed\coil-base-2.7.0\res
+com.example.mathapp-datastore-core-release-43 C:\Users\iftik\.gradle\caches\8.11.1\transforms\9ffd1ad871b4492f79344cf4239987a9\transformed\datastore-core-release\res
+com.example.mathapp-material-ripple-release-44 C:\Users\iftik\.gradle\caches\8.11.1\transforms\a6eaf9e6e0bd06c6bce80a46cd2b546d\transformed\material-ripple-release\res
+com.example.mathapp-lifecycle-process-2.9.1-45 C:\Users\iftik\.gradle\caches\8.11.1\transforms\ba9abcfef2f80a146a1fa87647f01a5f\transformed\lifecycle-process-2.9.1\res
+com.example.mathapp-datastore-release-46 C:\Users\iftik\.gradle\caches\8.11.1\transforms\c487689d2110be0892d980b640ab6fdd\transformed\datastore-release\res
+com.example.mathapp-core-viewtree-1.0.0-47 C:\Users\iftik\.gradle\caches\8.11.1\transforms\c5f1fe9830d88f2307a8561a2b98ae1e\transformed\core-viewtree-1.0.0\res
+com.example.mathapp-animation-release-48 C:\Users\iftik\.gradle\caches\8.11.1\transforms\c648da46f8e11e8ed72e26014b72c0f3\transformed\animation-release\res
+com.example.mathapp-foundation-release-49 C:\Users\iftik\.gradle\caches\8.11.1\transforms\c9300ab49fbed766ffb0ba6ac0e5955a\transformed\foundation-release\res
+com.example.mathapp-core-runtime-2.2.0-50 C:\Users\iftik\.gradle\caches\8.11.1\transforms\ca03014e770d20255e8cce525b39b271\transformed\core-runtime-2.2.0\res
+com.example.mathapp-activity-compose-1.10.1-51 C:\Users\iftik\.gradle\caches\8.11.1\transforms\ce899d1430f49d6e0cc1e523bf3bd24b\transformed\activity-compose-1.10.1\res
+com.example.mathapp-activity-ktx-1.10.1-52 C:\Users\iftik\.gradle\caches\8.11.1\transforms\d4f1d5fe9c010b7d755d239913e024ee\transformed\activity-ktx-1.10.1\res
+com.example.mathapp-play-services-basement-18.3.0-53 C:\Users\iftik\.gradle\caches\8.11.1\transforms\d742d83eeb5389a155e4a18d591fb0c8\transformed\play-services-basement-18.3.0\res
+com.example.mathapp-navigation-common-release-54 C:\Users\iftik\.gradle\caches\8.11.1\transforms\dec4aa9d9cfa6d89904bec9072b0ca62\transformed\navigation-common-release\res
+com.example.mathapp-lifecycle-livedata-core-ktx-2.9.1-55 C:\Users\iftik\.gradle\caches\8.11.1\transforms\e1ba2912b5279682c62bfbb1081dcfdd\transformed\lifecycle-livedata-core-ktx-2.9.1\res
+com.example.mathapp-ui-tooling-data-release-56 C:\Users\iftik\.gradle\caches\8.11.1\transforms\e900cc70bdf99d0b7fae9491685394e7\transformed\ui-tooling-data-release\res
+com.example.mathapp-customview-poolingcontainer-1.0.0-57 C:\Users\iftik\.gradle\caches\8.11.1\transforms\eb11d6677ed8f4f8967bdcf69f0d8254\transformed\customview-poolingcontainer-1.0.0\res
+com.example.mathapp-navigation-runtime-release-58 C:\Users\iftik\.gradle\caches\8.11.1\transforms\eb68d17d68eded5f189a9e5034e00f03\transformed\navigation-runtime-release\res
+com.example.mathapp-startup-runtime-1.1.1-59 C:\Users\iftik\.gradle\caches\8.11.1\transforms\f3dd63d2dc4958b0f72fa52f5e04bc2c\transformed\startup-runtime-1.1.1\res
+com.example.mathapp-ui-test-manifest-1.7.8-60 C:\Users\iftik\.gradle\caches\8.11.1\transforms\f66ca375aabb9ee4081cfbb3794680b5\transformed\ui-test-manifest-1.7.8\res
+com.example.mathapp-pngs-61 D:\My Projects\Math-App\MathApp\app\build\generated\res\pngs\debug
+com.example.mathapp-res-62 D:\My Projects\Math-App\MathApp\app\build\generated\res\processDebugGoogleServices
+com.example.mathapp-resValues-63 D:\My Projects\Math-App\MathApp\app\build\generated\res\resValues\debug
+com.example.mathapp-packageDebugResources-64 D:\My Projects\Math-App\MathApp\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.example.mathapp-packageDebugResources-65 D:\My Projects\Math-App\MathApp\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.example.mathapp-debug-66 D:\My Projects\Math-App\MathApp\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.example.mathapp-debug-67 D:\My Projects\Math-App\MathApp\app\src\debug\res
+com.example.mathapp-main-68 D:\My Projects\Math-App\MathApp\app\src\main\res

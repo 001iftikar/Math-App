@@ -31,27 +31,28 @@ import com.example.mathapp.ui.theme.GoalCardColor
 fun GoalsHomeScreen(
     navHostController: NavHostController
 ) {
-        Scaffold { innerPadding->
-            BlackBackGround {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                ) {
-                    FirstLayer(
-                        onFirstItemClick = {
-                            navHostController.navigate(Routes.UnfinishedGoalScreen)
-                        },
-                        onSecondItemClick = {navHostController.navigate(Routes.FinishedGoalsScreen)}
-                    )
+    Scaffold { innerPadding ->
+        BlackBackGround {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                FirstLayer(
+                    onFirstItemClick = {
+                        navHostController.navigate(Routes.UnfinishedGoalScreen)
+                    },
+                    onSecondItemClick = { navHostController.navigate(Routes.FinishedGoalsScreen) }
+                )
 
-                    Spacer(Modifier.height(8.dp))
-                    SecondLayer(
-                        onFirstItemClick = {navHostController.navigate(Routes.ProfileScreen)}
-                    )
-                }
+                Spacer(Modifier.height(8.dp))
+                SecondLayer(
+                    onFirstItemClick = { navHostController.navigate(Routes.GroupsScreen) },
+                    onSecondItemClick = { navHostController.navigate(Routes.ProfileScreen) }
+                )
             }
         }
+    }
 }
 
 @Composable
@@ -81,7 +82,9 @@ private fun FirstLayer(
 
 @Composable
 private fun SecondLayer(
-    onFirstItemClick: () -> Unit
+
+    onFirstItemClick: () -> Unit,
+    onSecondItemClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -89,10 +92,17 @@ private fun SecondLayer(
             .padding(horizontal = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+
+        HomeScreenItem(
+            image = R.drawable.shared,
+            title = "Shared Goals",
+            onClick = onFirstItemClick
+        )
+
         HomeScreenItem(
             image = R.drawable.profile,
             title = "Profile",
-            onClick = onFirstItemClick
+            onClick = onSecondItemClick
         )
     }
 }
@@ -105,8 +115,7 @@ private fun HomeScreenItem(
 ) {
     ElevatedCard(
         modifier = Modifier
-            .size(160.dp)
-        ,
+            .size(160.dp),
         colors = CardDefaults.cardColors(
             containerColor = GoalCardColor
         )

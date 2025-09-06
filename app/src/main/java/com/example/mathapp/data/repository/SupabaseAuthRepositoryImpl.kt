@@ -3,11 +3,13 @@ package com.example.mathapp.data.repository
 import android.util.Log
 import com.example.mathapp.data.remote.SupabaseOperation
 import com.example.mathapp.domain.model.SupabaseUser
+import com.example.mathapp.domain.model.UserProfile
 import com.example.mathapp.domain.repository.SupabaseAuthRepository
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserSession
+import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.buildJsonObject
@@ -39,6 +41,14 @@ class SupabaseAuthRepositoryImpl @Inject constructor(
                 ?.jsonPrimitive
                 ?.contentOrNull
             if (userId != null) {
+                supabaseClient.postgrest["profiles"]
+                    .upsert(
+                        UserProfile(
+                            id = userId,
+                            name = displayName ?: "User",
+                            email = user.email ?: "email not found"
+                        )
+                    )
                 emit(
                     SupabaseOperation.Success(
                         data = SupabaseUser(
@@ -49,7 +59,7 @@ class SupabaseAuthRepositoryImpl @Inject constructor(
                     )
                 )
             } else {
-                emit(SupabaseOperation.Failure(NullPointerException("User")))
+                emit(SupabaseOperation.Failure(NullPointerException("User creation failed!")))
             }
 
 

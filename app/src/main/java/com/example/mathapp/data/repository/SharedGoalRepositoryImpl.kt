@@ -5,6 +5,7 @@ import com.example.mathapp.data.remote.SupabaseOperation
 import com.example.mathapp.data.remote.model.GroupDto
 import com.example.mathapp.data.remote.model.GroupMemberDto
 import com.example.mathapp.domain.model.Group
+import com.example.mathapp.domain.model.UserProfile
 import com.example.mathapp.domain.repository.SharedGoalRepository
 import com.example.mathapp.mappers.toGroup
 import com.example.mathapp.utils.SupabaseConstants
@@ -53,34 +54,41 @@ class SharedGoalRepositoryImpl @Inject constructor(
             if (userId != null) {
                 var filteredGroups: List<Group>
                 getGroupMembers {members ->
-                    val belongedColumn = members.filter { it.user_id == userId }
+                    val belongedColumn = members.filter { it.user_id == userId } // only return the columns userId is in
                     val groupIds: List<String> = belongedColumn
                         .map {
                             it.group_id
-                        }
-                    Log.d("Shared-Goal-GoalId", "getGroups: $groupIds")
-
-                    filteredGroups = supabaseClient.postgrest[SupabaseConstants.GROUP_TABLE]
-                        .select {
-                            filter {
-                                or {
-                                    groupIds.forEach {
-                                        eq("id", it)
+                        } // store the group ids in the list to query later in the group table to get the groups where this user appears
+                    if (groupIds.isNotEmpty()) { // only run if the group id list is not empty, otherwise it returns the whole db if it does not fine any matches
+                        val userProfiles = supabaseClient.postgrest["profiles"]
+                            .select()
+                            .decodeList<UserProfile>()
+                        val profileMap = userProfiles.associateBy { it.id } // only query the db once, then store it in a hashmap to avoid filtering each time inside map
+                        filteredGroups = supabaseClient.postgrest[SupabaseConstants.GROUP_TABLE]
+                            .select {
+                                filter {
+                                    or {
+                                        groupIds.forEach {
+                                            eq("id", it)
+                                        }
                                     }
                                 }
                             }
-                        }
-                        .decodeList<GroupDto>()
-                        .map {
-                            it.toGroup()
-                        }
-                    Log.d("Shared-Goal-Groups", "getGroups: $filteredGroups --> ${filteredGroups.size}")
-                    emit(SupabaseOperation.Success(filteredGroups))
+                            .decodeList<GroupDto>()
+                            .map {groupDto ->
+                                val adminName = profileMap[groupDto.admin]?.name ?: "Unknown"
+                                groupDto.toGroup(adminName)
+                            }
+                        emit(SupabaseOperation.Success(filteredGroups))
+                    } else {
+                        emit(SupabaseOperation.Success(emptyList<Group>()))
+                    }
                 }
             }
-
+        } catch (e: IOException) {
+            emit(SupabaseOperation.Failure(Exception("Please check internet connection")))
         } catch (e: Exception) {
-            Log.e("Shared-Goal-Groups", "getGroups: $e", )
+            emit(SupabaseOperation.Failure(Exception("Some error happened")))
         }
     }
 
