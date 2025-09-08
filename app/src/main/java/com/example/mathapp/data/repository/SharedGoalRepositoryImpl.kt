@@ -43,7 +43,7 @@ class SharedGoalRepositoryImpl @Inject constructor(
         } catch (e: IOException) {
             emit(SupabaseOperation.Failure(Exception("Network error!")))
         } catch (e: Exception) {
-            Log.e("Shared-Goal-Repo", "createGroup: $e", )
+            Log.e("Shared-Goal-Repo", "createGroup: $e")
             emit(SupabaseOperation.Failure(Exception("Group creation failed!")))
         }
     }
@@ -53,8 +53,9 @@ class SharedGoalRepositoryImpl @Inject constructor(
             val userId = supabaseClient.auth.currentUserOrNull()?.id
             if (userId != null) {
                 var filteredGroups: List<Group>
-                getGroupMembers {members ->
-                    val belongedColumn = members.filter { it.user_id == userId } // only return the columns userId is in
+                getGroupMembers { members ->
+                    val belongedColumn =
+                        members.filter { it.user_id == userId } // only return the columns userId is in
                     val groupIds: List<String> = belongedColumn
                         .map {
                             it.group_id
@@ -63,7 +64,8 @@ class SharedGoalRepositoryImpl @Inject constructor(
                         val userProfiles = supabaseClient.postgrest["profiles"]
                             .select()
                             .decodeList<UserProfile>()
-                        val profileMap = userProfiles.associateBy { it.id } // only query the db once, then store it in a hashmap to avoid filtering each time inside map
+                        val profileMap =
+                            userProfiles.associateBy { it.id } // only query the db once, then store it in a hashmap to avoid filtering each time inside map
                         filteredGroups = supabaseClient.postgrest[SupabaseConstants.GROUP_TABLE]
                             .select {
                                 filter {
@@ -75,7 +77,7 @@ class SharedGoalRepositoryImpl @Inject constructor(
                                 }
                             }
                             .decodeList<GroupDto>()
-                            .map {groupDto ->
+                            .map { groupDto ->
                                 val adminName = profileMap[groupDto.admin]?.name ?: "Unknown"
                                 groupDto.toGroup(adminName)
                             }
@@ -92,6 +94,42 @@ class SharedGoalRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun joinGroup(groupId: String): Flow<SupabaseOperation<String>> = flow {
+        try {
+            val userId = supabaseClient.auth.currentUserOrNull()?.id
+            if (userId != null) {
+                getSingleById<GroupDto>(
+                    table = SupabaseConstants.GROUP_TABLE,
+                    id = groupId
+                ) { groupDto ->
+                    if (groupDto != null) {
+                        supabaseClient.postgrest[SupabaseConstants.GROUP_MEMBER_TABLE]
+                            .upsert(
+                                GroupMemberDto(
+                                    group_id = groupId,
+                                    user_id = userId,
+                                    role = "member"
+                                )
+                            )
+                        emit(SupabaseOperation.Success("Group joined"))
+                    } else {
+                        emit(SupabaseOperation.Failure(NullPointerException("Group not available.\n" +
+                                "Either you entered an invalid id or the admin deleted it.")))
+                        return@flow
+                    }
+                }
+            } else {
+                emit(SupabaseOperation.Failure(NullPointerException("Account not found")))
+                return@flow
+            }
+        } catch (e: IOException) {
+            emit(SupabaseOperation.Failure(Exception("Please check internet connection")))
+        }
+        catch (e: Exception) {
+            emit(SupabaseOperation.Failure(Exception("Pleae enter a valid Id.")))
+        }
+    }
+
     private suspend inline fun getGroupMembers(
         members: (List<GroupMemberDto>) -> Unit
     ) {
@@ -100,6 +138,22 @@ class SharedGoalRepositoryImpl @Inject constructor(
             .decodeList<GroupMemberDto>()
 
         members(members)
+    }
+
+    // Maybe I will use this to get a single value from a table instead of writing the same logic again and again
+    private suspend inline fun <reified T: Any> getSingleById(
+        table: String,
+        id: String,
+        data: (T?) -> Unit
+    ) {
+        val result = supabaseClient.postgrest[table]
+            .select {
+                filter {
+                    eq("id", id)
+                }
+            }
+            .decodeSingleOrNull<T>()
+        data(result)
     }
 }
 

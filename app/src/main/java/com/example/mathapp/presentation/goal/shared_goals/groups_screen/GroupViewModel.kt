@@ -1,9 +1,7 @@
 package com.example.mathapp.presentation.goal.shared_goals.groups_screen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mathapp.data.remote.model.GroupDto
 import com.example.mathapp.domain.repository.SharedGoalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +21,14 @@ class GroupViewModel @Inject constructor(
         getGroups()
     }
 
+    fun onEvent(event: GroupsScreenEvent) {
+        when (event) {
+            GroupsScreenEvent.Refresh -> {
+                getGroups()
+            }
+        }
+    }
+
     private fun getGroups() {
         viewModelScope.launch {
             _groupsState.update {
@@ -33,7 +39,6 @@ class GroupViewModel @Inject constructor(
             }
             sharedGoalRepository.getGroups().collect { supabaseOperation ->
                 supabaseOperation.onSuccess { groups ->
-                    Log.d("Shared-Goal-View", "getGroup: $groups --> ${groups.size}")
                     _groupsState.update {
                         it.copy(
                             isLoading = false,
@@ -41,7 +46,7 @@ class GroupViewModel @Inject constructor(
                         )
                     }
                 }.onFailure { exception ->
-                    _groupsState.update { 
+                    _groupsState.update {
                         it.copy(
                             isLoading = false,
                             error = exception.message
@@ -51,24 +56,7 @@ class GroupViewModel @Inject constructor(
             }
         }
     }
-
-    private fun createGroup(id: Int) {
-        viewModelScope.launch { 
-            sharedGoalRepository.createGroup(
-                GroupDto(
-                    name = "Hello $id",
-                    description = "world"
-                )
-            ).collect { supabaseOperation -> 
-                supabaseOperation.onSuccess {
-                    Log.d("Shared-create", "createGroup: $it")
-                }
-            }
-        }
-    }
 }
-
-
 
 
 

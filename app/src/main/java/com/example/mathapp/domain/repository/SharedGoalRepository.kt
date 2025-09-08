@@ -9,4 +9,5 @@ interface SharedGoalRepository {
     fun createGroup(groupDto: GroupDto): Flow<SupabaseOperation<String>>
 
     fun getGroups(): Flow<SupabaseOperation<List<Group>>>
+    fun joinGroup(groupId: String): Flow<SupabaseOperation<String>>
 }

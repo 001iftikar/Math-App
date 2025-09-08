@@ -20,8 +20,13 @@ import com.example.mathapp.presentation.goal.homescreen.GoalsHomeScreen
 import com.example.mathapp.presentation.goal.insert_goal_screen.AddGoalScreen
 import com.example.mathapp.presentation.goal.ongoing_goals_screen.OngoingGoalsScreen
 import com.example.mathapp.presentation.goal.profile_screen.ProfileScreen
+import com.example.mathapp.presentation.goal.shared_goals.SharedGoalDashboard
+import com.example.mathapp.presentation.goal.shared_goals.creategroup_screen.CreateGroupScreen
+import com.example.mathapp.presentation.goal.shared_goals.creategroup_screen.CreateGroupViewModel
 import com.example.mathapp.presentation.goal.shared_goals.groups_screen.GroupViewModel
 import com.example.mathapp.presentation.goal.shared_goals.groups_screen.GroupsScreen
+import com.example.mathapp.presentation.goal.shared_goals.joingroup_screen.JoinGroupScreen
+import com.example.mathapp.presentation.goal.shared_goals.joingroup_screen.JoinGroupViewModel
 import com.example.mathapp.presentation.goal.sign_in_up_screens.GoalSignInScreen
 import com.example.mathapp.presentation.goal.sign_in_up_screens.GoalSignUpScreen
 import com.example.mathapp.presentation.goal.specific_goal_screen.SpecificGoalScreen
@@ -45,36 +50,41 @@ import com.ketch.Ketch
 @Composable
 fun NavApp(
     navController: NavHostController,
-    ketch: Ketch) {
+    ketch: Ketch
+) {
     SharedTransitionLayout {
         NavHost(
             navController = navController, startDestination = Routes.HomeScreenRoute,
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(durationMillis = 165
-                        , easing = FastOutSlowInEasing)
+                    animationSpec = tween(
+                        durationMillis = 165, easing = FastOutSlowInEasing
+                    )
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(durationMillis = 165
-                        , easing = FastOutSlowInEasing)
+                    animationSpec = tween(
+                        durationMillis = 165, easing = FastOutSlowInEasing
+                    )
                 )
             },
             popEnterTransition = {
                 slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(durationMillis = 165
-                        , easing = FastOutSlowInEasing)
+                    animationSpec = tween(
+                        durationMillis = 165, easing = FastOutSlowInEasing
+                    )
                 )
             },
             popExitTransition = {
                 slideOutOfContainer(
                     AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(durationMillis = 165
-                        , easing = FastOutSlowInEasing)
+                    animationSpec = tween(
+                        durationMillis = 165, easing = FastOutSlowInEasing
+                    )
                 )
             }
         ) {
@@ -86,8 +96,7 @@ fun NavApp(
                 TeacherScreen(navHostController = navController)
             }
 
-            composable<Routes.TeacherScreenByNameRoute> {
-                    navBackStackEntry ->
+            composable<Routes.TeacherScreenByNameRoute> { navBackStackEntry ->
                 val name = navBackStackEntry.toRoute<Routes.TeacherScreenByNameRoute>().name
                 TeacherScreenByName(teacherName = name, navHostController = navController)
             }
@@ -98,12 +107,22 @@ fun NavApp(
 
             composable<Routes.BookByPaperScreen> {
                 val data = it.toRoute<Routes.BookByPaperScreen>()
-                BooksByPaperScreen(semester = data.semester, paperCode = data.paperCode, ketch = ketch, navController = navController)
+                BooksByPaperScreen(
+                    semester = data.semester,
+                    paperCode = data.paperCode,
+                    ketch = ketch,
+                    navController = navController
+                )
             }
 
             composable<Routes.PdfViewerScreen> {
                 val data = it.toRoute<Routes.PdfViewerScreen>()
-                BookPdfViewer(pdfUrl = data.pdfUrl, bookName = data.bookName, downloadedFile = data.downloadedPdf, navController = navController)
+                BookPdfViewer(
+                    pdfUrl = data.pdfUrl,
+                    bookName = data.bookName,
+                    downloadedFile = data.downloadedPdf,
+                    navController = navController
+                )
             }
 
             composable<Routes.StudySmartScreen> {
@@ -178,7 +197,8 @@ fun NavApp(
                             ),
                             animatedVisibilityScope = this
                         ),
-                    navHostController = navController)
+                    navHostController = navController
+                )
             }
 
             composable<Routes.SpecificGoalScreen> {
@@ -196,10 +216,31 @@ fun NavApp(
                 ProfileScreen(navHostController = navController)
             }
 
-            composable<Routes.GroupsScreen> { 
+            composable<Routes.SharedDashboard> {
+                SharedGoalDashboard(navController)
+            }
+
+            composable<Routes.GroupsScreen> {
                 val viewModel = hiltViewModel<GroupViewModel>()
                 GroupsScreen(
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    goToCreateGroupScreen = { navController.navigate(Routes.CreateGroupScreen) }
+                )
+            }
+
+            composable<Routes.CreateGroupScreen> {
+                val viewModel = hiltViewModel<CreateGroupViewModel>()
+                CreateGroupScreen(
+                    viewModel = viewModel,
+                    onCreateSuccess = { navController.popBackStack() }
+                )
+            }
+
+            composable<Routes.JoinGroupScreen> {
+                val viewModel = hiltViewModel<JoinGroupViewModel>()
+                JoinGroupScreen(
+                    viewModel = viewModel,
+                    onSuccess = { navController.popBackStack() }
                 )
             }
         }

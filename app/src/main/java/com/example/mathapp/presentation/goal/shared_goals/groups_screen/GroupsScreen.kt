@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -39,17 +40,23 @@ import com.example.mathapp.ui.theme.GroupColor1
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroupsScreen(
-      viewModel: GroupViewModel
+      viewModel: GroupViewModel,
+      goToCreateGroupScreen: () -> Unit
 ) {
     val state by viewModel.groupsState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val expanded by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
+
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(GroupsScreenEvent.Refresh)
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
             FloatingActionButton(
                 expanded = expanded,
-                onClick = {}
+                onClick =  goToCreateGroupScreen
             )
         }
     ) { innerPadding ->
@@ -130,7 +137,8 @@ private fun GroupList(
             items = groups,
             key = { it.id }) {group ->
             GroupItem(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .clickable(onClick = {})
                 ,
                 group = group

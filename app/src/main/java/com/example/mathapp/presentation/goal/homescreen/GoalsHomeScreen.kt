@@ -47,7 +47,7 @@ fun GoalsHomeScreen(
 
                 Spacer(Modifier.height(8.dp))
                 SecondLayer(
-                    onFirstItemClick = { navHostController.navigate(Routes.GroupsScreen) },
+                    onFirstItemClick = { navHostController.navigate(Routes.SharedDashboard) },
                     onSecondItemClick = { navHostController.navigate(Routes.ProfileScreen) }
                 )
             }
