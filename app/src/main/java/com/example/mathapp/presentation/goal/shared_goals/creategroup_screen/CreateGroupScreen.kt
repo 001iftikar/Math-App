@@ -20,10 +20,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mathapp.presentation.components.GroupBackGroundComponent
 import com.example.mathapp.presentation.components.TextFieldComponent
+import com.example.mathapp.shared.SharedEvent
+import com.example.mathapp.shared.SharedViewModel
 import com.example.mathapp.ui.theme.GroupColor1
 
 @Composable
 fun CreateGroupScreen(
+    sharedViewModel: SharedViewModel,
     viewModel: CreateGroupViewModel,
     onCreateSuccess: () -> Unit
 ) {
@@ -34,7 +37,10 @@ fun CreateGroupScreen(
     val onEvent = viewModel::onEvent
     LaunchedEffect(eventState) {
         when (eventState) {
-            CreateGroupScreenEvent.OnSuccess -> onCreateSuccess()
+            CreateGroupScreenEvent.OnSuccess -> {
+                sharedViewModel.sendEvent(SharedEvent.GroupListModifyEvent)
+                onCreateSuccess()
+            }
             else -> Unit
         }
 

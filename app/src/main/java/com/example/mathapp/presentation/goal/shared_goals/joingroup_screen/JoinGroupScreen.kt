@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mathapp.presentation.components.GroupBackGroundComponent
 import com.example.mathapp.presentation.components.TextFieldComponent
+import com.example.mathapp.shared.SharedViewModel
 import com.example.mathapp.ui.theme.GoalCardColor
 import com.example.mathapp.ui.theme.GroupColor1
 
@@ -35,7 +36,9 @@ fun JoinGroupScreen(
 
     LaunchedEffect(eventState) {
         when (eventState) {
-            JoinGroupScreenEvent.OnSuccess -> onSuccess()
+            JoinGroupScreenEvent.OnSuccess -> {
+                onSuccess()
+            }
             else -> Unit
         }
     }

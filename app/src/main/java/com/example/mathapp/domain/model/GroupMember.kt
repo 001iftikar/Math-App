@@ -5,5 +5,6 @@ data class GroupMember(
     val groupId: String,
     val userId: String,
     val role: String,
-    val addedAt: String
+    val addedAt: String,
+    val profile: UserProfile
 )

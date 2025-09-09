@@ -35,20 +35,31 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mathapp.domain.model.Group
 import com.example.mathapp.presentation.components.GroupBackGroundComponent
+import com.example.mathapp.shared.SharedEvent
+import com.example.mathapp.shared.SharedViewModel
 import com.example.mathapp.ui.theme.GroupColor1
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroupsScreen(
-      viewModel: GroupViewModel,
-      goToCreateGroupScreen: () -> Unit
+    sharedViewModel: SharedViewModel,
+    viewModel: GroupViewModel,
+    goToSharedGoalsScreen: (String) -> Unit,
+    goToCreateGroupScreen: () -> Unit
 ) {
     val state by viewModel.groupsState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val sharedEvent by sharedViewModel.sharedEventState.collectAsStateWithLifecycle(SharedEvent.Idle)
     val expanded by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
+    val onEvent = viewModel::onEvent
 
-    LaunchedEffect(Unit) {
-        viewModel.onEvent(GroupsScreenEvent.Refresh)
+    LaunchedEffect(sharedEvent) {
+        when(sharedEvent) {
+            SharedEvent.GroupListModifyEvent -> {
+                onEvent(GroupsScreenEvent.Refresh)
+            }
+            else -> Unit
+        }
     }
 
     Scaffold(
@@ -56,7 +67,7 @@ fun GroupsScreen(
         floatingActionButton = {
             FloatingActionButton(
                 expanded = expanded,
-                onClick =  goToCreateGroupScreen
+                onClick = goToCreateGroupScreen
             )
         }
     ) { innerPadding ->
@@ -65,14 +76,15 @@ fun GroupsScreen(
             state.isLoading -> {
                 LoadingList()
             }
-            
+
             state.groups != null -> {
                 Log.d("Shared-Screen", "GroupsScreen: ${state.groups}")
                 if (state.groups!!.isNotEmpty()) {
                     GroupList(
                         modifier = Modifier.padding(innerPadding),
                         listState = listState,
-                        groups = state.groups!!
+                        groups = state.groups!!,
+                        onClick = { goToSharedGoalsScreen(it) }
                     )
                 } else {
                     EmptyList(
@@ -127,7 +139,8 @@ private fun GroupItem(
 private fun GroupList(
     modifier: Modifier = Modifier,
     listState: LazyListState,
-    groups: List<Group>
+    groups: List<Group>,
+    onClick: (String) -> Unit
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
@@ -135,12 +148,11 @@ private fun GroupList(
     ) {
         items(
             items = groups,
-            key = { it.id }) {group ->
+            key = { it.id }) { group ->
             GroupItem(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(onClick = {})
-                ,
+                    .clickable(onClick = { onClick(group.id) }),
                 group = group
             )
         }

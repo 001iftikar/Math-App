@@ -7,6 +7,6 @@ data class GroupDto(
     val id: String = "",
     val admin: String = "",
     val name: String = "",
-    val description: String = "",
+    val description: String? = null,
     val created_at: String = ""
 )

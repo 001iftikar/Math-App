@@ -21,12 +21,16 @@ import com.example.mathapp.presentation.goal.insert_goal_screen.AddGoalScreen
 import com.example.mathapp.presentation.goal.ongoing_goals_screen.OngoingGoalsScreen
 import com.example.mathapp.presentation.goal.profile_screen.ProfileScreen
 import com.example.mathapp.presentation.goal.shared_goals.SharedGoalDashboard
+import com.example.mathapp.presentation.goal.shared_goals.addsharedgoal_screen.AddSharedGoalScreen
+import com.example.mathapp.presentation.goal.shared_goals.addsharedgoal_screen.AddSharedGoalViewModel
 import com.example.mathapp.presentation.goal.shared_goals.creategroup_screen.CreateGroupScreen
 import com.example.mathapp.presentation.goal.shared_goals.creategroup_screen.CreateGroupViewModel
 import com.example.mathapp.presentation.goal.shared_goals.groups_screen.GroupViewModel
 import com.example.mathapp.presentation.goal.shared_goals.groups_screen.GroupsScreen
 import com.example.mathapp.presentation.goal.shared_goals.joingroup_screen.JoinGroupScreen
 import com.example.mathapp.presentation.goal.shared_goals.joingroup_screen.JoinGroupViewModel
+import com.example.mathapp.presentation.goal.shared_goals.sharedgoals_screen.SharedGoalViewModel
+import com.example.mathapp.presentation.goal.shared_goals.sharedgoals_screen.SharedGoalsScreen
 import com.example.mathapp.presentation.goal.sign_in_up_screens.GoalSignInScreen
 import com.example.mathapp.presentation.goal.sign_in_up_screens.GoalSignUpScreen
 import com.example.mathapp.presentation.goal.specific_goal_screen.SpecificGoalScreen
@@ -43,6 +47,7 @@ import com.example.mathapp.presentation.studysmart.task.TaskScreen
 import com.example.mathapp.presentation.studysmart.task.TaskViewModel
 import com.example.mathapp.presentation.teacher.TeacherScreen
 import com.example.mathapp.presentation.teacher.TeacherScreenByName
+import com.example.mathapp.shared.SharedViewModel
 import com.example.mathapp.utils.FAB_EXPLODE_BOUNDS_KEY
 import com.ketch.Ketch
 
@@ -52,6 +57,7 @@ fun NavApp(
     navController: NavHostController,
     ketch: Ketch
 ) {
+    val sharedViewModel = hiltViewModel<SharedViewModel>()
     SharedTransitionLayout {
         NavHost(
             navController = navController, startDestination = Routes.HomeScreenRoute,
@@ -223,7 +229,11 @@ fun NavApp(
             composable<Routes.GroupsScreen> {
                 val viewModel = hiltViewModel<GroupViewModel>()
                 GroupsScreen(
+                    sharedViewModel = sharedViewModel,
                     viewModel = viewModel,
+                    goToSharedGoalsScreen = {
+                        navController.navigate(Routes.SharedGoalsScreen(it))
+                    },
                     goToCreateGroupScreen = { navController.navigate(Routes.CreateGroupScreen) }
                 )
             }
@@ -231,6 +241,7 @@ fun NavApp(
             composable<Routes.CreateGroupScreen> {
                 val viewModel = hiltViewModel<CreateGroupViewModel>()
                 CreateGroupScreen(
+                    sharedViewModel = sharedViewModel,
                     viewModel = viewModel,
                     onCreateSuccess = { navController.popBackStack() }
                 )
@@ -241,6 +252,28 @@ fun NavApp(
                 JoinGroupScreen(
                     viewModel = viewModel,
                     onSuccess = { navController.popBackStack() }
+                )
+            }
+
+            composable<Routes.SharedGoalsScreen> { navBackStack ->
+                val viewModel = hiltViewModel<SharedGoalViewModel>()
+
+                SharedGoalsScreen(
+                    sharedViewModel = sharedViewModel,
+                    viewModel = viewModel,
+                    addGoal = { navController.navigate(Routes.AddSharedGoalScreen(it)) },
+                )
+            }
+
+            composable<Routes.AddSharedGoalScreen> { navBackStack ->
+                val viewModel = hiltViewModel<AddSharedGoalViewModel>()
+                val groupId = navBackStack.toRoute<Routes.SharedGoalsScreen>().groupId
+                AddSharedGoalScreen(
+                    sharedViewModel = sharedViewModel,
+                    viewModel = viewModel,
+                    groupId = groupId,
+                    onCancel = { navController.popBackStack() },
+                    backOnSuccess = { navController.popBackStack() }
                 )
             }
         }

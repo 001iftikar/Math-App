@@ -75,4 +75,8 @@ sealed class Routes {
     data object CreateGroupScreen
     @Serializable
     data object JoinGroupScreen
+    @Serializable
+    data class SharedGoalsScreen(val groupId: String)
+    @Serializable
+    data class AddSharedGoalScreen(val groupId: String)
 }

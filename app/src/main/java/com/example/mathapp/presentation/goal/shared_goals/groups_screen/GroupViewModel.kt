@@ -1,5 +1,6 @@
 package com.example.mathapp.presentation.goal.shared_goals.groups_screen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mathapp.domain.repository.SharedGoalRepository
@@ -53,6 +54,19 @@ class GroupViewModel @Inject constructor(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private fun getSpecificGroup(groupId: String) {
+        viewModelScope.launch {
+            sharedGoalRepository.getSpecificGroup(groupId).collect { supabaseOperation ->
+                supabaseOperation.onSuccess { group ->
+                    Log.d("Group", "getSpecificGroup: ${group.id} : ${group.name}")
+                }
+                    .onFailure {
+                        Log.e("Group", "getSpecificGroup: $it", )
+                    }
             }
         }
     }

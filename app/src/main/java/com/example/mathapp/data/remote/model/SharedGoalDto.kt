@@ -1,5 +1,8 @@
 package com.example.mathapp.data.remote.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class SharedGoalDto(
     val id: String = "",
     val group_id: String = "",
