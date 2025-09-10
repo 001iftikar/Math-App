@@ -23,7 +23,7 @@ class SpecificGroupViewModel @Inject constructor(
 
     init {
         getGroup()
-        getProfiles()
+        getMembers()
     }
 
     private fun getGroup() {
@@ -48,10 +48,22 @@ class SpecificGroupViewModel @Inject constructor(
         }
     }
 
-    private fun getProfiles() {
+    private fun getMembers() {
         viewModelScope.launch {
-            sharedGoalRepository.getGroupMembersForSpecificGroup(groupId).collect {
-
+            sharedGoalRepository.getGroupMembersForSpecificGroup(groupId).collect { supabaseOperation ->
+                supabaseOperation.onSuccess { profiles ->
+                    _specificGoalState.update {
+                        it.copy(
+                            error = null,
+                            belongedMembers = profiles
+                        )
+                    }
+                }
+                    .onFailure { exception ->
+                        _specificGoalState.update {
+                            it.copy(error = exception.message)
+                        }
+                    }
             }
         }
     }

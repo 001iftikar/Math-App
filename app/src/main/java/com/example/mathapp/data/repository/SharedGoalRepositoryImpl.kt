@@ -65,9 +65,10 @@ class SharedGoalRepositoryImpl @Inject constructor(
                             it.group_id
                         } // store the group ids in the list to query later in the group table to get the groups where this user appears
                     if (groupIds.isNotEmpty()) { // only run if the group id list is not empty, otherwise it returns the whole db if it does not fine any matches
-                        val userProfiles = supabaseClient.postgrest["profiles"]
-                            .select()
-                            .decodeList<UserProfile>()
+                        val userProfiles =
+                            supabaseClient.postgrest[SupabaseConstants.PROFILES_TABLE]
+                                .select()
+                                .decodeList<UserProfile>()
                         val profileMap =
                             userProfiles.associateBy { it.id } // only query the db once, then store it in a hashmap to avoid filtering each time inside map
                         filteredGroups = supabaseClient.postgrest[SupabaseConstants.GROUP_TABLE]
@@ -136,8 +137,14 @@ class SharedGoalRepositoryImpl @Inject constructor(
                                 )
                             emit(SupabaseOperation.Success("Group joined"))
                         } else {
-                            emit(SupabaseOperation.Failure(NullPointerException("Group not available.\n" +
-                                    "Either you entered an invalid id or the admin deleted it.")))
+                            emit(
+                                SupabaseOperation.Failure(
+                                    NullPointerException(
+                                        "Group not available.\n" +
+                                                "Either you entered an invalid id or the admin deleted it."
+                                    )
+                                )
+                            )
                             return@flow
                         }
                     }
@@ -149,8 +156,7 @@ class SharedGoalRepositoryImpl @Inject constructor(
             }
         } catch (e: IOException) {
             emit(SupabaseOperation.Failure(Exception("Please check internet connection")))
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             emit(SupabaseOperation.Failure(Exception("Please enter a valid Id.")))
         }
     }
@@ -162,13 +168,13 @@ class SharedGoalRepositoryImpl @Inject constructor(
                     table = SupabaseConstants.GROUP_TABLE,
                     id = groupId
                 ) { groupDto ->
-                   if (groupDto != null) {
-                       Log.d("Group", "getSpecificGroup: $groupDto")
-                       emit(SupabaseOperation.Success(groupDto.toGroup(groupDto.admin)))
-                   }
+                    if (groupDto != null) {
+                        Log.d("Group", "getSpecificGroup: $groupDto")
+                        emit(SupabaseOperation.Success(groupDto.toGroup(groupDto.admin)))
+                    }
                 }
             } catch (e: Exception) {
-                Log.e("Group", "getSpecificGroup: $e", )
+                Log.e("Group", "getSpecificGroup: $e")
             }
         }
     }
@@ -180,55 +186,65 @@ class SharedGoalRepositoryImpl @Inject constructor(
             SupabaseOperation.Success("Goal Created")
         } catch (e: IOException) {
             SupabaseOperation.Failure(Exception("Please check internet connection"))
-        }
-        catch (e: Exception) {
-            Log.e("Create-Shared-Repo", "createSharedGoal: $e", )
+        } catch (e: Exception) {
+            Log.e("Create-Shared-Repo", "createSharedGoal: $e")
             SupabaseOperation.Failure(Exception("Group creation failed"))
         }
     }
 
-    override fun getSharedGoalsForGroup(groupId: String): Flow<SupabaseOperation<List<SharedGoal>>> = flow {
-        try {
-            getByForeignKey<SharedGoalDto>(
-                table = SupabaseConstants.SHARED_GOALS_TABLE,
-                column = "group_id",
-                refId = groupId
-            ) {sharedGoalDtos ->
-                if (sharedGoalDtos.isNotEmpty()) {
-                    val sharedGoals = sharedGoalDtos.map { it.toSharedGoal() }
-                    Log.d("Shared-Goal", "getSharedGoalsForGroup: $sharedGoals")
-                    emit(SupabaseOperation.Success(sharedGoals))
-                } else {
-                    Log.d("Shared-Goal", "getSharedGoalsForGroup: No goals")
-                    emit(SupabaseOperation.Success(emptyList()))
+    override fun getSharedGoalsForGroup(groupId: String): Flow<SupabaseOperation<List<SharedGoal>>> =
+        flow {
+            try {
+                getByForeignKey<SharedGoalDto>(
+                    table = SupabaseConstants.SHARED_GOALS_TABLE,
+                    column = "group_id",
+                    refId = groupId
+                ) { sharedGoalDtos ->
+                    if (sharedGoalDtos.isNotEmpty()) {
+                        val sharedGoals = sharedGoalDtos.map { it.toSharedGoal() }
+                        Log.d("Shared-Goal", "getSharedGoalsForGroup: $sharedGoals")
+                        emit(SupabaseOperation.Success(sharedGoals))
+                    } else {
+                        Log.d("Shared-Goal", "getSharedGoalsForGroup: No goals")
+                        emit(SupabaseOperation.Success(emptyList()))
+                    }
                 }
+            } catch (e: IOException) {
+                emit(SupabaseOperation.Failure(Exception(IOException("Please check internet connection"))))
+            } catch (e: Exception) {
+                Log.e("Shared-Goal", "getSharedGoalsForGroup: ${e.localizedMessage}")
+                emit(SupabaseOperation.Failure(Exception("Error fetching goals")))
             }
-        } catch (e: IOException) {
-            emit(SupabaseOperation.Failure(Exception(IOException("Please check internet connection"))))
-        } catch (e: Exception) {
-            Log.e("Shared-Goal", "getSharedGoalsForGroup: ${e.localizedMessage}")
-            emit(SupabaseOperation.Failure(Exception("Error fetching goals")))
         }
-    }
 
-    override fun getGroupMembersForSpecificGroup(groupId: String): Flow<List<GroupMemberDto>> {
+    override fun getGroupMembersForSpecificGroup(groupId: String): Flow<SupabaseOperation<List<UserProfile>>> {
         return flow {
             try {
                 getByForeignKey<GroupMemberDto>(
                     table = SupabaseConstants.GROUP_MEMBER_TABLE,
                     column = "group_id",
                     refId = groupId
-                ) {memberDtos ->
-                   val userIds = memberDtos.map {
-                       it.user_id
-                   }
-                    Log.d("Group-Mem", "getGroupMembers: $userIds")
+                ) { memberDtos ->
+                    val userIds = memberDtos.map {
+                        it.user_id
+                    }
+                    val profiles = supabaseClient.postgrest[SupabaseConstants.PROFILES_TABLE]
+                        .select {
+                            filter {
+                                isIn("id", userIds) // no need for for-each
+                            }
+                        }
+                        .decodeList<UserProfile>()
+                    emit(SupabaseOperation.Success(profiles))
                 }
+            } catch (e: IOException) {
+                emit(SupabaseOperation.Failure(IOException("Network error")))
             } catch (e: Exception) {
-                Log.e("Group-Mem", "getSpecificGroup: $e", )
+                emit(SupabaseOperation.Failure(IOException("Fetching error")))
             }
         }
     }
+
     private suspend inline fun getGroupMembers(
         members: (List<GroupMemberDto>) -> Unit
     ) {
@@ -240,7 +256,7 @@ class SharedGoalRepositoryImpl @Inject constructor(
     }
 
     // Maybe I will use this to get a single value from a table instead of writing the same logic again and again
-    private suspend inline fun <reified T: Any> getSingleById(
+    private suspend inline fun <reified T : Any> getSingleById(
         table: String,
         id: String,
         data: (T?) -> Unit
@@ -255,7 +271,7 @@ class SharedGoalRepositoryImpl @Inject constructor(
         data(result)
     }
 
-    private suspend inline fun <reified T: Any> getByForeignKey(
+    private suspend inline fun <reified T : Any> getByForeignKey(
         table: String,
         column: String,
         refId: String,

@@ -10,4 +10,5 @@ object SupabaseConstants {
     const val GROUP_TABLE = "groups"
     const val GROUP_MEMBER_TABLE = "group_members"
     const val SHARED_GOALS_TABLE = "shared_goals"
+    const val PROFILES_TABLE = "profiles"
 }

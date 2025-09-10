@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.Card
@@ -26,9 +28,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mathapp.domain.model.Group
+import com.example.mathapp.domain.model.UserProfile
 import com.example.mathapp.presentation.components.GroupBackGroundComponent
 import com.example.mathapp.ui.theme.GroupColor1
 
@@ -40,27 +45,43 @@ fun SpecificGroupDetailsScreen(
     Scaffold { innerPadding ->
         GroupBackGroundComponent()
 
-        state.group?.let { group ->
-            GroupDetails(
-                modifier = Modifier.padding(innerPadding),
-                group = group
-            )
+        if (state.error == null) {
+            state.group?.let { group ->
+                GroupDetails(
+                    modifier = Modifier.padding(innerPadding),
+                    group = group,
+                    members = state.belongedMembers
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    state.error!!
+                )
+            }
         }
     }
-
 }
 
 @Composable
 private fun GroupDetails(
     modifier: Modifier,
-    group: Group
+    group: Group,
+    members: List<UserProfile>
 ) {
     Column(
-        modifier = modifier.fillMaxSize().padding(12.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(12.dp),
         horizontalAlignment = Alignment.Start
     ) {
-        Box(modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
             Text(
                 text = group.name,
                 style = MaterialTheme.typography.headlineLarge
@@ -81,15 +102,59 @@ private fun GroupDetails(
                 modifier = Modifier.padding(8.dp),
                 fontStyle = FontStyle.Italic
             )
+
+            Text(
+                text = group.createdAt,
+                modifier = Modifier.padding(8.dp),
+                fontSize = 12.sp
+            )
         }
 
         Spacer(Modifier.height(8.dp))
 
-        Box(modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
             GroupIdCopy(group.id)
         }
 
+        Spacer(Modifier.height(30.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = GroupColor1.copy(alpha = 0.3f)
+            )
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                item {
+                    Text(
+                        text = "${members.size} members",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Light
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
+                items(items = members) { member ->
+                    Column(modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)) {
+                        Text(
+                            text = member.name,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Text(
+                            text = member.email,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Light
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
