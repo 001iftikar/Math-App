@@ -76,7 +76,9 @@ sealed class Routes {
     @Serializable
     data object JoinGroupScreen
     @Serializable
-    data class SharedGoalsScreen(val groupId: String)
+    data class SharedGoalsScreen(val groupId: String, val groupName: String = "") // had to give a default value cuz it was crashing when clicking on add shared goal button
     @Serializable
     data class AddSharedGoalScreen(val groupId: String)
+    @Serializable
+    data class SpecificGroupDetailsScreen(val groupId: String)
 }

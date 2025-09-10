@@ -18,7 +18,8 @@ class SharedGoalViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val groupId: String = checkNotNull(savedStateHandle["groupId"])
-    private val _sharedGoals = MutableStateFlow(SharedGoalsScreenState(groupId = groupId))
+    private val groupName: String = checkNotNull(savedStateHandle["groupName"])
+    private val _sharedGoals = MutableStateFlow(SharedGoalsScreenState(groupId = groupId, groupName = groupName))
     val sharedGoals = _sharedGoals.asStateFlow()
 
     init {

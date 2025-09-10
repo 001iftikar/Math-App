@@ -31,6 +31,8 @@ import com.example.mathapp.presentation.goal.shared_goals.joingroup_screen.JoinG
 import com.example.mathapp.presentation.goal.shared_goals.joingroup_screen.JoinGroupViewModel
 import com.example.mathapp.presentation.goal.shared_goals.sharedgoals_screen.SharedGoalViewModel
 import com.example.mathapp.presentation.goal.shared_goals.sharedgoals_screen.SharedGoalsScreen
+import com.example.mathapp.presentation.goal.shared_goals.specificgroupdetails_screen.SpecificGroupDetailsScreen
+import com.example.mathapp.presentation.goal.shared_goals.specificgroupdetails_screen.SpecificGroupViewModel
 import com.example.mathapp.presentation.goal.sign_in_up_screens.GoalSignInScreen
 import com.example.mathapp.presentation.goal.sign_in_up_screens.GoalSignUpScreen
 import com.example.mathapp.presentation.goal.specific_goal_screen.SpecificGoalScreen
@@ -231,8 +233,8 @@ fun NavApp(
                 GroupsScreen(
                     sharedViewModel = sharedViewModel,
                     viewModel = viewModel,
-                    goToSharedGoalsScreen = {
-                        navController.navigate(Routes.SharedGoalsScreen(it))
+                    goToSharedGoalsScreen = { id, name ->
+                        navController.navigate(Routes.SharedGoalsScreen(id, name))
                     },
                     goToCreateGroupScreen = { navController.navigate(Routes.CreateGroupScreen) }
                 )
@@ -261,6 +263,7 @@ fun NavApp(
                 SharedGoalsScreen(
                     sharedViewModel = sharedViewModel,
                     viewModel = viewModel,
+                    groupInfoClick = { navController.navigate(Routes.SpecificGroupDetailsScreen(it)) },
                     addGoal = { navController.navigate(Routes.AddSharedGoalScreen(it)) },
                 )
             }
@@ -274,6 +277,13 @@ fun NavApp(
                     groupId = groupId,
                     onCancel = { navController.popBackStack() },
                     backOnSuccess = { navController.popBackStack() }
+                )
+            }
+
+            composable<Routes.SpecificGroupDetailsScreen> {
+                val viewModel = hiltViewModel<SpecificGroupViewModel>()
+                SpecificGroupDetailsScreen(
+                    viewModel
                 )
             }
         }

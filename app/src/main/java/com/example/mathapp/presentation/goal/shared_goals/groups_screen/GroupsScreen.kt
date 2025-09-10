@@ -44,7 +44,7 @@ import com.example.mathapp.ui.theme.GroupColor1
 fun GroupsScreen(
     sharedViewModel: SharedViewModel,
     viewModel: GroupViewModel,
-    goToSharedGoalsScreen: (String) -> Unit,
+    goToSharedGoalsScreen: (String, String) -> Unit,
     goToCreateGroupScreen: () -> Unit
 ) {
     val state by viewModel.groupsState.collectAsStateWithLifecycle()
@@ -84,7 +84,8 @@ fun GroupsScreen(
                         modifier = Modifier.padding(innerPadding),
                         listState = listState,
                         groups = state.groups!!,
-                        onClick = { goToSharedGoalsScreen(it) }
+                        onClick = { id, name ->
+                            goToSharedGoalsScreen(id, name) }
                     )
                 } else {
                     EmptyList(
@@ -140,7 +141,7 @@ private fun GroupList(
     modifier: Modifier = Modifier,
     listState: LazyListState,
     groups: List<Group>,
-    onClick: (String) -> Unit
+    onClick: (String, String) -> Unit
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
@@ -152,7 +153,7 @@ private fun GroupList(
             GroupItem(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(onClick = { onClick(group.id) }),
+                    .clickable(onClick = { onClick(group.id, group.name) }),
                 group = group
             )
         }

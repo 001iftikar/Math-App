@@ -15,6 +15,7 @@ import com.example.mathapp.utils.SupabaseConstants
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Count
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.io.IOException
@@ -101,26 +102,47 @@ class SharedGoalRepositoryImpl @Inject constructor(
         try {
             val userId = supabaseClient.auth.currentUserOrNull()?.id
             if (userId != null) {
-                getSingleById<GroupDto>(
-                    table = SupabaseConstants.GROUP_TABLE,
-                    id = groupId
-                ) { groupDto ->
-                    if (groupDto != null) {
-                        supabaseClient.postgrest[SupabaseConstants.GROUP_MEMBER_TABLE]
-                            .upsert(
-                                GroupMemberDto(
-                                    group_id = groupId,
-                                    user_id = userId,
-                                    role = "member"
+                // check if a user is already in the table for the group
+                val exists = (supabaseClient.postgrest[SupabaseConstants.GROUP_MEMBER_TABLE]
+                    .select {
+                        // no need for data, just check if there's any row exists
+                        head = true
+                        count(Count.EXACT)
+                        filter {
+                            and {
+                                eq("group_id", groupId)
+                                eq("user_id", userId)
+                            }
+                        }
+                    }
+                    .countOrNull() ?: 0L) > 0L
+                Log.d("Group-Join", exists.toString())
+                if (exists) {
+                    emit(SupabaseOperation.Failure(Exception("You are already in this group")))
+                    return@flow
+                } else {
+                    getSingleById<GroupDto>(
+                        table = SupabaseConstants.GROUP_TABLE,
+                        id = groupId
+                    ) { groupDto ->
+                        if (groupDto != null) {
+                            supabaseClient.postgrest[SupabaseConstants.GROUP_MEMBER_TABLE]
+                                .upsert(
+                                    GroupMemberDto(
+                                        group_id = groupId,
+                                        user_id = userId,
+                                        role = "member"
+                                    )
                                 )
-                            )
-                        emit(SupabaseOperation.Success("Group joined"))
-                    } else {
-                        emit(SupabaseOperation.Failure(NullPointerException("Group not available.\n" +
-                                "Either you entered an invalid id or the admin deleted it.")))
-                        return@flow
+                            emit(SupabaseOperation.Success("Group joined"))
+                        } else {
+                            emit(SupabaseOperation.Failure(NullPointerException("Group not available.\n" +
+                                    "Either you entered an invalid id or the admin deleted it.")))
+                            return@flow
+                        }
                     }
                 }
+
             } else {
                 emit(SupabaseOperation.Failure(NullPointerException("Account not found")))
                 return@flow
@@ -196,8 +218,11 @@ class SharedGoalRepositoryImpl @Inject constructor(
                     table = SupabaseConstants.GROUP_MEMBER_TABLE,
                     column = "group_id",
                     refId = groupId
-                ) {
-                    Log.d("Group-Mem", "getGroupMembers: $it")
+                ) {memberDtos ->
+                   val userIds = memberDtos.map {
+                       it.user_id
+                   }
+                    Log.d("Group-Mem", "getGroupMembers: $userIds")
                 }
             } catch (e: Exception) {
                 Log.e("Group-Mem", "getSpecificGroup: $e", )
