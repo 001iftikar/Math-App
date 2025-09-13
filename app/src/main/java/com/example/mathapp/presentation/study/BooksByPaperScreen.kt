@@ -99,7 +99,6 @@ fun BooksByPaperScreen(
                     downloadModels.forEach {
                         status = it.status
                         progress = it.progress
-                        Log.d("Status", "BooksByPaperScreen: ${it.status}")
                     }
                 }
         }

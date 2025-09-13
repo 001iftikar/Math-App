@@ -42,7 +42,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.mathapp.presentation.components.AddSubjectDialog
@@ -51,18 +50,14 @@ import com.example.mathapp.presentation.components.DeleteDialog
 import com.example.mathapp.presentation.components.studySessionList
 import com.example.mathapp.presentation.components.taskList
 import com.example.mathapp.presentation.navigation.Routes
-import com.example.mathapp.presentation.studysmart.task.TaskViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubjectScreen(
     subjectViewModel: SubjectViewModel,
-    taskViewModel: TaskViewModel = hiltViewModel(),
-    navController: NavController,
-    subjectId: Int
+    navController: NavController
 ) {
     val subjectState by subjectViewModel.state.collectAsStateWithLifecycle()
-    val taskState by taskViewModel.state.collectAsStateWithLifecycle()
     val onEvent = subjectViewModel::onEvent
     val listState = rememberLazyListState()
     val isFABExpanded by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }

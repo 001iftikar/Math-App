@@ -229,7 +229,6 @@ class SubjectViewModel @Inject constructor(
                 }
 
             } catch (e: Exception) {
-                e.printStackTrace()
                 SnackbarController.sendEvent(
                     SnackbarEvent(
                         message = "Error updating subject: ${e.message}",

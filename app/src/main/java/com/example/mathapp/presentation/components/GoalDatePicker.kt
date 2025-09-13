@@ -19,7 +19,8 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
-fun GoalDatePicker(
+fun DatePickerComponent(
+    title: String,
     datePickerState: DatePickerState,
     isOpenState: Boolean,
     onDismissRequest: () -> Unit,
@@ -53,7 +54,7 @@ fun GoalDatePicker(
                 modifier = Modifier.fillMaxSize(),
                 title = {
                     Text(
-                        text = "Set your goal's deadline",
+                        text = title,
                         modifier = Modifier.padding(12.dp),
                         color = Color(0xFFFF4081),
                         style = MaterialTheme.typography.bodyLarge

@@ -1,1 +1,0 @@
--keep,allowobfuscation,allowshrinking class com.example.mathapp.ui.teacher.TeacherViewModel

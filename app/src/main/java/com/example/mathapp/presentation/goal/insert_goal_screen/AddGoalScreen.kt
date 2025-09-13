@@ -17,8 +17,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.mathapp.presentation.components.AddGoalComponent
+import com.example.mathapp.presentation.components.DatePickerComponent
 import com.example.mathapp.presentation.components.GoalAddedConfirmationDialog
-import com.example.mathapp.presentation.components.GoalDatePicker
 import com.example.mathapp.utils.SelectableDatesImpl
 import com.example.mathapp.utils.SupabaseTimeCast.formattedTimestampZ
 import com.example.mathapp.utils.SupabaseTimeCast.toTimestampZ
@@ -68,7 +68,8 @@ fun AddGoalScreen(
                 onPickDateClick = { onEvent(AddGoalScreenEvent.OnPickDateButtonClick) },
                 onCancelClick = { navHostController.popBackStack() }
             )
-            GoalDatePicker(
+            DatePickerComponent(
+                title = "Set your goal's deadline",
                 datePickerState = datePickerState,
                 isOpenState = state.isDatePickerOpen,
                 onDismissRequest = { onEvent(AddGoalScreenEvent.OnDatePickerDismissRequest) },

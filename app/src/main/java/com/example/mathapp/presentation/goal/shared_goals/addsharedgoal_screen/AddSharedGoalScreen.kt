@@ -10,7 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mathapp.presentation.components.AddGoalComponent
-import com.example.mathapp.presentation.components.GoalDatePicker
+import com.example.mathapp.presentation.components.DatePickerComponent
 import com.example.mathapp.presentation.components.GroupBackGroundComponent
 import com.example.mathapp.shared.SharedEvent
 import com.example.mathapp.shared.SharedViewModel
@@ -63,7 +63,8 @@ fun AddSharedGoalScreen(
             onCancelClick = onCancel
         )
 
-        GoalDatePicker(
+        DatePickerComponent(
+            title = "Set your goal's deadline",
             datePickerState = datePickerState,
             isOpenState = state.isDatePickerOpen,
             onDismissRequest = { onEvent(AddSharedGoalScreenEvent.DatePickerStateChange(false)) },

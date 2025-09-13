@@ -45,11 +45,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.mathapp.presentation.components.DatePickerComponent
 import com.example.mathapp.presentation.components.DeleteDialog
 import com.example.mathapp.presentation.components.SubjectListBottomSheet
 import com.example.mathapp.presentation.components.TaskCheckBox
-import com.example.mathapp.presentation.components.TaskDatePicker
 import com.example.mathapp.utils.Priority
+import com.example.mathapp.utils.SelectableDatesImpl
 import com.example.mathapp.utils.changeMillisToDateString
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -66,7 +67,8 @@ fun TaskScreen(
     var deleteDialogOpenState by remember { mutableStateOf(false) }
     var isTaskDatePickerDialogOpen by remember { mutableStateOf(false) }
     val taskDatePickerState: DatePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = Instant.now().toEpochMilli()
+        initialSelectedDateMillis = Instant.now().toEpochMilli(),
+        selectableDates = SelectableDatesImpl
     )
 
     var relatedToSubject by remember { mutableStateOf("Select a subject") }
@@ -88,15 +90,17 @@ fun TaskScreen(
         }
     }
 
-    TaskDatePicker(
-        state = taskDatePickerState,
-        isOpen = isTaskDatePickerDialogOpen,
+    DatePickerComponent(
+        title = "By when do you plan to complete?",
+        datePickerState = taskDatePickerState,
+        isOpenState = isTaskDatePickerDialogOpen,
         onDismissRequest = { isTaskDatePickerDialogOpen = false },
-        onConfirmButtonClicked = {
+        onConfirm = {
             val selectedDate = taskDatePickerState.selectedDateMillis
             onEvent(TaskEvent.OnDateChange(selectedDate))
             isTaskDatePickerDialogOpen = false
-        }
+        },
+        onCancel = { isTaskDatePickerDialogOpen = false }
     )
 
     DeleteDialog(
@@ -189,15 +193,20 @@ fun TaskScreen(
                 style = MaterialTheme.typography.bodySmall
             )
             Spacer(Modifier.height(10.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp)
+            ) {
                 Priority.entries.forEach { priority ->
                     PriorityButton(
+                        modifier = Modifier.weight(1f),
                         label = priority.title,
                         backGroundColor = priority.color,
-                        borderColor = if (priority == Priority.MEDIUM) {
+                        borderColor = if (state.priority == priority) {
                             Color.White
                         } else Color.Transparent,
-                        labelColor = if (priority == Priority.MEDIUM) {
+                        labelColor = if (state.priority == priority) {
                             Color.White
                         } else Color.White.copy(alpha = 0.7f),
                         onClick = {

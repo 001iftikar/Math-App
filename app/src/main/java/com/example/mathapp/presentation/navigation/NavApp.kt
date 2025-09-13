@@ -164,8 +164,7 @@ fun NavApp(
                 )
                 SubjectScreen(
                     subjectViewModel = viewModel,
-                    navController = navController,
-                    subjectId = screenArgs.subjectId
+                    navController = navController
                 )
             }
 
