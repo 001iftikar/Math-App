@@ -4,6 +4,7 @@ import com.example.mathapp.domain.model.Subject
 import com.example.mathapp.utils.Priority
 
 sealed class TaskEvent {
+    data object Idle : TaskEvent()
     data class OnTitleChange(val title: String) : TaskEvent()
     data class OnDescriptionChange(val desc: String) : TaskEvent()
     data class OnDateChange(val millis: Long?) : TaskEvent()
@@ -12,4 +13,5 @@ sealed class TaskEvent {
     data object OnIsCompleteChange : TaskEvent()
     data object SaveTask : TaskEvent()
     data object DeleteTask : TaskEvent()
+    data object OnSuccess : TaskEvent()
 }

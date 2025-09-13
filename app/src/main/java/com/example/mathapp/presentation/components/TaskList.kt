@@ -79,7 +79,9 @@ fun LazyListScope.taskList(
 @Composable
 private fun TaskCard(task: Task, onCheckBoxClick: () -> Unit, onClick: () -> Unit) {
     ElevatedCard(
-        modifier = Modifier.clickable(
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable(
             onClick = {
                 onClick()
             }

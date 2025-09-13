@@ -4,7 +4,7 @@ import com.example.mathapp.domain.model.Subject
 import com.example.mathapp.utils.Priority
 
 data class TaskState(
-    val currentTaskId: Int = 0,
+    val currentTaskId: Int? = null,
     val title: String = "",
     val description: String = "",
     val dueDate: Long? = null,

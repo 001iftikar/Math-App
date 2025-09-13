@@ -4,6 +4,7 @@ import com.example.mathapp.data.local.SessionDao
 import com.example.mathapp.domain.model.Session
 import com.example.mathapp.domain.repository.SessionRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
@@ -12,8 +13,14 @@ class SessionRepositoryImpl @Inject constructor(private val sessionDao: SessionD
         sessionDao.insertSession(session)
     }
 
+    override suspend fun deleteSession(session: Session) {
+        sessionDao.deleteSession(session)
+    }
+
     override fun getAllSessions(): Flow<List<Session>> {
-        return sessionDao.getAllSessions()
+        return sessionDao.getAllSessions().map { sessions ->
+            sessions.sortedByDescending { it.date } // latest first
+        }
     }
 
     override fun getTotalSessionDuration(): Flow<Long> {
@@ -21,7 +28,11 @@ class SessionRepositoryImpl @Inject constructor(private val sessionDao: SessionD
     }
 
     override fun getRecentTenSessionForSubject(subjectId: Int): Flow<List<Session>> {
-        return sessionDao.getRecentSessionForSubject(subjectId).take(10)
+        return sessionDao.getRecentSessionForSubject(subjectId)
+            .map { sessions ->
+                sessions.sortedByDescending { it.date }
+            }
+            .take(10)
     }
 
     override fun getTotalSessionDurationBySubject(subjectId: Int): Flow<Long> {
@@ -33,6 +44,8 @@ class SessionRepositoryImpl @Inject constructor(private val sessionDao: SessionD
     }
 
     override fun getRecentFiveSessions(): Flow<List<Session>> {
-        return sessionDao.getRecentFiveSessions()
+        return sessionDao.getRecentFiveSessions().map { sessions ->
+            sessions.sortedByDescending { it.date }
+        }
     }
 }

@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class Task(
     @PrimaryKey(autoGenerate = true)
-    val taskId: Int = 0,
+    val taskId: Int? = 0,
     val taskSubjectId: Int,
     val title: String,
     val description: String,

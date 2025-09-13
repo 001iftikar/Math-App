@@ -10,15 +10,14 @@ import com.example.mathapp.domain.model.Task
 import com.example.mathapp.domain.repository.SessionRepository
 import com.example.mathapp.domain.repository.SubjectRepository
 import com.example.mathapp.domain.repository.TaskRepository
-import com.example.mathapp.utils.SnackBarEvent
+import com.example.mathapp.presentation.snackbar.SnackbarController
+import com.example.mathapp.presentation.snackbar.SnackbarEvent
 import com.example.mathapp.utils.toHours
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -26,9 +25,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DashBoardViewModel @Inject constructor(private val subjectRepository: SubjectRepository,
+class DashBoardViewModel @Inject constructor(
+    private val subjectRepository: SubjectRepository,
     private val sessionRepository: SessionRepository,
-    private val taskRepository: TaskRepository) : ViewModel() {
+    private val taskRepository: TaskRepository
+) : ViewModel() {
     private val _state = MutableStateFlow(DashBoardState())
     val state = combine(
         _state,
@@ -36,8 +37,7 @@ class DashBoardViewModel @Inject constructor(private val subjectRepository: Subj
         subjectRepository.getTotalGoalHours(),
         subjectRepository.getAllSubjects(),
         sessionRepository.getTotalSessionDuration()
-    ) {
-        state, subjectCount, goalHours, subjects, totalSessionDuration ->
+    ) { state, subjectCount, goalHours, subjects, totalSessionDuration ->
         state.copy(
             totalSubjectCount = subjectCount,
             subjectList = subjects,
@@ -64,21 +64,22 @@ class DashBoardViewModel @Inject constructor(private val subjectRepository: Subj
             initialValue = emptyList()
         )
 
-    private val _snackBarEventFlow = MutableSharedFlow<SnackBarEvent>()
-    val snackBarEventFlow = _snackBarEventFlow.asSharedFlow()
+
     fun onEvent(event: DashBoardEvent) {
-        when(event) {
+        when (event) {
             DashBoardEvent.SaveSubject -> saveSubject()
             is DashBoardEvent.onGoalStudyHoursChange -> {
                 _state.update {
                     it.copy(goalStudyHours = event.hours)
                 }
             }
+
             is DashBoardEvent.onSubjectCardColorChange -> {
                 _state.update {
                     it.copy(subjectCardColors = event.colors)
                 }
             }
+
             is DashBoardEvent.onSubjectNameChange -> {
                 _state.update {
                     it.copy(subjectName = event.name)
@@ -86,16 +87,16 @@ class DashBoardViewModel @Inject constructor(private val subjectRepository: Subj
             }
 
             is DashBoardEvent.onTaskIsCompleteChange -> {
-
+                updateTask(event.task)
             }
 
-            DashBoardEvent.DeleteSession -> {
-            }
             is DashBoardEvent.onDeleteSessionButtonClick -> {
                 _state.update {
                     it.copy(session = event.session)
                 }
             }
+
+            DashBoardEvent.DeleteSession -> deleteSession()
         }
     }
 
@@ -115,21 +116,65 @@ class DashBoardViewModel @Inject constructor(private val subjectRepository: Subj
                         goalStudyHours = ""
                     )
                 }
-                _snackBarEventFlow.emit(
-                    SnackBarEvent.ShowSnackBar(
-                        message = "Subject added."
+                SnackbarController.sendEvent(
+                    SnackbarEvent(
+                        message = "Subject Added",
+                        duration = SnackbarDuration.Short
                     )
                 )
             } catch (e: Exception) {
-                _snackBarEventFlow.emit(
-                    SnackBarEvent.ShowSnackBar(
+                SnackbarController.sendEvent(
+                    SnackbarEvent(
                         message = "Couldn't save subject. ${e.message}",
-                        SnackbarDuration.Long
+                        duration = SnackbarDuration.Long
                     )
                 )
-
             }
+        }
+    }
 
+    private fun deleteSession() {
+        viewModelScope.launch {
+            try {
+                state.value.session?.let {
+                    sessionRepository.deleteSession(it)
+
+                    SnackbarController.sendEvent(
+                        SnackbarEvent(
+                            message = "Session deleted successfully",
+                            duration = SnackbarDuration.Short
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                SnackbarController.sendEvent(
+                    SnackbarEvent(
+                        message = "Session deleting failed: ${e.message}",
+                        duration = SnackbarDuration.Long
+                    )
+                )
+            }
+        }
+    }
+
+    private fun updateTask(task: Task) {
+        viewModelScope.launch {
+            try {
+                taskRepository.upsertTask(
+                    task = task.copy(isComplete = !task.isComplete)
+                )
+                SnackbarController.sendEvent(
+                    SnackbarEvent(message = "Saved in completed tasks.",
+                        duration = SnackbarDuration.Short)
+                )
+            } catch (e: Exception) {
+                SnackbarController.sendEvent(
+                    SnackbarEvent(
+                        message = "Couldn't update task. ${e.message}",
+                        duration = SnackbarDuration.Long
+                    )
+                )
+            }
         }
     }
 }

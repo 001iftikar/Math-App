@@ -7,16 +7,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.mathapp.domain.model.Task
 import com.example.mathapp.domain.repository.SubjectRepository
 import com.example.mathapp.domain.repository.TaskRepository
+import com.example.mathapp.presentation.snackbar.SnackbarController
+import com.example.mathapp.presentation.snackbar.SnackbarEvent
 import com.example.mathapp.utils.Priority
-import com.example.mathapp.utils.SnackBarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -42,8 +42,8 @@ class TaskViewModel @Inject constructor(
         initialValue = TaskState()
     )
 
-    private val _snackBarEventFlow = MutableSharedFlow<SnackBarEvent>()
-    val snackBarEventFlow = _snackBarEventFlow.asSharedFlow()
+    private val _taskEvent: Channel<TaskEvent> = Channel()
+    val taskEvent = _taskEvent.receiveAsFlow()
 
     init {
         fetchTask()
@@ -73,7 +73,11 @@ class TaskViewModel @Inject constructor(
                 }
             }
 
-            is TaskEvent.OnPriorityChange -> TODO()
+            is TaskEvent.OnPriorityChange -> {
+                _state.update {
+                    it.copy(priority = event.priority)
+                }
+            }
             is TaskEvent.OnRelatedSubjectSelect -> {
                 _state.update {
                     it.copy(
@@ -90,6 +94,8 @@ class TaskViewModel @Inject constructor(
             }
 
             TaskEvent.SaveTask -> saveTask()
+
+            else -> Unit
         }
     }
 
@@ -97,10 +103,10 @@ class TaskViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
 
             if (_state.value.subjectId == null || _state.value.relatedToSubject == null) {
-                _snackBarEventFlow.emit(
-                    SnackBarEvent.ShowSnackBar(
+                SnackbarController.sendEvent(
+                    SnackbarEvent(
                         message = "Please select a subject",
-                        duration = SnackbarDuration.Long
+                        duration = SnackbarDuration.Short
                     )
                 )
                 return@launch
@@ -121,21 +127,19 @@ class TaskViewModel @Inject constructor(
 
                 )
 
-                _snackBarEventFlow.emit(
-                    SnackBarEvent.ShowSnackBar(
-                        message = "Task Saved"
+                SnackbarController.sendEvent(
+                    SnackbarEvent(
+                        message = "Task Saved",
+                        duration = SnackbarDuration.Short
                     )
                 )
 
-                delay(350)
+                _taskEvent.send(TaskEvent.OnSuccess)
 
-                _snackBarEventFlow.emit(
-                    SnackBarEvent.NavigateBack
-                )
             } catch (e: Exception) {
                 e.printStackTrace()
-                _snackBarEventFlow.emit(
-                    SnackBarEvent.ShowSnackBar(
+                SnackbarController.sendEvent(
+                    SnackbarEvent(
                         message = "Saving task was not possible: ${e.message}",
                         duration = SnackbarDuration.Long
                     )

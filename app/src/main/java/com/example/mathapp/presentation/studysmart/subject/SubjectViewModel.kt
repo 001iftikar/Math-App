@@ -7,18 +7,17 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mathapp.domain.model.Subject
+import com.example.mathapp.domain.model.Task
 import com.example.mathapp.domain.repository.SessionRepository
 import com.example.mathapp.domain.repository.SubjectRepository
 import com.example.mathapp.domain.repository.TaskRepository
-import com.example.mathapp.utils.SnackBarEvent
+import com.example.mathapp.presentation.snackbar.SnackbarController
+import com.example.mathapp.presentation.snackbar.SnackbarEvent
 import com.example.mathapp.utils.toHours
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -29,7 +28,7 @@ import javax.inject.Inject
 class SubjectViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val subjectRepository: SubjectRepository,
-    taskRepository: TaskRepository,
+    private val taskRepository: TaskRepository,
     private val sessionRepository: SessionRepository,
 ) : ViewModel() {
     private val subjectId: Int = checkNotNull(savedStateHandle["subjectId"])
@@ -53,9 +52,6 @@ class SubjectViewModel @Inject constructor(
         initialValue = SubjectState()
     )
 
-    private val _snackBarEvent = MutableSharedFlow<SnackBarEvent>()
-    val snackBarEvent = _snackBarEvent.asSharedFlow()
-
     init {
         fetchSubject()
     }
@@ -64,7 +60,13 @@ class SubjectViewModel @Inject constructor(
         when (event) {
             SubjectEvent.DeleteSession -> deleteSession()
             SubjectEvent.DeleteSubject -> deleteSubject()
-            is SubjectEvent.OnDeleteSessionButtonClick -> TODO()
+            is SubjectEvent.OnDeleteSessionButtonClick -> {
+                _state.update {
+                    it.copy(
+                        session = event.session
+                    )
+                }
+            }
             is SubjectEvent.OnGoalStudyHoursChange -> {
                 _state.update {
                     it.copy(
@@ -81,14 +83,18 @@ class SubjectViewModel @Inject constructor(
                 }
             }
 
-            is SubjectEvent.OnSubjectNameChange ->
+            is SubjectEvent.OnSubjectNameChange -> {
                 _state.update {
                     it.copy(
                         subjectName = event.name
                     )
                 }
+            }
 
-            is SubjectEvent.OnTaskIsCompleteChange -> TODO()
+            is SubjectEvent.OnTaskIsCompleteChange -> {
+                updateTask(event.task)
+            }
+
             SubjectEvent.UpdateSubject -> {
                 updateSubject()
             }
@@ -127,25 +133,23 @@ class SubjectViewModel @Inject constructor(
                     subjectRepository.deleteSubject(currentSubjectId)
 
 
-                    _snackBarEvent.emit(
-                        SnackBarEvent.ShowSnackBar(
+                    SnackbarController.sendEvent(
+                        SnackbarEvent(
                             message = "Subject deleted successfully",
+                            duration = SnackbarDuration.Short
                         )
                     )
-                    delay(350)
-                    _snackBarEvent.emit(
-                        SnackBarEvent.NavigateBack
-                    )
                 } else {
-                    _snackBarEvent.emit(
-                        SnackBarEvent.ShowSnackBar(
+                    SnackbarController.sendEvent(
+                        SnackbarEvent(
                             message = "No subject",
+                            duration = SnackbarDuration.Short
                         )
                     )
                 }
             } catch (e: Exception) {
-                _snackBarEvent.emit(
-                    SnackBarEvent.ShowSnackBar(
+                SnackbarController.sendEvent(
+                    SnackbarEvent(
                         message = "Error deleting subject: ${e.message}",
                         duration = SnackbarDuration.Long
                     )
@@ -154,8 +158,56 @@ class SubjectViewModel @Inject constructor(
         }
     }
 
-    private fun deleteSession() {
+    private fun updateTask(task: Task) {
+        viewModelScope.launch {
+            try {
+                taskRepository.upsertTask(
+                    task = task.copy(isComplete = !task.isComplete)
+                )
+                if (task.isComplete) {
+                    SnackbarController.sendEvent(
+                        SnackbarEvent(message = "Saved in upcoming tasks.",
+                            duration = SnackbarDuration.Short)
+                    )
+                } else {
+                    SnackbarController.sendEvent(
+                        SnackbarEvent(message = "Saved in completed tasks.",
+                            duration = SnackbarDuration.Short)
+                    )
+                }
+            } catch (e: Exception) {
+                SnackbarController.sendEvent(
+                    SnackbarEvent(
+                        message = "Couldn't update task. ${e.message}",
+                        duration = SnackbarDuration.Long
+                    )
+                )
+            }
+        }
+    }
 
+    private fun deleteSession() {
+        viewModelScope.launch {
+            try {
+                state.value.session?.let {
+                    sessionRepository.deleteSession(it)
+
+                    SnackbarController.sendEvent(
+                        SnackbarEvent(
+                            message = "Session deleted successfully",
+                            duration = SnackbarDuration.Short
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                SnackbarController.sendEvent(
+                    SnackbarEvent(
+                        message = "Session deleting failed: ${e.message}",
+                        duration = SnackbarDuration.Long
+                    )
+                )
+            }
+        }
     }
 
     private fun updateSubject() {
@@ -170,17 +222,18 @@ class SubjectViewModel @Inject constructor(
                             colors = state.value.subjectCardColors.map { color -> color.toArgb() },
                         )
                     )
-                    _snackBarEvent.emit(
-                        SnackBarEvent.ShowSnackBar(message = "Subject updated")
+                    SnackbarController.sendEvent(
+                        SnackbarEvent(message = "Subject updated",
+                            duration = SnackbarDuration.Short)
                     )
                 }
 
             } catch (e: Exception) {
                 e.printStackTrace()
-                _snackBarEvent.emit(
-                    SnackBarEvent.ShowSnackBar(
+                SnackbarController.sendEvent(
+                    SnackbarEvent(
                         message = "Error updating subject: ${e.message}",
-                        SnackbarDuration.Long
+                        duration = SnackbarDuration.Long
                     )
                 )
             }

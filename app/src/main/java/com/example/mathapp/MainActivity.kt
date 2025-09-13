@@ -1,9 +1,14 @@
 package com.example.mathapp
 
 import android.annotation.SuppressLint
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -13,8 +18,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -25,6 +33,7 @@ import com.example.mathapp.presentation.navigation.NavApp
 import com.example.mathapp.presentation.navigation.Routes
 import com.example.mathapp.presentation.snackbar.ObserveAsEvents
 import com.example.mathapp.presentation.snackbar.SnackbarController
+import com.example.mathapp.presentation.studysmart.session.StudySessionTimerService
 import com.example.mathapp.ui.theme.MathAppTheme
 import com.ketch.DownloadConfig
 import com.ketch.Ketch
@@ -36,6 +45,33 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var ketch: Ketch
+
+    private var isBound by mutableStateOf(false)
+    private lateinit var timerService: StudySessionTimerService
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(
+            name: ComponentName?,
+            service: IBinder?
+        ) {
+            val binder = service as StudySessionTimerService.StudySessionTimerBinder
+            timerService = binder.getService()
+            isBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            isBound = false
+        }
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Intent(this, StudySessionTimerService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -71,52 +107,61 @@ class MainActivity : ComponentActivity() {
             statusBarStyle = SystemBarStyle.dark(Color.Transparent.toArgb())
         )
         setContent {
-            val navController = rememberNavController()
-            MathAppTheme(darkTheme = true, dynamicColor = false) {
-                val snackbarHostState = remember {
-                    SnackbarHostState()
-                }
-                val scope = rememberCoroutineScope()
-                ObserveAsEvents(
-                    flow = SnackbarController.events,
-                    snackbarHostState
-                ) { event ->
-                    scope.launch {
-                        snackbarHostState.currentSnackbarData?.dismiss()
-                        val result = snackbarHostState.showSnackbar(
-                            message = event.message,
-                            actionLabel = event.action?.name,
-                            duration = event.duration
-                        )
+            if (isBound){
+                val navController = rememberNavController()
+                MathAppTheme(darkTheme = true, dynamicColor = false) {
+                    val snackbarHostState = remember {
+                        SnackbarHostState()
+                    }
+                    val scope = rememberCoroutineScope()
+                    ObserveAsEvents(
+                        flow = SnackbarController.events,
+                        snackbarHostState
+                    ) { event ->
+                        scope.launch {
+                            snackbarHostState.currentSnackbarData?.dismiss()
+                            val result = snackbarHostState.showSnackbar(
+                                message = event.message,
+                                actionLabel = event.action?.name,
+                                duration = event.duration
+                            )
 
-                        if (result == SnackbarResult.ActionPerformed) {
-                            event.action?.route?.let { route ->
-                                if (route == Routes.FinishedGoalsScreen) {
-                                    navController.navigate(route) {
-                                        popUpTo<Routes.GoalHomeScreen> {
-                                            inclusive = false
+                            if (result == SnackbarResult.ActionPerformed) {
+                                event.action?.route?.let { route ->
+                                    if (route == Routes.FinishedGoalsScreen) {
+                                        navController.navigate(route) {
+                                            popUpTo<Routes.GoalHomeScreen> {
+                                                inclusive = false
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                Scaffold(
-                    snackbarHost = {
-                        SnackbarHost(
-                            hostState = snackbarHostState
-                        )
-                    },
-                    modifier = Modifier.fillMaxSize()
-                ) { innerPadding ->
-                    NavApp(
-                        navController = navController,
-                       ketch =  ketch)
-
+                    Scaffold(
+                        snackbarHost = {
+                            SnackbarHost(
+                                hostState = snackbarHostState
+                            )
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    ) { innerPadding ->
+                        NavApp(
+                            navController = navController,
+                            ketch =  ketch,
+                            timerService = timerService)
+                    }
                 }
             }
+
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(connection)
+        isBound = false
     }
 }
 

@@ -13,6 +13,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.example.mathapp.presentation.chatbot.ChatBotScreen
 import com.example.mathapp.presentation.goal.finished_goals_screen.FinishedGoalsScreen
@@ -43,6 +44,7 @@ import com.example.mathapp.presentation.study.DownloadsScreen
 import com.example.mathapp.presentation.study.StudyHomeScreen
 import com.example.mathapp.presentation.studysmart.dashboard.StudySmartScreen
 import com.example.mathapp.presentation.studysmart.session.SessionScreen
+import com.example.mathapp.presentation.studysmart.session.StudySessionTimerService
 import com.example.mathapp.presentation.studysmart.subject.SubjectScreen
 import com.example.mathapp.presentation.studysmart.subject.SubjectViewModel
 import com.example.mathapp.presentation.studysmart.task.TaskScreen
@@ -51,13 +53,15 @@ import com.example.mathapp.presentation.teacher.TeacherScreen
 import com.example.mathapp.presentation.teacher.TeacherScreenByName
 import com.example.mathapp.shared.SharedViewModel
 import com.example.mathapp.utils.FAB_EXPLODE_BOUNDS_KEY
+import com.example.mathapp.utils.ServiceConstants
 import com.ketch.Ketch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun NavApp(
     navController: NavHostController,
-    ketch: Ketch
+    ketch: Ketch,
+    timerService: StudySessionTimerService
 ) {
     val sharedViewModel = hiltViewModel<SharedViewModel>()
     SharedTransitionLayout {
@@ -133,12 +137,20 @@ fun NavApp(
                 )
             }
 
-            composable<Routes.StudySmartScreen> {
+            composable<Routes.StudySmartScreen>(
+                deepLinks = listOf(
+                    navDeepLink { uriPattern = "yourapp://studysmart" }
+                )
+            ) {
                 StudySmartScreen(navHostController = navController)
             }
 
-            composable<Routes.SessionScreen> {
-                SessionScreen(navHostController = navController)
+            composable<Routes.SessionScreen>(
+                deepLinks = listOf(
+                    navDeepLink { uriPattern = ServiceConstants.STUDY_SESSION_DEEP_LINK }
+                )
+            ) {
+                SessionScreen(navHostController = navController, timerService = timerService)
             }
 
             composable<Routes.SubjectScreen> {

@@ -27,6 +27,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.mathapp.R
 import com.example.mathapp.domain.model.Session
+import com.example.mathapp.utils.changeMillisToDateString
+import com.example.mathapp.utils.toHours
 
 fun LazyListScope.studySessionList(
     sectionTitle: String,
@@ -65,7 +67,7 @@ fun LazyListScope.studySessionList(
         }
     }
 
-    items(sessions) {session ->
+    items(sessions) { session ->
         StudySessionCard(
             session = session,
         ) {
@@ -79,7 +81,7 @@ private fun StudySessionCard(
     session: Session,
     onDeleteIconClick: () -> Unit
 ) {
-    Card() {
+    Card(modifier = Modifier.padding(8.dp)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -93,13 +95,13 @@ private fun StudySessionCard(
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = "${session.date}",
+                    text = session.date.changeMillisToDateString(),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
             Spacer(Modifier.weight(1f))
             Text(
-                text = "${session.duration}H",
+                text = "${session.duration.toHours()}H",
                 style = MaterialTheme.typography.bodySmall
             )
             IconButton(

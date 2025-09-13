@@ -37,7 +37,7 @@ sealed class Routes {
     object SessionScreen
 
     @Serializable
-    data class TaskScreen(val taskId: Int)
+    data class TaskScreen(val taskId: Int?)
 
     // Routes for Ai
     @Serializable

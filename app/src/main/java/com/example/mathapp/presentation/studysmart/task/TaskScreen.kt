@@ -28,8 +28,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
@@ -52,7 +50,6 @@ import com.example.mathapp.presentation.components.SubjectListBottomSheet
 import com.example.mathapp.presentation.components.TaskCheckBox
 import com.example.mathapp.presentation.components.TaskDatePicker
 import com.example.mathapp.utils.Priority
-import com.example.mathapp.utils.SnackBarEvent
 import com.example.mathapp.utils.changeMillisToDateString
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -66,7 +63,6 @@ fun TaskScreen(
 ) {
     val state by taskViewModel.state.collectAsStateWithLifecycle()
     val onEvent = taskViewModel::onEvent
-    val snackBarState = taskViewModel.snackBarEventFlow
     var deleteDialogOpenState by remember { mutableStateOf(false) }
     var isTaskDatePickerDialogOpen by remember { mutableStateOf(false) }
     val taskDatePickerState: DatePickerState = rememberDatePickerState(
@@ -80,21 +76,14 @@ fun TaskScreen(
     var isSheetOpen by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    val snackBarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(true) {
-        snackBarState.collectLatest {
-            when(it) {
-                is SnackBarEvent.ShowSnackBar -> {
-                    snackBarHostState.showSnackbar(
-                        message = it.message,
-                        duration = it.duration
-                    )
-                }
-
-                SnackBarEvent.NavigateBack -> {
+    LaunchedEffect(Unit) {
+        taskViewModel.taskEvent.collectLatest { event ->
+            when (event) {
+                TaskEvent.OnSuccess -> {
                     navController.popBackStack()
                 }
+
+                else -> Unit
             }
         }
     }
@@ -102,18 +91,19 @@ fun TaskScreen(
     TaskDatePicker(
         state = taskDatePickerState,
         isOpen = isTaskDatePickerDialogOpen,
-        onDismissRequest = {isTaskDatePickerDialogOpen = false},
+        onDismissRequest = { isTaskDatePickerDialogOpen = false },
         onConfirmButtonClicked = {
             val selectedDate = taskDatePickerState.selectedDateMillis
             onEvent(TaskEvent.OnDateChange(selectedDate))
-            isTaskDatePickerDialogOpen = false}
+            isTaskDatePickerDialogOpen = false
+        }
     )
 
     DeleteDialog(
         isOpen = deleteDialogOpenState,
         title = "Delete Task",
         bodyText = "Are you sure? This action is non reversible",
-        onDismissRequest = {deleteDialogOpenState = false}
+        onDismissRequest = { deleteDialogOpenState = false }
     ) {
         onEvent(TaskEvent.DeleteTask)
         deleteDialogOpenState = false
@@ -122,15 +112,15 @@ fun TaskScreen(
     SubjectListBottomSheet(
         sheetState = sheetState,
         isOpen = isSheetOpen,
-        subjects = state.subjects  ,
-        onSubjectClicked = {subject ->
+        subjects = state.subjects,
+        onSubjectClicked = { subject ->
             relatedToSubject = subject.name
             onEvent(TaskEvent.OnRelatedSubjectSelect(subject))
             scope.launch { sheetState.hide() }.invokeOnCompletion {
                 if (!sheetState.isVisible) isSheetOpen = false
             }
         },
-        onDismissButtonClick = {isSheetOpen = false}
+        onDismissButtonClick = { isSheetOpen = false }
     )
 
     Scaffold(
@@ -138,14 +128,13 @@ fun TaskScreen(
             TaskScreenTopBar(
                 isTaskExists = state.currentTaskId != null,
                 isCompleted = state.isTaskComplete,
-                checkBoxBorderColor = Color.Red,
-                onDeleteButtonClick = {deleteDialogOpenState = true},
-                onBackButtonClick = {navController.popBackStack()},
-                onCheckBoxClick = {onEvent(TaskEvent.OnIsCompleteChange)}
+                checkBoxBorderColor = state.priority.color,
+                onDeleteButtonClick = { deleteDialogOpenState = true },
+                onBackButtonClick = { navController.popBackStack() },
+                onCheckBoxClick = { onEvent(TaskEvent.OnIsCompleteChange) }
             )
-        },
-        snackbarHost = { SnackbarHost(snackBarHostState) }
-    ) {innerPadding ->
+        }
+    ) { innerPadding ->
         Column(
             modifier =
                 Modifier
@@ -157,16 +146,16 @@ fun TaskScreen(
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.title,
-                onValueChange = {onEvent(TaskEvent.OnTitleChange(it))},
-                label = {Text("Title")},
+                onValueChange = { onEvent(TaskEvent.OnTitleChange(it)) },
+                label = { Text("Title") },
                 singleLine = true
             )
             Spacer(Modifier.height(10.dp))
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.description,
-                onValueChange = {onEvent(TaskEvent.OnDescriptionChange(it))},
-                label = {Text("Description")},
+                onValueChange = { onEvent(TaskEvent.OnDescriptionChange(it)) },
+                label = { Text("Description") },
             )
             Spacer(Modifier.height(20.dp))
             Text(
@@ -210,7 +199,10 @@ fun TaskScreen(
                         } else Color.Transparent,
                         labelColor = if (priority == Priority.MEDIUM) {
                             Color.White
-                        } else Color.White.copy(alpha = 0.7f)
+                        } else Color.White.copy(alpha = 0.7f),
+                        onClick = {
+                            onEvent(TaskEvent.OnPriorityChange(priority))
+                        }
                     )
                 }
             }
@@ -274,7 +266,7 @@ private fun TaskScreenTopBar(
                 )
             }
         },
-        title = {Text("Tasks", style = MaterialTheme.typography.headlineSmall)},
+        title = { Text("Tasks", style = MaterialTheme.typography.headlineSmall) },
         actions = {
             if (isTaskExists) {
                 TaskCheckBox(
