@@ -52,6 +52,7 @@ dependencies {
     // Supabase
     implementation(platform("io.github.jan-tennert.supabase:bom:3.2.2"))
     implementation("io.github.jan-tennert.supabase:postgrest-kt:3.2.2")
+    implementation("io.github.jan-tennert.supabase:realtime-kt:3.2.2")
 
     implementation("io.github.jan-tennert.supabase:auth-kt:3.2.2")
     implementation("io.ktor:ktor-client-android:3.2.3")

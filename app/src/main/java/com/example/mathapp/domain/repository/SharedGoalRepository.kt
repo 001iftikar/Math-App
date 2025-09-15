@@ -17,4 +17,6 @@ interface SharedGoalRepository {
     fun getSharedGoalsForGroup(groupId: String): Flow<SupabaseOperation<List<SharedGoal>>>
     suspend fun createSharedGoal(sharedGoalDto: SharedGoalDto): SupabaseOperation<String>
     fun getGroupMembersForSpecificGroup(groupId: String): Flow<SupabaseOperation<List<UserProfile>>>
+
+    suspend fun isGroupAdmin(groupId: String): Flow<SupabaseOperation<Boolean>> // forced to use flow bcz of return mismatch from lambda
 }

@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
@@ -54,7 +56,7 @@ fun SharedGoalsScreen(
     val onEvent = viewModel::onEvent
 
     LaunchedEffect(sharedEventState) {
-        when(sharedEventState) {
+        when (sharedEventState) {
             SharedEvent.SharedGoalModify -> onEvent(SharedGoalsScreenEvent.Refresh)
             else -> Unit
         }
@@ -80,12 +82,15 @@ fun SharedGoalsScreen(
             )
         },
         floatingActionButton = {
-            AddGoalButton(
-                onClick = {
-                    addGoal(it)
-                },
-                groupId = state.groupId
-            )
+            if (!state.isLoading) {
+                FloatingButtonSection(
+                    onAddGoalClick = {
+                        addGoal(it)
+                    },
+                    groupId = state.groupId,
+                    isAdmin = state.isAdmin
+                )
+            }
         }
     ) { innerPadding ->
         GroupBackGroundComponent()
@@ -113,20 +118,39 @@ fun SharedGoalsScreen(
 }
 
 @Composable
-private fun AddGoalButton(
-    onClick: (String) -> Unit,
-    groupId: String
+private fun FloatingButtonSection(
+    onAddGoalClick: (String) -> Unit,
+    groupId: String,
+    isAdmin: Boolean
 ) {
-    FloatingActionButton(
-        onClick = { onClick(groupId) },
-        containerColor = GroupColor1
-    ) {
-        Icon(
-            imageVector = Icons.Default.AddCircle,
-            contentDescription = null,
-            tint = Color.Black
-        )
+    Row {
+        if (isAdmin) {
+            FloatingActionButton(
+                onClick = { onAddGoalClick(groupId) },
+                containerColor = GroupColor1
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AddCircle,
+                    contentDescription = null,
+                    tint = Color.Black
+                )
+            }
+        }
+
+        Spacer(Modifier.width(6.dp))
+
+        FloatingActionButton(
+            onClick = {  },
+            containerColor = GroupColor1
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Chat,
+                contentDescription = null,
+                tint = Color.Black
+            )
+        }
     }
+
 }
 
 @Composable

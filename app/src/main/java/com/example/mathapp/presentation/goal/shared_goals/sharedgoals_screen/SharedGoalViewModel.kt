@@ -1,5 +1,6 @@
 package com.example.mathapp.presentation.goal.shared_goals.sharedgoals_screen
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,6 +25,7 @@ class SharedGoalViewModel @Inject constructor(
 
     init {
         getSharedGoals()
+        isGroupAdmin()
     }
 
     fun onEvent(event: SharedGoalsScreenEvent) {
@@ -62,6 +64,21 @@ class SharedGoalViewModel @Inject constructor(
                 }
             }
         }
+
+    private fun isGroupAdmin() {
+        viewModelScope.launch {
+             sharedGoalRepository.isGroupAdmin(groupId).collect { supabaseOperation ->
+                 supabaseOperation.onSuccess { isAdmin->
+                     _sharedGoals.update {
+                         it.copy(isAdmin = isAdmin)
+                     }
+                 }
+                     .onFailure { exception ->
+                         Log.e("Admin-check", "isGroupAdmin: ${exception.message}", )
+                     }
+             }
+        }
+    }
 }
 
 

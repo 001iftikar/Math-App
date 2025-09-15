@@ -240,8 +240,31 @@ class SharedGoalRepositoryImpl @Inject constructor(
             } catch (e: IOException) {
                 emit(SupabaseOperation.Failure(IOException("Network error")))
             } catch (e: Exception) {
-                emit(SupabaseOperation.Failure(IOException("Fetching error")))
+                emit(SupabaseOperation.Failure(Exception("Fetching error")))
             }
+        }
+    }
+
+    override suspend fun isGroupAdmin(groupId: String): Flow<SupabaseOperation<Boolean>> = flow {
+        try {
+            val userId = supabaseClient.auth.currentUserOrNull()?.id ?: return@flow emit(
+                SupabaseOperation.Failure(
+                    NullPointerException("User not logged in")
+                )
+            )
+            getSingleById<GroupDto>(
+                table = SupabaseConstants.GROUP_TABLE,
+                id = groupId
+            ) { groupDto ->
+                if (groupDto != null) {
+                    emit(SupabaseOperation.Success(userId == groupDto.admin))
+                }
+            }
+        } catch (e: IOException) {
+            emit(SupabaseOperation.Failure(IOException("No internet")))
+        } catch (e: Exception) {
+            Log.e("Admin-check", "isGroupAdmin: ${e.localizedMessage}", )
+            emit(SupabaseOperation.Failure(Exception("Please try again later")))
         }
     }
 

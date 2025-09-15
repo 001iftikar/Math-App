@@ -65,10 +65,12 @@ fun GroupsScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
-            FloatingActionButton(
-                expanded = expanded,
-                onClick = goToCreateGroupScreen
-            )
+            if(!state.isLoading) {
+                FloatingActionButton(
+                    expanded = expanded,
+                    onClick = goToCreateGroupScreen
+                )
+            }
         }
     ) { innerPadding ->
         GroupBackGroundComponent(modifier = Modifier.fillMaxSize())
