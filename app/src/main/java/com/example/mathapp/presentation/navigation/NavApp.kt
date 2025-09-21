@@ -24,6 +24,8 @@ import com.example.mathapp.presentation.goal.profile_screen.ProfileScreen
 import com.example.mathapp.presentation.goal.shared_goals.SharedGoalDashboard
 import com.example.mathapp.presentation.goal.shared_goals.addsharedgoal_screen.AddSharedGoalScreen
 import com.example.mathapp.presentation.goal.shared_goals.addsharedgoal_screen.AddSharedGoalViewModel
+import com.example.mathapp.presentation.goal.shared_goals.chat_screen.ChatScreen
+import com.example.mathapp.presentation.goal.shared_goals.chat_screen.ChatViewModel
 import com.example.mathapp.presentation.goal.shared_goals.creategroup_screen.CreateGroupScreen
 import com.example.mathapp.presentation.goal.shared_goals.creategroup_screen.CreateGroupViewModel
 import com.example.mathapp.presentation.goal.shared_goals.groups_screen.GroupViewModel
@@ -61,7 +63,7 @@ import com.ketch.Ketch
 fun NavApp(
     navController: NavHostController,
     ketch: Ketch,
-    timerService: StudySessionTimerService
+    timerService: StudySessionTimerService?
 ) {
     val sharedViewModel = hiltViewModel<SharedViewModel>()
     SharedTransitionLayout {
@@ -150,7 +152,9 @@ fun NavApp(
                     navDeepLink { uriPattern = ServiceConstants.STUDY_SESSION_DEEP_LINK }
                 )
             ) {
-                SessionScreen(navHostController = navController, timerService = timerService)
+                timerService?.let { service ->
+                    SessionScreen(navHostController = navController, timerService = service)
+                }
             }
 
             composable<Routes.SubjectScreen> {
@@ -276,6 +280,8 @@ fun NavApp(
                     viewModel = viewModel,
                     groupInfoClick = { navController.navigate(Routes.SpecificGroupDetailsScreen(it)) },
                     addGoal = { navController.navigate(Routes.AddSharedGoalScreen(it)) },
+                    onChatClick = { groupId, groupName ->
+                        navController.navigate(Routes.ChatScreen(groupId = groupId, groupName = groupName)) }
                 )
             }
 
@@ -288,6 +294,14 @@ fun NavApp(
                     groupId = groupId,
                     onCancel = { navController.popBackStack() },
                     backOnSuccess = { navController.popBackStack() }
+                )
+            }
+
+            composable<Routes.ChatScreen> {
+                val viewModel = hiltViewModel<ChatViewModel>()
+                ChatScreen(
+                    viewModel = viewModel,
+                    groupInfoClick = { navController.navigate(Routes.SpecificGroupDetailsScreen(it)) },
                 )
             }
 

@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ToggleOff
+import androidx.compose.material.icons.filled.ToggleOn
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -49,7 +52,8 @@ fun SharedGoalsScreen(
     sharedViewModel: SharedViewModel,
     viewModel: SharedGoalViewModel,
     groupInfoClick: (String) -> Unit,
-    addGoal: (String) -> Unit
+    addGoal: (String) -> Unit,
+    onChatClick: (String, String) -> Unit
 ) {
     val state by viewModel.sharedGoals.collectAsStateWithLifecycle()
     val sharedEventState by sharedViewModel.sharedEventState.collectAsStateWithLifecycle(SharedEvent.Idle)
@@ -88,7 +92,8 @@ fun SharedGoalsScreen(
                         addGoal(it)
                     },
                     groupId = state.groupId,
-                    isAdmin = state.isAdmin
+                    isAdmin = state.isAdmin,
+                    onChatClick = { onChatClick(state.groupId, state.groupName) }
                 )
             }
         }
@@ -109,19 +114,22 @@ fun SharedGoalsScreen(
             state.goals != null -> {
                 GoalsList(
                     modifier = Modifier.padding(innerPadding),
-                    goals = state.goals!!
+                    goals = state.goals!!,
+                    onMarkAsCompleteClick = { isCompleted, sharedGoalId ->
+                        viewModel.markAsComplete(isCompleted, sharedGoalId)
+                    }
                 )
             }
         }
     }
-
 }
 
 @Composable
 private fun FloatingButtonSection(
     onAddGoalClick: (String) -> Unit,
     groupId: String,
-    isAdmin: Boolean
+    isAdmin: Boolean,
+    onChatClick: () -> Unit
 ) {
     Row {
         if (isAdmin) {
@@ -140,7 +148,7 @@ private fun FloatingButtonSection(
         Spacer(Modifier.width(6.dp))
 
         FloatingActionButton(
-            onClick = {  },
+            onClick = onChatClick,
             containerColor = GroupColor1
         ) {
             Icon(
@@ -156,7 +164,8 @@ private fun FloatingButtonSection(
 @Composable
 private fun GoalsList(
     modifier: Modifier,
-    goals: List<SharedGoal>
+    goals: List<SharedGoal>,
+    onMarkAsCompleteClick: (Boolean, String) -> Unit
 ) {
     if (goals.isNotEmpty()) {
         LazyColumn(
@@ -165,7 +174,10 @@ private fun GoalsList(
             items(goals) { goal ->
                 GoalItem(
                     modifier = Modifier.fillMaxWidth(),
-                    sharedGoal = goal
+                    sharedGoal = goal,
+                    onMarkAsCompleteClick = {
+                        onMarkAsCompleteClick(!goal.isCompleted, goal.id)
+                    }
                 )
             }
         }
@@ -186,7 +198,8 @@ private fun GoalsList(
 @Composable
 private fun GoalItem(
     modifier: Modifier,
-    sharedGoal: SharedGoal
+    sharedGoal: SharedGoal,
+    onMarkAsCompleteClick: () -> Unit
 ) {
     Card(
         modifier = modifier
@@ -201,10 +214,35 @@ private fun GoalItem(
                 .fillMaxWidth()
                 .padding(vertical = 8.dp, horizontal = 8.dp)
         ) {
-            Text(
-                text = sharedGoal.title,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = sharedGoal.title,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
+
+                IconButton(
+                    onClick = onMarkAsCompleteClick
+                ) {
+                    if (sharedGoal.isCompleted) {
+                        Icon(
+                            imageVector = Icons.Default.ToggleOn,
+                            contentDescription = null,
+                            modifier = Modifier.size(40.dp)
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.ToggleOff,
+                            contentDescription = null,
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+                }
+            }
+
 
             Spacer(Modifier.height(5.dp))
             Row(
@@ -259,10 +297,6 @@ private fun Error(
         )
     }
 }
-
-
-
-
 
 
 

@@ -24,6 +24,7 @@ class SpecificGroupViewModel @Inject constructor(
     init {
         getGroup()
         getMembers()
+        isAdmin()
     }
 
     private fun getGroup() {
@@ -68,6 +69,27 @@ class SpecificGroupViewModel @Inject constructor(
         }
     }
 
+    private fun isAdmin() {
+        viewModelScope.launch {
+            sharedGoalRepository.isGroupAdmin(groupId).collect { supabaseOperation ->
+                supabaseOperation.onSuccess {isAdmin ->
+                    if (isAdmin) {
+                        _specificGoalState.update {
+                            it.copy(
+                                isAdmin = true
+                            )
+                        }
+                    } else {
+                        _specificGoalState.update {
+                            it.copy(
+                                isAdmin = false
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 

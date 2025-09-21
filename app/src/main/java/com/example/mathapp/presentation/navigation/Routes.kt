@@ -81,4 +81,6 @@ sealed class Routes {
     data class AddSharedGoalScreen(val groupId: String)
     @Serializable
     data class SpecificGroupDetailsScreen(val groupId: String)
+    @Serializable
+    data class ChatScreen(val groupId: String, val groupName: String)
 }

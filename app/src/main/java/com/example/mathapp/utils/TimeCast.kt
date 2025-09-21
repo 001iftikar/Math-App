@@ -9,8 +9,10 @@ import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -35,7 +37,13 @@ fun Long.toHours(): Float {
 fun Int.pad(): String {
     return this.toString().padStart(length = 2, padChar = '0')
 }
-
+// to show the time when the message was sent
+fun Long.sentMessageDateTime(): String {
+    val instant = java.time.Instant.ofEpochMilli(this)
+    val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a")
+        .withZone(ZoneId.systemDefault())
+    return formatter.format(instant)
+}
 
 @OptIn(ExperimentalTime::class)
 object SupabaseTimeCast {

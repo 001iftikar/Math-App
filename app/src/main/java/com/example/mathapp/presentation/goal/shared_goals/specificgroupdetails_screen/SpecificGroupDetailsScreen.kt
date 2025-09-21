@@ -50,12 +50,15 @@ fun SpecificGroupDetailsScreen(
                 GroupDetails(
                     modifier = Modifier.padding(innerPadding),
                     group = group,
+                    isAdmin = state.isAdmin,
                     members = state.belongedMembers
                 )
             }
         } else {
             Box(
-                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -70,6 +73,7 @@ fun SpecificGroupDetailsScreen(
 private fun GroupDetails(
     modifier: Modifier,
     group: Group,
+    isAdmin: Boolean,
     members: List<UserProfile>
 ) {
     Column(
@@ -112,14 +116,16 @@ private fun GroupDetails(
 
         Spacer(Modifier.height(8.dp))
 
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            GroupIdCopy(group.id)
-        }
+        if (isAdmin) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                GroupIdCopy(group.id)
+            }
 
-        Spacer(Modifier.height(30.dp))
+            Spacer(Modifier.height(30.dp))
+        }
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -141,7 +147,9 @@ private fun GroupDetails(
                     Spacer(Modifier.height(8.dp))
                 }
                 items(items = members) { member ->
-                    Column(modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)) {
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 6.dp)) {
                         Text(
                             text = member.name,
                             style = MaterialTheme.typography.titleLarge

@@ -2,11 +2,13 @@ package com.example.mathapp.mappers
 
 import com.example.mathapp.data.remote.model.MessageDto
 import com.example.mathapp.domain.model.Message
+import com.example.mathapp.utils.sentMessageDateTime
 
-fun MessageDto.toMessage(): Message {
+fun MessageDto.toMessage(senderName: String): Message {
     return Message(
-        sender = sender,
+        senderId = sender,
+        senderName = senderName,
         content = content,
-        createdAt = created_at
+        createdAt = createdAt.sentMessageDateTime()
     )
 }
