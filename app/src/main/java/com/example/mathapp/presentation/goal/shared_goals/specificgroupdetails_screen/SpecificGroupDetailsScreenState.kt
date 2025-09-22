@@ -7,5 +7,6 @@ data class SpecificGroupDetailsScreenState(
     val group: Group? = null,
     val isAdmin: Boolean = false,
     val belongedMembers: List<UserProfile> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val isLoading: Boolean
 )

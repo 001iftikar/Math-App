@@ -19,7 +19,7 @@ interface SharedGoalRepository {
     suspend fun createSharedGoal(sharedGoalDto: SharedGoalDto): SupabaseOperation<String>
     fun getGroupMembersForSpecificGroup(groupId: String): Flow<SupabaseOperation<List<UserProfile>>>
 
-    suspend fun isGroupAdmin(groupId: String): Flow<SupabaseOperation<Boolean>> // forced to use flow bcz of return mismatch from lambda
+    fun isGroupAdmin(groupId: String): Flow<SupabaseOperation<Boolean>> // forced to use flow bcz of return mismatch from lambda
     suspend fun sendMessage(content: String, groupId: String): SupabaseOperation<Unit>
     fun getMessages(groupId: String): Flow<SupabaseOperation<List<Message>>>
     suspend fun getCurrentUserId(): String?

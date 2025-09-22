@@ -185,8 +185,11 @@ class SharedGoalRepositoryImpl @Inject constructor(
                         emit(SupabaseOperation.Success(groupDto.toGroup(groupDto.admin)))
                     }
                 }
+            } catch (e: IOException) {
+                emit(SupabaseOperation.Failure(IOException("Network error")))
             } catch (e: Exception) {
                 Log.e("Group", "getSpecificGroup: $e")
+                emit(SupabaseOperation.Failure(e))
             }
         }
     }
@@ -261,7 +264,7 @@ class SharedGoalRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun isGroupAdmin(groupId: String): Flow<SupabaseOperation<Boolean>> = flow {
+    override fun isGroupAdmin(groupId: String): Flow<SupabaseOperation<Boolean>> = flow {
         try {
             val userId = supabaseClient.auth.currentUserOrNull()?.id ?: return@flow emit(
                 SupabaseOperation.Failure(
@@ -274,6 +277,8 @@ class SharedGoalRepositoryImpl @Inject constructor(
             ) { groupDto ->
                 if (groupDto != null) {
                     emit(SupabaseOperation.Success(userId == groupDto.admin))
+                } else {
+                    emit(SupabaseOperation.Failure(Exception("Group not found")))
                 }
             }
         } catch (e: IOException) {
@@ -382,11 +387,18 @@ class SharedGoalRepositoryImpl @Inject constructor(
     private suspend inline fun getGroupMembers(
         members: (List<GroupMemberDto>) -> Unit
     ) {
-        val members = supabaseClient.postgrest[SupabaseConstants.GROUP_MEMBER_TABLE]
-            .select()
-            .decodeList<GroupMemberDto>()
+        try {
+            val members = supabaseClient.postgrest[SupabaseConstants.GROUP_MEMBER_TABLE]
+                .select()
+                .decodeList<GroupMemberDto>()
 
-        members(members)
+            members(members)
+        } catch (e: IOException) {
+            throw e
+        }
+        catch (e: Exception) {
+            throw e
+        }
     }
 
     // Maybe I will use this to get a single value from a table instead of writing the same logic again and again
@@ -395,14 +407,21 @@ class SharedGoalRepositoryImpl @Inject constructor(
         id: String,
         data: (T?) -> Unit
     ) {
-        val result = supabaseClient.postgrest[table]
-            .select {
-                filter {
-                    eq("id", id)
+        try {
+            val result = supabaseClient.postgrest[table]
+                .select {
+                    filter {
+                        eq("id", id)
+                    }
                 }
-            }
-            .decodeSingleOrNull<T>()
-        data(result)
+                .decodeSingleOrNull<T>()
+            data(result)
+        } catch (e: IOException) {
+            throw e
+        }
+        catch (e: Exception) {
+            throw e
+        }
     }
 
     private suspend inline fun <reified T : Any> getByForeignKey(
@@ -411,14 +430,20 @@ class SharedGoalRepositoryImpl @Inject constructor(
         refId: String,
         data: (List<T>) -> Unit
     ) {
-        val result = supabaseClient.postgrest[table]
-            .select {
-                filter {
-                    eq(column, refId)
+        try {
+            val result = supabaseClient.postgrest[table]
+                .select {
+                    filter {
+                        eq(column, refId)
+                    }
                 }
-            }
-            .decodeList<T>()
-        data(result)
+                .decodeList<T>()
+            data(result)
+        } catch (e: IOException) {
+            throw e
+        } catch (e: Exception) {
+            throw e
+        }
     }
 }
 

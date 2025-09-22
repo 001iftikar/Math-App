@@ -13,8 +13,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,24 +48,49 @@ fun SpecificGroupDetailsScreen(
     Scaffold { innerPadding ->
         GroupBackGroundComponent()
 
-        if (state.error == null) {
-            state.group?.let { group ->
+        when {
+            state.isLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = GroupColor1)
+                }
+            }
+
+            state.error != null -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = state.error!!,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.error
+                    )
+
+                    Button(
+                        onClick = { viewModel.retry() },
+                        colors = ButtonDefaults.buttonColors(
+                            contentColor = GroupColor1
+                        )
+                    ) {
+                        Text("Refresh")
+                    }
+                }
+            }
+
+            state.group != null -> {
                 GroupDetails(
                     modifier = Modifier.padding(innerPadding),
-                    group = group,
+                    group = state.group!!,
                     isAdmin = state.isAdmin,
                     members = state.belongedMembers
-                )
-            }
-        } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    state.error!!
                 )
             }
         }
@@ -147,9 +175,11 @@ private fun GroupDetails(
                     Spacer(Modifier.height(8.dp))
                 }
                 items(items = members) { member ->
-                    Column(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 6.dp)) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 6.dp)
+                    ) {
                         Text(
                             text = member.name,
                             style = MaterialTheme.typography.titleLarge
