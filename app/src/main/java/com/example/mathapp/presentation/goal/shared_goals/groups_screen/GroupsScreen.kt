@@ -208,7 +208,7 @@ private fun EmptyList(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "You are not belonged to any group",
+            text = "You do not belong to any groups",
             style = MaterialTheme.typography.titleLarge,
             color = GroupColor1
         )

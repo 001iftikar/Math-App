@@ -21,6 +21,9 @@ class UseCases @Inject constructor(private val sharedGoalRepository: SharedGoalR
     fun getGroupMembersForSpecificGroup(groupId: String): Flow<Result<List<UserProfile>>> =
         sharedGoalRepository.getGroupMembersForSpecificGroup(groupId).map { it.toResult() }
 
+    suspend fun deleteGroup(groupId: String) = sharedGoalRepository.deleteGroup(groupId)
+
+
     private fun <T> SupabaseOperation<T>.toResult(): Result<T> =
         when (this) {
             is SupabaseOperation.Failure -> Result.failure(exception)

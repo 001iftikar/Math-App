@@ -1,12 +1,16 @@
 package com.example.mathapp.presentation.goal.shared_goals.specificgroupdetails_screen
 
+import androidx.compose.material3.SnackbarDuration
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mathapp.domain.UseCases
+import com.example.mathapp.presentation.snackbar.SnackbarController
+import com.example.mathapp.presentation.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +18,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.launch
@@ -22,11 +27,14 @@ import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class SpecificGroupViewModel @Inject constructor(
-    useCases: UseCases,
+    private val useCases: UseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val groupId: String = checkNotNull(savedStateHandle["groupId"])
     private val _retryTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    private val _deleteEvent: Channel<Boolean> = Channel()
+    val deleteEvent = _deleteEvent.receiveAsFlow()
 
     fun retry() {
         viewModelScope.launch { _retryTrigger.emit(Unit) }
@@ -66,6 +74,33 @@ class SpecificGroupViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = SpecificGroupDetailsScreenState(isLoading = true)
             )
+
+    fun deleteGroup() {
+        viewModelScope.launch {
+            useCases.deleteGroup(groupId)
+                .onSuccess {
+                    this.launch {
+                        SnackbarController.sendEvent(
+                            SnackbarEvent(
+                                message = "Group deleted",
+                                duration = SnackbarDuration.Short
+                            )
+                        )
+
+                        _deleteEvent.send(true)
+                    }
+                }.onFailure {
+                    this.launch {
+                        SnackbarController.sendEvent(
+                            SnackbarEvent(
+                                message = it.message ?: "Some unexpected error occurred",
+                                duration = SnackbarDuration.Long
+                            )
+                        )
+                    }
+                }
+        }
+    }
 }
 
 

@@ -23,6 +23,6 @@ interface SharedGoalRepository {
     suspend fun sendMessage(content: String, groupId: String): SupabaseOperation<Unit>
     fun getMessages(groupId: String): Flow<SupabaseOperation<List<Message>>>
     suspend fun getCurrentUserId(): String?
-
     suspend fun markAsCompleted(isCompleted: Boolean, sharedGoalId: String): SupabaseOperation<Boolean>
+    suspend fun deleteGroup(groupId: String): SupabaseOperation<Unit>
 }

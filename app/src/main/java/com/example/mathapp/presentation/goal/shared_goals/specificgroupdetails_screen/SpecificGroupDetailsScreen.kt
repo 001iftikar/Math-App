@@ -1,5 +1,6 @@
 package com.example.mathapp.presentation.goal.shared_goals.specificgroupdetails_screen
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -24,27 +26,50 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.example.mathapp.domain.model.Group
 import com.example.mathapp.domain.model.UserProfile
+import com.example.mathapp.presentation.components.DeleteDialog
 import com.example.mathapp.presentation.components.GroupBackGroundComponent
+import com.example.mathapp.presentation.navigation.Routes
 import com.example.mathapp.ui.theme.GroupColor1
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SpecificGroupDetailsScreen(
-    viewModel: SpecificGroupViewModel
+    viewModel: SpecificGroupViewModel,
+    navHostController: NavHostController
 ) {
     val state by viewModel.specificGoalState.collectAsStateWithLifecycle()
+    var isDialogOpen by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.deleteEvent.collectLatest {
+            if (it) {
+                navHostController.navigate(Routes.GroupsScreen) {
+                    popUpTo<Routes.GroupsScreen> {
+                        inclusive = true
+                    }
+                }
+            }
+        }
+    }
     Scaffold { innerPadding ->
         GroupBackGroundComponent()
 
@@ -90,7 +115,19 @@ fun SpecificGroupDetailsScreen(
                     modifier = Modifier.padding(innerPadding),
                     group = state.group!!,
                     isAdmin = state.isAdmin,
-                    members = state.belongedMembers
+                    members = state.belongedMembers,
+                    onDeleteClick = { isDialogOpen = true }
+                )
+
+                DeleteDialog(
+                    isOpen = isDialogOpen,
+                    title = "Delete the group?",
+                    bodyText = "Careful with this one, deleting will erase all the goals this group owns",
+                    onDismissRequest = { isDialogOpen = false },
+                    onConfirmButton = {
+                        isDialogOpen = false
+                        viewModel.deleteGroup()
+                    }
                 )
             }
         }
@@ -102,7 +139,8 @@ private fun GroupDetails(
     modifier: Modifier,
     group: Group,
     isAdmin: Boolean,
-    members: List<UserProfile>
+    members: List<UserProfile>,
+    onDeleteClick: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -135,11 +173,30 @@ private fun GroupDetails(
                 fontStyle = FontStyle.Italic
             )
 
-            Text(
-                text = group.createdAt,
-                modifier = Modifier.padding(8.dp),
-                fontSize = 12.sp
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = group.createdAt,
+                    modifier = Modifier.padding(8.dp),
+                    fontSize = 12.sp
+                )
+
+                if (isAdmin) {
+                    IconButton(
+                        onClick = onDeleteClick
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = Color.Red
+                        )
+                    }
+                }
+            }
+
         }
 
         Spacer(Modifier.height(8.dp))

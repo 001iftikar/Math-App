@@ -308,7 +308,8 @@ fun NavApp(
             composable<Routes.SpecificGroupDetailsScreen> {
                 val viewModel = hiltViewModel<SpecificGroupViewModel>()
                 SpecificGroupDetailsScreen(
-                    viewModel
+                    viewModel = viewModel,
+                    navHostController = navController
                 )
             }
         }

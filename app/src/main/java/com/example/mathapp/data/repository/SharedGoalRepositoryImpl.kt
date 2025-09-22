@@ -384,6 +384,20 @@ class SharedGoalRepositoryImpl @Inject constructor(
             messagesRef.removeEventListener(listener)
         }
     }
+
+    override suspend fun deleteGroup(groupId: String): SupabaseOperation<Unit> {
+        return try {
+            supabaseClient.postgrest[SupabaseConstants.GROUP_TABLE]
+                .delete {
+                    filter {
+                        GroupDto::id eq groupId
+                    }
+                }
+            SupabaseOperation.Success(Unit)
+        } catch (e: Exception) {
+            SupabaseOperation.Failure(e)
+        }
+    }
     private suspend inline fun getGroupMembers(
         members: (List<GroupMemberDto>) -> Unit
     ) {
