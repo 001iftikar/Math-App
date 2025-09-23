@@ -22,6 +22,7 @@ class UseCases @Inject constructor(private val sharedGoalRepository: SharedGoalR
         sharedGoalRepository.getGroupMembersForSpecificGroup(groupId).map { it.toResult() }
 
     suspend fun deleteGroup(groupId: String) = sharedGoalRepository.deleteGroup(groupId)
+    suspend fun leaveGroup(groupId: String) = sharedGoalRepository.leaveGroup(groupId)
 
 
     private fun <T> SupabaseOperation<T>.toResult(): Result<T> =

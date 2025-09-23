@@ -398,6 +398,23 @@ class SharedGoalRepositoryImpl @Inject constructor(
             SupabaseOperation.Failure(e)
         }
     }
+
+    override suspend fun leaveGroup(groupId: String): SupabaseOperation<Unit> {
+        return try {
+            val userId = supabaseClient.auth.currentUserOrNull()?.id
+                ?: throw NullPointerException("User not logged in")
+            supabaseClient.postgrest[SupabaseConstants.GROUP_MEMBER_TABLE]
+                .delete {
+                    filter {
+                        GroupMemberDto::group_id eq groupId
+                        GroupMemberDto::user_id eq userId
+                    }
+                }
+            SupabaseOperation.Success(Unit)
+        } catch (ex: Exception) {
+            SupabaseOperation.Failure(ex)
+        }
+    }
     private suspend inline fun getGroupMembers(
         members: (List<GroupMemberDto>) -> Unit
     ) {

@@ -101,6 +101,33 @@ class SpecificGroupViewModel @Inject constructor(
                 }
         }
     }
+
+    fun leaveGroup() {
+        viewModelScope.launch {
+            useCases.leaveGroup(groupId)
+                .onSuccess {
+                    this.launch {
+                        SnackbarController.sendEvent(
+                            SnackbarEvent(
+                                message = "Group left",
+                                duration = SnackbarDuration.Short
+                            )
+                        )
+
+                        _deleteEvent.send(true)
+                    }
+                }.onFailure {
+                    this.launch {
+                        SnackbarController.sendEvent(
+                            SnackbarEvent(
+                                message = it.message ?: "Some unexpected error occurred",
+                                duration = SnackbarDuration.Long
+                            )
+                        )
+                    }
+                }
+        }
+    }
 }
 
 

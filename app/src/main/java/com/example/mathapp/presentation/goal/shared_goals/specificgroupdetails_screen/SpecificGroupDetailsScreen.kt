@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
@@ -58,7 +59,8 @@ fun SpecificGroupDetailsScreen(
     navHostController: NavHostController
 ) {
     val state by viewModel.specificGoalState.collectAsStateWithLifecycle()
-    var isDialogOpen by remember { mutableStateOf(false) }
+    var isDeleteDialogOpen by remember { mutableStateOf(false) }
+    var isLeaveDialogOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.deleteEvent.collectLatest {
@@ -117,17 +119,30 @@ fun SpecificGroupDetailsScreen(
                     group = state.group!!,
                     isAdmin = state.isAdmin,
                     members = state.belongedMembers,
-                    onDeleteClick = { isDialogOpen = true }
+                    onDeleteClick = { isDeleteDialogOpen = true },
+                    onLeaveGroupClick = { isLeaveDialogOpen = true }
                 )
 
                 DeleteDialog(
-                    isOpen = isDialogOpen,
+                    isOpen = isDeleteDialogOpen,
                     title = "Delete the group?",
                     bodyText = "Careful with this one, deleting will erase all the goals this group owns",
-                    onDismissRequest = { isDialogOpen = false },
+                    onDismissRequest = { isDeleteDialogOpen = false },
                     onConfirmButton = {
-                        isDialogOpen = false
+                        isDeleteDialogOpen = false
                         viewModel.deleteGroup()
+                    }
+                )
+
+                DeleteDialog(
+                    isOpen = isLeaveDialogOpen,
+                    title = "Leave the group?",
+                    bodyText = "If you are the admin, this group will be disabled, but the remaining members can see the goals and can chat",
+                    confirmButtonText = "I understand",
+                    onDismissRequest = { isLeaveDialogOpen = false },
+                    onConfirmButton = {
+                        isLeaveDialogOpen = false
+                        viewModel.leaveGroup()
                     }
                 )
             }
@@ -141,6 +156,7 @@ private fun GroupDetails(
     group: Group,
     isAdmin: Boolean,
     members: List<UserProfile>,
+    onLeaveGroupClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
     Column(
@@ -150,13 +166,24 @@ private fun GroupDetails(
         horizontalAlignment = Alignment.Start
     ) {
         Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = group.name,
-                style = MaterialTheme.typography.headlineLarge
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.align(Alignment.Center)
             )
+
+            IconButton(
+                onClick = onLeaveGroupClick,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.ExitToApp,
+                    contentDescription = null,
+                    tint = Color.Red
+                )
+            }
         }
 
         Spacer(Modifier.height(24.dp))

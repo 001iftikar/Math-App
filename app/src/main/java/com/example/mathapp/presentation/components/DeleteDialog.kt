@@ -10,6 +10,7 @@ fun DeleteDialog(
     isOpen: Boolean,
     title: String,
     bodyText: String,
+    confirmButtonText: String = "Delete",
     onDismissRequest: () -> Unit,
     onConfirmButton: () -> Unit
 ) {
@@ -26,7 +27,7 @@ fun DeleteDialog(
                 TextButton(
                     onClick = onConfirmButton
                 ) {
-                    Text("Delete")
+                    Text(confirmButtonText)
                 }
             },
             dismissButton = {
