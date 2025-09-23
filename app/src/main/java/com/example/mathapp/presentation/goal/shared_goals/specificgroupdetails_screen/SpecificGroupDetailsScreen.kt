@@ -1,6 +1,6 @@
 package com.example.mathapp.presentation.goal.shared_goals.specificgroupdetails_screen
 
-import android.widget.Toast
+import android.content.ClipData
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,13 +30,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -50,6 +50,7 @@ import com.example.mathapp.presentation.components.GroupBackGroundComponent
 import com.example.mathapp.presentation.navigation.Routes
 import com.example.mathapp.ui.theme.GroupColor1
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
 fun SpecificGroupDetailsScreen(
@@ -257,7 +258,11 @@ private fun GroupDetails(
 private fun GroupIdCopy(
     groupId: String
 ) {
-    val clipboardManager = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
+
+    val clipData = ClipData.newPlainText("group Id", groupId)
+    val clipEntry = clipData.toClipEntry()
     Card(
         colors = CardDefaults.cardColors(
             containerColor = Color.White.copy(alpha = 0.1f)
@@ -271,7 +276,10 @@ private fun GroupIdCopy(
             Text(groupId)
             IconButton(
                 onClick = {
-                    clipboardManager.setText(AnnotatedString(groupId))
+                    scope.launch {
+                        clipboard.setClipEntry(clipEntry)
+                    }
+
                 }
             ) {
                 Icon(
