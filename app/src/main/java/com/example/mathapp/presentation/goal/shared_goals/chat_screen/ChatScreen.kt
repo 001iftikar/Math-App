@@ -9,12 +9,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.SmsFailed
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -38,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mathapp.data.remote.model.MessageStatus
 import com.example.mathapp.domain.model.Message
 import com.example.mathapp.presentation.components.GroupBackGroundComponent
 import com.example.mathapp.ui.theme.GoalCardColor
@@ -61,7 +67,19 @@ fun ChatScreen(
                 LoadingList()
             }
 
-            state.value.messages.isNotEmpty() -> {
+            state.value.error != null -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Error(
+                        error = state.value.error!!
+                    )
+                }
+            }
+
+            else -> {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     topBar = {
@@ -80,7 +98,7 @@ fun ChatScreen(
                                     )
                                 }
                             }
-                            )
+                        )
                     }
                 ) { innerPadding ->
                     GroupBackGroundComponent()
@@ -101,19 +119,11 @@ fun ChatScreen(
                                     )
                                 }
                             }
-
-                            SendMessageSection(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = state.value.textMessage,
-                                onValueChange = { onEvent(ChatScreenEvent.OnValueChange(it)) },
-                                sendEnabled = state.value.textMessage.isNotEmpty(),
-                                onClick = {
-                                    onEvent(ChatScreenEvent.SendMessage)
-                                }
-                            )
                         } else {
                             Column(
-                                modifier = Modifier.fillMaxSize(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
@@ -123,14 +133,18 @@ fun ChatScreen(
                                 )
                             }
                         }
+
+                        SendMessageSection(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = state.value.textMessage,
+                            onValueChange = { onEvent(ChatScreenEvent.OnValueChange(it)) },
+                            sendEnabled = state.value.textMessage.isNotEmpty(),
+                            onClick = {
+                                onEvent(ChatScreenEvent.SendMessage)
+                            }
+                        )
                     }
                 }
-            }
-
-            state.value.error != null -> {
-                Error(
-                    error = state.value.error!!
-                )
             }
         }
 
@@ -140,7 +154,7 @@ fun ChatScreen(
 @Composable
 private fun ChatBubble(
     message: Message,
-    currentUserId: String,
+    currentUserId: String
 ) {
     val isCurrentUser = message.senderId == currentUserId
     Box(
@@ -166,11 +180,28 @@ private fun ChatBubble(
                 Spacer(Modifier.height(3.dp))
                 Text(message.content)
                 Spacer(Modifier.height(3.dp))
-                Text(
-                    text = message.createdAt,
+                Row(
                     modifier = Modifier.align(Alignment.End),
-                    fontSize = 12.sp
-                )
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = message.createdAt,
+                        fontSize = 12.sp
+                    )
+                    Spacer(Modifier.width(3.dp))
+                    if(isCurrentUser) {
+                        val icon = when(message.status) {
+                            MessageStatus.SENDING -> Icons.Default.Schedule
+                            MessageStatus.SENT -> Icons.Default.Done
+                            MessageStatus.FAILED -> Icons.Default.SmsFailed
+                        }
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+                }
             }
         }
     }

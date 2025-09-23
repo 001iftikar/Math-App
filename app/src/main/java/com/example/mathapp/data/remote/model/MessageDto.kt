@@ -6,5 +6,10 @@ data class MessageDto(
     val groupId: String = "",
     val sender: String = "",
     val content: String = "",
-    val createdAt: Long = Instant.now().toEpochMilli()
+    val createdAt: Long = Instant.now().toEpochMilli(),
+    val status: MessageStatus = MessageStatus.SENDING
 )
+
+enum class MessageStatus {
+    SENDING, SENT, FAILED
+}

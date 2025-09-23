@@ -9,6 +9,7 @@ fun MessageDto.toMessage(senderName: String): Message {
         senderId = sender,
         senderName = senderName,
         content = content,
-        createdAt = createdAt.sentMessageDateTime()
+        createdAt = createdAt.sentMessageDateTime(),
+        status = status
     )
 }

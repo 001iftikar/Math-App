@@ -1,11 +1,14 @@
 package com.example.mathapp.presentation.goal.shared_goals.chat_screen
 
-import android.util.Log
+import androidx.compose.material3.SnackbarDuration
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mathapp.domain.repository.SharedGoalRepository
+import com.example.mathapp.presentation.snackbar.SnackbarController
+import com.example.mathapp.presentation.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -21,7 +24,7 @@ class ChatViewModel @Inject constructor(
     private val groupId: String = checkNotNull(savedStateHandle["groupId"])
     private val groupName: String = checkNotNull(savedStateHandle["groupName"])
     private val _state = MutableStateFlow(ChatScreenState(groupName = groupName, groupId = groupId))
-    val state =_state.asStateFlow()
+    val state = _state.asStateFlow()
 
     init {
         getMessages()
@@ -29,7 +32,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun onEvent(event: ChatScreenEvent) {
-        when(event) {
+        when (event) {
             is ChatScreenEvent.OnValueChange -> {
                 _state.update {
                     it.copy(textMessage = event.text)
@@ -41,7 +44,8 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun sendTestMessage() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+
             val result = sharedGoalRepository.sendMessage(
                 content = _state.value.textMessage.trim(),
                 groupId = groupId
@@ -50,9 +54,16 @@ class ChatViewModel @Inject constructor(
                 _state.update {
                     it.copy(textMessage = "")
                 }
-                Log.d("Messages", "sendTestMessage: Sent with $groupId")
             }.onFailure { error ->
-                Log.e("Messages", "Failed to send test message: ${error.message}")
+               launch(Dispatchers.Main)
+                {
+                    SnackbarController.sendEvent(
+                        SnackbarEvent(
+                            message = "Sending message failed: ${error.message}",
+                            duration = SnackbarDuration.Short
+                        )
+                    )
+                }
             }
         }
     }
@@ -63,7 +74,7 @@ class ChatViewModel @Inject constructor(
                 it.copy(isLoading = true, error = null)
             }
             sharedGoalRepository.getMessages(groupId).collect { supabaseOperation ->
-                supabaseOperation.onSuccess {messages ->
+                supabaseOperation.onSuccess { messages ->
                     _state.update {
                         it.copy(
                             isLoading = false,

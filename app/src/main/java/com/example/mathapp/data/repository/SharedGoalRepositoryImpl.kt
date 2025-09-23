@@ -5,6 +5,7 @@ import com.example.mathapp.data.remote.SupabaseOperation
 import com.example.mathapp.data.remote.model.GroupDto
 import com.example.mathapp.data.remote.model.GroupMemberDto
 import com.example.mathapp.data.remote.model.MessageDto
+import com.example.mathapp.data.remote.model.MessageStatus
 import com.example.mathapp.data.remote.model.SharedGoalDto
 import com.example.mathapp.domain.model.Group
 import com.example.mathapp.domain.model.Message
@@ -297,13 +298,21 @@ class SharedGoalRepositoryImpl @Inject constructor(
             val messagesRef = database.getReference("Messages")
             val child = UUID.randomUUID().toString()
             messagesRef.child(child)
-                .setValue(MessageDto(
-                    content = content,
-                    groupId = groupId,
-                    sender = userId
-                ))
-                .await() // used await() bcz setValue is asynchronous but runCatching is synchronous
-            Unit
+                .setValue(
+                    MessageDto(
+                        content = content,
+                        groupId = groupId,
+                        sender = userId,
+                        status = MessageStatus.SENDING
+                    )
+                ) {
+                    error, ref ->
+                    if (error != null) {
+                        ref.child("status").setValue(MessageStatus.FAILED.name)
+                    } else {
+                        ref.child("status").setValue(MessageStatus.SENT.name)
+                    }
+                }
         }.fold(
             onSuccess = { SupabaseOperation.Success(it) },
             onFailure = { SupabaseOperation.Failure(Exception(it.message)) }
@@ -312,14 +321,20 @@ class SharedGoalRepositoryImpl @Inject constructor(
 
     override suspend fun getCurrentUserId(): String? {
         return try {
-            supabaseClient.auth.currentUserOrNull()?.id
+            val user = supabaseClient.auth.currentUserOrNull()?.id
+            Log.d("Messages", "getCurrentUserId: $user")
+            user
+
         } catch (e: Exception) {
-            Log.e("User-Repo", "getCurrentUserId: ${e.localizedMessage}")
+            Log.e("Messages", "getCurrentUserId: ${e.localizedMessage}")
             null
         }
     }
 
-    override suspend fun markAsCompleted(isCompleted: Boolean, sharedGoalId: String): SupabaseOperation<Boolean> {
+    override suspend fun markAsCompleted(
+        isCompleted: Boolean,
+        sharedGoalId: String
+    ): SupabaseOperation<Boolean> {
         try {
             supabaseClient.postgrest[SupabaseConstants.SHARED_GOALS_TABLE]
                 .update(
@@ -339,64 +354,87 @@ class SharedGoalRepositoryImpl @Inject constructor(
     }
 
     // Unfortunately I will have to use Fb realtime db
-    override fun getMessages(groupId: String): Flow<SupabaseOperation<List<Message>>> = callbackFlow {
-        val messagesRef = database.getReference("Messages")
-        val profiles = supabaseClient.postgrest[SupabaseConstants.PROFILES_TABLE]
-            .select()
-            .decodeList<UserProfile>()
-        val profile = profiles.associateBy {
-            it.id
-        }
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val messages = snapshot.children.mapNotNull {
-                    it.getValue(MessageDto::class.java)
+    override fun getMessages(groupId: String): Flow<SupabaseOperation<List<Message>>> =
+        callbackFlow {
+            val messagesRef = database.getReference("Messages")
+            val profiles = supabaseClient.postgrest[SupabaseConstants.PROFILES_TABLE]
+                .select()
+                .decodeList<UserProfile>()
+            val profile = profiles.associateBy {
+                it.id
+            }
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val messages = snapshot.children.mapNotNull {
+                        it.getValue(MessageDto::class.java)
+                    }
+                        .sortedByDescending { it.createdAt }
+                        .filter {
+                            it.groupId == groupId
+                        }
+                        .map {
+                            val senderName = profile[it.sender]?.name ?: "Unknown"
+                            it.toMessage(senderName)
+                        }
+                    Log.d("Messages", "getMessages: $messages")
+                    trySend(SupabaseOperation.Success(messages))
                 }
-                    .sortedByDescending { it.createdAt }
-                    .filter {
-                        it.groupId == groupId
+
+                override fun onCancelled(error: DatabaseError) {
+                    when {
+                        error.code == NETWORK_ERROR -> {
+                            Log.e("Messages", "onCancelled: $error", )
+                            trySend(SupabaseOperation.Failure(Exception("Please check internet connection")))
+                        }
+
+                        else -> {
+                            Log.e("Messages", "onCancelled- else block: $error", )
+                            trySend(
+                                SupabaseOperation.Failure(
+                                    Exception(
+                                        "Please try again: ${error.message}"
+                                    )
+                                )
+                            )
+                        }
                     }
-                    .map {
-                        val senderName = profile[it.sender]?.name ?: "Unknown"
-                        it.toMessage(senderName)
-                    }
-                trySend(SupabaseOperation.Success(messages))
+                }
             }
 
-            override fun onCancelled(error: DatabaseError) {
-                when {
-                    error.code == NETWORK_ERROR -> {
-                        trySend(SupabaseOperation.Failure(Exception("Please check internet connection")))
-                    }
+            messagesRef.addValueEventListener(listener)
 
-                    else -> {
-                        trySend(SupabaseOperation.Failure(Exception(
-                            "Please try again: ${error.message}"
-                        )))
-                    }
-                }
+            awaitClose {
+                messagesRef.removeEventListener(listener)
             }
         }
-
-        messagesRef.addValueEventListener(listener)
-
-        awaitClose {
-            messagesRef.removeEventListener(listener)
-        }
-    }
 
     override suspend fun deleteGroup(groupId: String): SupabaseOperation<Unit> {
-        return try {
+        return runCatching {
             supabaseClient.postgrest[SupabaseConstants.GROUP_TABLE]
                 .delete {
-                    filter {
-                        GroupDto::id eq groupId
+                    filter { GroupDto::id eq groupId }
+                }
+        }.fold(
+            onSuccess = {
+                // Delete the messages from fb db if group deletion is successful
+                val messageRef = database.reference.child("Messages")
+                val snapshot = messageRef.get().await()
+
+                val updates = mutableMapOf<String, Any?>()
+
+                snapshot.children.forEach {
+                    val groupIdToDelete = it.child("groupId").getValue(String::class.java)
+                    if (groupIdToDelete == groupId) {
+                        updates[it.key!!] = null
                     }
                 }
-            SupabaseOperation.Success(Unit)
-        } catch (e: Exception) {
-            SupabaseOperation.Failure(e)
-        }
+                messageRef.updateChildren(updates).await()
+                SupabaseOperation.Success(Unit)
+            },
+            onFailure = { throwable ->
+                SupabaseOperation.Failure(Exception(throwable.message))
+            }
+        )
     }
 
     override suspend fun leaveGroup(groupId: String): SupabaseOperation<Unit> {
@@ -415,6 +453,7 @@ class SharedGoalRepositoryImpl @Inject constructor(
             SupabaseOperation.Failure(ex)
         }
     }
+
     private suspend inline fun getGroupMembers(
         members: (List<GroupMemberDto>) -> Unit
     ) {
@@ -426,8 +465,7 @@ class SharedGoalRepositoryImpl @Inject constructor(
             members(members)
         } catch (e: IOException) {
             throw e
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             throw e
         }
     }
@@ -449,8 +487,7 @@ class SharedGoalRepositoryImpl @Inject constructor(
             data(result)
         } catch (e: IOException) {
             throw e
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             throw e
         }
     }
