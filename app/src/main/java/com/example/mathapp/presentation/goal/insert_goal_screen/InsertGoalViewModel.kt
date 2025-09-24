@@ -1,10 +1,12 @@
 package com.example.mathapp.presentation.goal.insert_goal_screen
 
-import android.util.Log
+import androidx.compose.material3.SnackbarDuration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mathapp.data.remote.model.GoalRequestDto
 import com.example.mathapp.domain.repository.UserGoalRepository
+import com.example.mathapp.presentation.snackbar.SnackbarController
+import com.example.mathapp.presentation.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -87,7 +89,7 @@ class InsertGoalViewModel @Inject constructor(
 
 
     private fun insertGoal() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             userGoalRepository.upsertGoal(
                 GoalRequestDto(
                     title = _insertGoalState.value.title,
@@ -96,8 +98,7 @@ class InsertGoalViewModel @Inject constructor(
                 )
             ).collect { supabaseOperation ->
                 supabaseOperation.onSuccess {
-                    Log.d("Goal-View", "insertGoal: $it")
-                    viewModelScope.launch(Dispatchers.IO) {
+                    viewModelScope.launch(Dispatchers.Main) {
                         _insertGoalState.update {state ->
                             state.copy(isDialogOpen = true, goalAddMessage = it)
                         }
@@ -113,7 +114,14 @@ class InsertGoalViewModel @Inject constructor(
                     }
 
                 }.onFailure { exception ->
-                    Log.e("Goal-View-Error", "insertGoal: ${exception.message}")
+                    viewModelScope.launch(Dispatchers.Main) {
+                        SnackbarController.sendEvent(
+                            SnackbarEvent(
+                                message = exception.message ?: "Unexpected error occurred",
+                                duration = SnackbarDuration.Long
+                            )
+                        )
+                    }
                 }
             }
         }

@@ -134,7 +134,7 @@ class DashBoardViewModel @Inject constructor(
     }
 
     private fun deleteSession() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 state.value.session?.let {
                     sessionRepository.deleteSession(it)
@@ -158,7 +158,7 @@ class DashBoardViewModel @Inject constructor(
     }
 
     private fun updateTask(task: Task) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 taskRepository.upsertTask(
                     task = task.copy(isComplete = !task.isComplete)

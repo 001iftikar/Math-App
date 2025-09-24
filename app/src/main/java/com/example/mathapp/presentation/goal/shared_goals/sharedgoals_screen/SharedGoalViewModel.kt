@@ -9,8 +9,10 @@ import com.example.mathapp.domain.repository.SharedGoalRepository
 import com.example.mathapp.presentation.snackbar.SnackbarController
 import com.example.mathapp.presentation.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,14 +42,16 @@ class SharedGoalViewModel @Inject constructor(
 
 
     private fun getSharedGoals() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
             _sharedGoals.update {
                 it.copy(
                     isLoading = true, error = null
                 )
             }
 
-            sharedGoalRepository.getSharedGoalsForGroup(groupId).collect { supabaseOperation ->
+            sharedGoalRepository.getSharedGoalsForGroup(groupId)
+                .flowOn(Dispatchers.IO)
+                .collect { supabaseOperation ->
                 supabaseOperation.onSuccess { sharedGoals ->
                     _sharedGoals.update {
                         it.copy(
@@ -70,7 +74,9 @@ class SharedGoalViewModel @Inject constructor(
 
     private fun isGroupAdmin() {
         viewModelScope.launch {
-            sharedGoalRepository.isGroupAdmin(groupId).collect { supabaseOperation ->
+            sharedGoalRepository.isGroupAdmin(groupId)
+                .flowOn(Dispatchers.IO)
+                .collect { supabaseOperation ->
                 supabaseOperation.onSuccess { isAdmin ->
                     _sharedGoals.update {
                         it.copy(isAdmin = isAdmin)
@@ -84,7 +90,7 @@ class SharedGoalViewModel @Inject constructor(
     }
 
     fun markAsComplete(isCompleted: Boolean, sharedGoalId: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
             sharedGoalRepository.markAsCompleted(isCompleted, sharedGoalId).onSuccess {
                 _sharedGoals.update { currentState ->
                     val updatedGoals = currentState.goals?.map { goal ->

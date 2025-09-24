@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -55,9 +56,11 @@ class JoinGroupViewModel @Inject constructor(
 
     private fun joinGroup() {
         viewModelScope.launch {
-            sharedGoalRepository.joinGroup(_joinGroupScreenState.value.groupId).collect { supabaseOperation ->
+            sharedGoalRepository.joinGroup(_joinGroupScreenState.value.groupId)
+                .flowOn(Dispatchers.IO)
+                .collect { supabaseOperation ->
                 supabaseOperation.onSuccess { message ->
-                    this.launch(Dispatchers.IO) {
+                    this.launch(Dispatchers.Main) {
                         _joinGroupEvent.send(JoinGroupScreenEvent.OnSuccess)
                         SnackbarController.sendEvent(
                             SnackbarEvent(

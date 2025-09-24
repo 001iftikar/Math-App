@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mathapp.domain.repository.UserGoalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,12 +26,12 @@ class OngoingGoalsViewModel @Inject constructor(
     val dashboardEvent = _ongoingGoalsScreenEvent.receiveAsFlow()
 
     init {
-        getAllGoals()
+        getOngoingGoals()
     }
 
     fun onEvent(event: OngoingGoalsScreenEvent) {
         when(event) {
-            OngoingGoalsScreenEvent.Refresh -> getAllGoals()
+            OngoingGoalsScreenEvent.Refresh -> getOngoingGoals()
             is OngoingGoalsScreenEvent.NavigateToSpecificGoal -> navigateToSpecificGoal(event.goalId)
             OngoingGoalsScreenEvent.NavigateBack -> navigateBack()
 
@@ -44,12 +46,14 @@ class OngoingGoalsViewModel @Inject constructor(
             else -> Unit
         }
     }
-    private fun getAllGoals() {
-        _goalsState.update {
-            it.copy(isLoading = true, error = null)
-        }
-        viewModelScope.launch {
-            userGoalRepository.getAllGoals().collect { supabaseOperation ->
+    private fun getOngoingGoals() {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
+            _goalsState.update {
+                it.copy(isLoading = true, error = null)
+            }
+            userGoalRepository.getAllGoals()
+                .flowOn(Dispatchers.IO)
+                .collect { supabaseOperation ->
                 supabaseOperation.onSuccess {goals ->
                     _goalsState.update {state ->
                         state.copy(

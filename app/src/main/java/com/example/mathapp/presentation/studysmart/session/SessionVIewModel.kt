@@ -9,6 +9,7 @@ import com.example.mathapp.domain.repository.SubjectRepository
 import com.example.mathapp.presentation.snackbar.SnackbarController
 import com.example.mathapp.presentation.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -83,7 +84,7 @@ class SessionVIewModel @Inject constructor(
     }
 
     private fun insertSession(duration: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (duration < 30) {
                 SnackbarController.sendEvent(
                     SnackbarEvent(
@@ -122,7 +123,7 @@ class SessionVIewModel @Inject constructor(
     }
 
     private fun deleteSession() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 sessionState.value.session?.let {
                     sessionRepository.deleteSession(it)

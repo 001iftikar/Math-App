@@ -9,6 +9,7 @@ import com.example.mathapp.domain.repository.SharedGoalRepository
 import com.example.mathapp.presentation.snackbar.SnackbarController
 import com.example.mathapp.presentation.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -66,7 +67,7 @@ class AddSharedGoalViewModel @Inject constructor(
 
     private fun createSharedGoal(groupId: String) {
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             sharedGoalRepository.createSharedGoal(
                 SharedGoalDto(
                     group_id = groupId,
@@ -75,7 +76,7 @@ class AddSharedGoalViewModel @Inject constructor(
                     end_by = _addSharedGoalState.value.date
                 )
             ).onSuccess { message ->
-                this.launch {
+                viewModelScope.launch(Dispatchers.Main) {
                     _addGoalEventState.send(AddSharedGoalScreenEvent.OnSuccess)
 
                     SnackbarController.sendEvent(
@@ -87,7 +88,16 @@ class AddSharedGoalViewModel @Inject constructor(
                 }
             }
                 .onFailure { exception ->
-                    Log.e("Create-Shared", "createSharedGoal: ${exception.message}")
+                    viewModelScope.launch(Dispatchers.Main) {
+                        _addGoalEventState.send(AddSharedGoalScreenEvent.OnSuccess)
+
+                        SnackbarController.sendEvent(
+                            SnackbarEvent(
+                                message = exception.message ?: "Unexpected error occurred",
+                                duration = SnackbarDuration.Short
+                            )
+                        )
+                    }
                 }
         }
     }

@@ -9,6 +9,7 @@ import com.example.mathapp.domain.repository.SupabaseAuthRepository
 import com.example.mathapp.domain.repository.UserGoalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.auth.user.UserSession
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import javax.inject.Inject
@@ -55,9 +57,11 @@ class ProfileScreenViewModel @Inject constructor(
     }
 
     private fun getUser() {
-        viewModelScope.launch {
-            _userState.update {
-                it.copy(isLoading = true, error = null)
+        viewModelScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                _userState.update {
+                    it.copy(isLoading = true, error = null)
+                }
             }
 
             getUserAndGoals().collect { combinedResult ->
@@ -69,7 +73,6 @@ class ProfileScreenViewModel @Inject constructor(
                         val name = userInfo.userMetadata?.get("display_name")
                             ?.jsonPrimitive
                             ?.contentOrNull ?: "User"
-
                         _userState.update {
                             it.copy(
                                 isLoading = false,

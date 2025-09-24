@@ -1,12 +1,13 @@
 package com.example.mathapp.presentation.goal.shared_goals.groups_screen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mathapp.domain.repository.SharedGoalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,14 +32,16 @@ class GroupViewModel @Inject constructor(
     }
 
     private fun getGroups() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
             _groupsState.update {
                 it.copy(
                     isLoading = true,
                     error = null
                 )
             }
-            sharedGoalRepository.getGroups().collect { supabaseOperation ->
+            sharedGoalRepository.getGroups()
+                .flowOn(Dispatchers.IO)
+                .collect { supabaseOperation ->
                 supabaseOperation.onSuccess { groups ->
                     _groupsState.update {
                         it.copy(
@@ -54,19 +57,6 @@ class GroupViewModel @Inject constructor(
                         )
                     }
                 }
-            }
-        }
-    }
-
-    private fun getSpecificGroup(groupId: String) {
-        viewModelScope.launch {
-            sharedGoalRepository.getSpecificGroup(groupId).collect { supabaseOperation ->
-                supabaseOperation.onSuccess { group ->
-                    Log.d("Group", "getSpecificGroup: ${group.id} : ${group.name}")
-                }
-                    .onFailure {
-                        Log.e("Group", "getSpecificGroup: $it", )
-                    }
             }
         }
     }

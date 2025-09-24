@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -111,7 +112,7 @@ class SubjectViewModel @Inject constructor(
     }
 
     private fun fetchSubject() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             subjectRepository.getSubjectById(subjectId)?.let { subject ->
                 _state.update {
                     it.copy(
@@ -159,7 +160,7 @@ class SubjectViewModel @Inject constructor(
     }
 
     private fun updateTask(task: Task) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 taskRepository.upsertTask(
                     task = task.copy(isComplete = !task.isComplete)
@@ -176,18 +177,20 @@ class SubjectViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                SnackbarController.sendEvent(
-                    SnackbarEvent(
-                        message = "Couldn't update task. ${e.message}",
-                        duration = SnackbarDuration.Long
+                withContext(Dispatchers.Main) {
+                    SnackbarController.sendEvent(
+                        SnackbarEvent(
+                            message = "Couldn't update task. ${e.message}",
+                            duration = SnackbarDuration.Long
+                        )
                     )
-                )
+                }
             }
         }
     }
 
     private fun deleteSession() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 state.value.session?.let {
                     sessionRepository.deleteSession(it)
@@ -200,18 +203,20 @@ class SubjectViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                SnackbarController.sendEvent(
-                    SnackbarEvent(
-                        message = "Session deleting failed: ${e.message}",
-                        duration = SnackbarDuration.Long
+               withContext(Dispatchers.Main) {
+                    SnackbarController.sendEvent(
+                        SnackbarEvent(
+                            message = "Session deleting failed: ${e.message}",
+                            duration = SnackbarDuration.Long
+                        )
                     )
-                )
+                }
             }
         }
     }
 
     private fun updateSubject() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 state.value.currentSubjectId?.let {
                     subjectRepository.upsertSubject(
@@ -229,12 +234,14 @@ class SubjectViewModel @Inject constructor(
                 }
 
             } catch (e: Exception) {
-                SnackbarController.sendEvent(
-                    SnackbarEvent(
-                        message = "Error updating subject: ${e.message}",
-                        duration = SnackbarDuration.Long
+                withContext(Dispatchers.Main) {
+                    SnackbarController.sendEvent(
+                        SnackbarEvent(
+                            message = "Error updating subject: ${e.message}",
+                            duration = SnackbarDuration.Long
+                        )
                     )
-                )
+                }
             }
         }
     }

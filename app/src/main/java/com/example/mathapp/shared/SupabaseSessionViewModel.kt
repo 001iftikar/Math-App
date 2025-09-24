@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.mathapp.domain.repository.SupabaseAuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.auth.user.UserSession
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -23,7 +24,7 @@ class SupabaseSessionViewModel @Inject constructor(
     }
 
     fun loadUserSession() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             supabaseRepository.loadUserSession().collect { supabaseOperation ->
                 supabaseOperation.onSuccess { session ->
                     _userSessionState.update {

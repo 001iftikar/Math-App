@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.Instant
 import javax.inject.Inject
 
@@ -137,19 +138,20 @@ class TaskViewModel @Inject constructor(
                 _taskEvent.send(TaskEvent.OnSuccess)
 
             } catch (e: Exception) {
-                e.printStackTrace()
-                SnackbarController.sendEvent(
-                    SnackbarEvent(
-                        message = "Saving task was not possible: ${e.message}",
-                        duration = SnackbarDuration.Long
+                withContext(Dispatchers.Main) {
+                    SnackbarController.sendEvent(
+                        SnackbarEvent(
+                            message = "Saving task was not possible: ${e.message}",
+                            duration = SnackbarDuration.Long
+                        )
                     )
-                )
+                }
             }
         }
     }
 
     private fun fetchTask() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             taskRepository.getTaskById(taskId)?.let {task ->
                 _state.update {
                     it.copy(
@@ -168,7 +170,7 @@ class TaskViewModel @Inject constructor(
     }
 
     private fun fetchSubjects() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _state.value.subjectId?.let { subjectId ->
                 subjectRepository.getSubjectById(subjectId)?.let { subject ->
                     _state.update {

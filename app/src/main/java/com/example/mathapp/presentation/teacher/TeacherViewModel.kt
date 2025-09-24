@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.mathapp.data.ResultState
 import com.example.mathapp.domain.repository.TeacherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -49,7 +50,7 @@ class TeacherViewModel @Inject constructor(private val teacherRepository: Teache
     }
 
     fun getTeacherByName(name: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             teacherRepository.getTeacherByName(name).collect {
                 when(it) {
                     is ResultState.Loading -> {

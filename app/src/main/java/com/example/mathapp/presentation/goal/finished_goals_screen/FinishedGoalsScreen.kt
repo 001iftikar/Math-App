@@ -15,6 +15,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +32,7 @@ import com.example.mathapp.presentation.components.BlackBackGround
 import com.example.mathapp.presentation.components.GoalListComponent
 import com.example.mathapp.presentation.components.GoalTopAppBarComp
 import com.example.mathapp.presentation.components.LoadingListComponent
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,9 +43,17 @@ fun FinishedGoalsScreen(
     val state = viewModel.goalsState.collectAsStateWithLifecycle()
     val onEvent = viewModel::onEvent
     var goalId by remember { mutableStateOf("") } // set the goal id later from the lambda
+    val eventState by viewModel.deleteEvent.collectAsState(false)
 
     val listState = rememberLazyListState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    LaunchedEffect(eventState) {
+        when(eventState) {
+            true -> onEvent(FinishedGoalsScreenEvent.Refresh)
+            else -> Unit
+        }
+    }
 
     Scaffold(
         modifier = Modifier
@@ -75,7 +86,7 @@ fun FinishedGoalsScreen(
 
                             Button(
                                 onClick = {
-                                    onEvent(FinishedGoalsScreenEvent.Retry)
+                                    onEvent(FinishedGoalsScreenEvent.Refresh)
                                 }
                             ) {
                                 Text("Retry")
@@ -124,7 +135,6 @@ fun FinishedGoalsScreen(
                             onEvent(FinishedGoalsScreenEvent.OnDeleteConfirmClick(goalId)) // pass the goal id finally here
                         }
                     )
-
                 }
             }
         }

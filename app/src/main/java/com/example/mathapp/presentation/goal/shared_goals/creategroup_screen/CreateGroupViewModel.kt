@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -45,7 +46,7 @@ class CreateGroupViewModel @Inject constructor(
     }
 
     private fun createGroup() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
             _createGoalScreenState.update {
                 it.copy(isLoading = true, error = null)
             }
@@ -54,7 +55,9 @@ class CreateGroupViewModel @Inject constructor(
                     name = _createGoalScreenState.value.title,
                     description = _createGoalScreenState.value.description
                 )
-            ).collect { supabaseOperation ->
+            )
+                .flowOn(Dispatchers.IO)
+                .collect { supabaseOperation ->
                 supabaseOperation.onSuccess {message ->
                     _createGoalScreenState.update {
                         it.copy(isLoading = false)

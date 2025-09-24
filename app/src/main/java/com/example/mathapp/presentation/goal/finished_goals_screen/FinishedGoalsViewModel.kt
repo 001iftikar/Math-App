@@ -8,8 +8,11 @@ import com.example.mathapp.presentation.snackbar.SnackbarController
 import com.example.mathapp.presentation.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,14 +23,21 @@ class FinishedGoalsViewModel @Inject constructor(
 ) : ViewModel() {
     private val _goalsState = MutableStateFlow(FinishedGoalsScreenState())
     val goalsState = _goalsState.asStateFlow()
+    private val _deleteEvent: Channel<Boolean> = Channel()
+    val deleteEvent = _deleteEvent.receiveAsFlow()
 
     init {
-        getUnfinishedGoals()
+        getFinishedGoals()
     }
 
     fun onEvent(event: FinishedGoalsScreenEvent) {
         when(event) {
-            FinishedGoalsScreenEvent.Retry -> getUnfinishedGoals()
+            FinishedGoalsScreenEvent.Refresh -> {
+                getFinishedGoals()
+                viewModelScope.launch {
+                    _deleteEvent.send(false)
+                }
+            }
             is FinishedGoalsScreenEvent.OnDeleteButtonClick -> {
                 _goalsState.update {
                     it.copy(
@@ -49,18 +59,19 @@ class FinishedGoalsViewModel @Inject constructor(
                 _goalsState.update {
                     it.copy(alertDialogState = false)
                 }
-                getUnfinishedGoals()
             }
         }
     }
 
-    private fun getUnfinishedGoals() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _goalsState.update {
-                it.copy(isLoading = true, error = null)
-            }
+    private fun getFinishedGoals() {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
+                _goalsState.update {
+                    it.copy(isLoading = true, error = null)
+                }
 
-            goalRepository.getAllGoals().collect { supabaseOperation ->
+            goalRepository.getAllGoals()
+                .flowOn(Dispatchers.IO)
+                .collect { supabaseOperation ->
                 supabaseOperation
                     .onSuccess { goals ->
                     _goalsState.update { state ->
@@ -80,18 +91,29 @@ class FinishedGoalsViewModel @Inject constructor(
     }
 
     private fun deleteGoal(goalId: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             goalRepository.deleteFinishedGoal(goalId).collect { supabaseOperation ->
-                supabaseOperation.onSuccess {
-                    this.launch(Dispatchers.IO) {
-                        SnackbarController.sendEvent(
-                            event = SnackbarEvent(
-                                message = it,
-                                duration = SnackbarDuration.Short
+                    supabaseOperation.onSuccess {
+                        viewModelScope.launch(Dispatchers.Main) {
+                            SnackbarController.sendEvent(
+                                event = SnackbarEvent(
+                                    message = it,
+                                    duration = SnackbarDuration.Short
+                                )
                             )
-                        )
+
+                            _deleteEvent.send(true)
+                        }
+                    }.onFailure { exception ->
+                        viewModelScope.launch(Dispatchers.Main) {
+                            SnackbarController.sendEvent(
+                                event = SnackbarEvent(
+                                    message = exception.message ?: "Unexpected error occurred",
+                                    duration = SnackbarDuration.Long
+                                )
+                            )
+                        }
                     }
-                }
             }
         }
     }

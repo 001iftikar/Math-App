@@ -11,8 +11,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,41 +41,46 @@ class ChatViewModel @Inject constructor(
                 }
             }
 
-            ChatScreenEvent.SendMessage -> sendTestMessage()
+            ChatScreenEvent.SendMessage -> sendMessage()
         }
     }
 
-    private fun sendTestMessage() {
+    private fun sendMessage() {
         viewModelScope.launch(Dispatchers.IO) {
 
             val result = sharedGoalRepository.sendMessage(
                 content = _state.value.textMessage.trim(),
                 groupId = groupId
             )
-            result.onSuccess {
-                _state.update {
-                    it.copy(textMessage = "")
-                }
-            }.onFailure { error ->
-               launch(Dispatchers.Main)
-                {
-                    SnackbarController.sendEvent(
-                        SnackbarEvent(
-                            message = "Sending message failed: ${error.message}",
-                            duration = SnackbarDuration.Short
+            withContext(Dispatchers.Main) {
+                result.onSuccess {
+                    _state.update {
+                        it.copy(textMessage = "")
+                    }
+
+                }.onFailure { error ->
+                    this@launch.launch(Dispatchers.Main.immediate)
+                    {
+                        SnackbarController.sendEvent(
+                            SnackbarEvent(
+                                message = "Sending message failed: ${error.message}",
+                                duration = SnackbarDuration.Short
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
     }
 
     private fun getMessages() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
             _state.update {
                 it.copy(isLoading = true, error = null)
             }
-            sharedGoalRepository.getMessages(groupId).collect { supabaseOperation ->
+            sharedGoalRepository.getMessages(groupId)
+                .flowOn(Dispatchers.IO)
+                .collect { supabaseOperation ->
                 supabaseOperation.onSuccess { messages ->
                     _state.update {
                         it.copy(
