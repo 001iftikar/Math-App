@@ -1,6 +1,5 @@
 package com.example.mathapp.presentation.goal.ongoing_goals_screen
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -46,7 +45,6 @@ import com.example.mathapp.presentation.components.LoadingListComponent
 import com.example.mathapp.presentation.navigation.Routes.AddGoalScreen
 import com.example.mathapp.presentation.navigation.Routes.SpecificGoalScreen
 import com.example.mathapp.utils.FAB_EXPLODE_BOUNDS_KEY
-import com.example.mathapp.utils.SupabaseTimeCast.toEpochMillisFromFormatted
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -56,26 +54,29 @@ fun SharedTransitionScope.OngoingGoalsScreen(
     navHostController: NavHostController
 ) {
     val state = ongoingGoalsViewModel.goalState.collectAsStateWithLifecycle()
-    val ongoingGoalsScreenEvent by ongoingGoalsViewModel.dashboardEvent.collectAsState(OngoingGoalsScreenEvent.Idle)
+    val ongoingGoalsScreenEvent by ongoingGoalsViewModel.dashboardEvent.collectAsState(
+        OngoingGoalsScreenEvent.Idle
+    )
     val onEvent = ongoingGoalsViewModel::onEvent
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val listState = rememberLazyListState()
 
     LaunchedEffect(ongoingGoalsScreenEvent) {
-        when(val event = ongoingGoalsScreenEvent) { // To avoid casting using 'as'
+        when (val event = ongoingGoalsScreenEvent) { // To avoid casting using 'as'
             is OngoingGoalsScreenEvent.NavigateToSpecificGoal -> {
                 navHostController.navigate(SpecificGoalScreen(event.goalId))
             }
+
             OngoingGoalsScreenEvent.NavigateBack -> {
                 navHostController.popBackStack()
             }
+
             else -> Unit
         }
     }
 
     LaunchedEffect(Unit) {
-        Log.d("Goal-Refresh", "DashBoardScreen: Refresh")
         onEvent(OngoingGoalsScreenEvent.Refresh)
     }
 
@@ -84,7 +85,8 @@ fun SharedTransitionScope.OngoingGoalsScreen(
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            GoalTopAppBarComp(title = "Ongoing Goals",
+            GoalTopAppBarComp(
+                title = "Ongoing Goals",
                 scrollBehavior = scrollBehavior,
                 onClick = {
                     onEvent(OngoingGoalsScreenEvent.NavigateBack)
@@ -121,51 +123,28 @@ fun SharedTransitionScope.OngoingGoalsScreen(
         BlackBackGround {
             when {
                 state.value.goals != null -> {
-                    if (state.value.goals != null) {
-                        val sortedList = when(state.value.sortBy) {
-                            SortBy.NAMEASC -> {
-                                state.value.goals!!.sortedBy {
-                                    it.title.lowercase()
-                                }
-                            }
-                            SortBy.NAMEDSC -> {
-                                state.value.goals!!.sortedByDescending {
-                                    it.title.lowercase()
-                                }
-                            }
-
-                            SortBy.CREATEDAT -> {
-                                state.value.goals!!.sortedBy {
-                                    it.createdAt.toEpochMillisFromFormatted()
-                                }
-                            }
-                            SortBy.ENDBY -> {
-                                state.value.goals!!.sortedBy {
-                                    it.endBy.toEpochMillisFromFormatted()
-                                }
-                            }
-                        }
-                        if (state.value.goals!!.isEmpty()) {
-                            Column(
-                                modifier = Modifier.fillMaxSize()
-                                    .padding(innerPadding),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text("You currently have no goals, add some")
-                            }
-                        }
-                        GoalListComponent(
+                    if (state.value.goals!!.isEmpty()) {
+                        Column(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(innerPadding),
-                            goals = sortedList,
-                            listState = listState,
-                            onClick = {
-                                onEvent(OngoingGoalsScreenEvent.NavigateToSpecificGoal(it))
-                            }
-                        )
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text("You currently have no goals, add some")
+                        }
                     }
+
+                    GoalListComponent(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        goals = state.value.goals!!,
+                        listState = listState,
+                        onClick = {
+                            onEvent(OngoingGoalsScreenEvent.NavigateToSpecificGoal(it))
+                        }
+                    )
                 }
 
                 state.value.isLoading -> {
@@ -197,9 +176,12 @@ fun SharedTransitionScope.OngoingGoalsScreen(
                     }
                 }
             }
+
+
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -225,10 +207,9 @@ private fun DropDown(
 
         ExposedDropdownMenu(
             modifier = Modifier
-                .width(120.dp)
-            ,
+                .width(120.dp),
             expanded = isExpanded,
-            onDismissRequest = {isExpanded = false}
+            onDismissRequest = { isExpanded = false }
         ) {
             SortBy.entries.forEach {
                 DropdownMenuItem(
