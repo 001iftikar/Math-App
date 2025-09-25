@@ -26,4 +26,5 @@ interface SharedGoalRepository {
     suspend fun markAsCompleted(isCompleted: Boolean, sharedGoalId: String): SupabaseOperation<Boolean>
     suspend fun deleteGroup(groupId: String): SupabaseOperation<Unit>
     suspend fun leaveGroup(groupId: String): SupabaseOperation<Unit>
+    suspend fun kickOutMember(groupId: String, userId: String): SupabaseOperation<Unit>
 }

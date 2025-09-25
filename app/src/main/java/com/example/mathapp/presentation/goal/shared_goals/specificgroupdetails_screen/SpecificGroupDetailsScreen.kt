@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
@@ -61,6 +62,10 @@ fun SpecificGroupDetailsScreen(
     val state by viewModel.specificGoalState.collectAsStateWithLifecycle()
     var isDeleteDialogOpen by remember { mutableStateOf(false) }
     var isLeaveDialogOpen by remember { mutableStateOf(false) }
+
+    var isKickOutDialogOpen by remember { mutableStateOf(false) }
+    var groupIdToKickOut by remember { mutableStateOf("") }
+    var userIdToKickOut by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         viewModel.deleteEvent.collectLatest {
@@ -120,7 +125,11 @@ fun SpecificGroupDetailsScreen(
                     isAdmin = state.isAdmin,
                     members = state.belongedMembers,
                     onDeleteClick = { isDeleteDialogOpen = true },
-                    onLeaveGroupClick = { isLeaveDialogOpen = true }
+                    onLeaveGroupClick = { isLeaveDialogOpen = true },
+                    onKickOutClick = { groupId, userId ->
+                        isKickOutDialogOpen = true
+                        groupIdToKickOut = groupId; userIdToKickOut = userId
+                    }
                 )
 
                 DeleteDialog(
@@ -145,6 +154,18 @@ fun SpecificGroupDetailsScreen(
                         viewModel.leaveGroup()
                     }
                 )
+
+                DeleteDialog(
+                    isOpen = isKickOutDialogOpen,
+                    title = "Kick this member out of this group?",
+                    bodyText = "You can reinvite this member",
+                    onDismissRequest = { isKickOutDialogOpen = false },
+                    confirmButtonText = "OK",
+                    onConfirmButton = {
+                        viewModel.kickOutMember(groupIdToKickOut, userIdToKickOut)
+                        isKickOutDialogOpen = false
+                    }
+                )
             }
         }
     }
@@ -157,7 +178,8 @@ private fun GroupDetails(
     isAdmin: Boolean,
     members: List<UserProfile>,
     onLeaveGroupClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onKickOutClick: (String, String) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -259,16 +281,33 @@ private fun GroupDetails(
                     )
                     Spacer(Modifier.height(8.dp))
                 }
-                items(items = members) { member ->
+                items(items = members, key = { it.id }) { member ->
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 6.dp)
                     ) {
-                        Text(
-                            text = member.name,
-                            style = MaterialTheme.typography.titleLarge
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = member.name,
+                                style = MaterialTheme.typography.titleLarge
+                            )
+
+                            if (isAdmin && group.admin != member.id) {
+                                IconButton(
+                                    onClick = { onKickOutClick(group.id, member.id) }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = null,
+                                        tint = Color.Red
+                                    )
+                                }
+                            }
+                        }
+
                         Text(
                             text = member.email,
                             style = MaterialTheme.typography.titleMedium,

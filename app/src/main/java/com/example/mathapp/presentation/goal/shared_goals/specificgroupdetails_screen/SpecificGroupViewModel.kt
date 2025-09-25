@@ -8,6 +8,7 @@ import com.example.mathapp.domain.UseCases
 import com.example.mathapp.presentation.snackbar.SnackbarController
 import com.example.mathapp.presentation.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -121,6 +122,31 @@ class SpecificGroupViewModel @Inject constructor(
                         SnackbarController.sendEvent(
                             SnackbarEvent(
                                 message = it.message ?: "Some unexpected error occurred",
+                                duration = SnackbarDuration.Long
+                            )
+                        )
+                    }
+                }
+        }
+    }
+
+    fun kickOutMember(groupId: String, userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            useCases.kickOutMember(groupId, userId)
+                .onSuccess {
+                    launch(Dispatchers.Main) {
+                        SnackbarController.sendEvent(
+                            SnackbarEvent(
+                                message = "Member is kicked out",
+                                duration = SnackbarDuration.Short
+                            )
+                        )
+                    }
+                }.onFailure { ex ->
+                    launch(Dispatchers.Main) {
+                        SnackbarController.sendEvent(
+                            SnackbarEvent(
+                                message = ex.message ?: "Unexpected error occurred",
                                 duration = SnackbarDuration.Long
                             )
                         )

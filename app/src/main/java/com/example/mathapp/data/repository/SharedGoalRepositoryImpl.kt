@@ -474,6 +474,21 @@ class SharedGoalRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun kickOutMember(groupId: String, userId: String): SupabaseOperation<Unit> {
+        return try {
+            supabaseClient.postgrest[SupabaseConstants.GROUP_MEMBER_TABLE]
+                .delete {
+                    filter {
+                        GroupMemberDto::group_id eq groupId
+                        GroupMemberDto::user_id eq userId
+                    }
+                }
+            SupabaseOperation.Success(Unit)
+        } catch (ex: Exception) {
+            SupabaseOperation.Failure(Exception("Error: ${ex.message}"))
+        }
+    }
+
     private suspend inline fun getGroupMembers(
         members: (List<GroupMemberDto>) -> Unit
     ) {
