@@ -305,8 +305,7 @@ class SharedGoalRepositoryImpl @Inject constructor(
                         sender = userId,
                         status = MessageStatus.SENDING
                     )
-                ) {
-                    error, ref ->
+                ) { error, ref ->
                     if (error != null) {
                         ref.child("status").setValue(MessageStatus.FAILED.name)
                     } else {
@@ -383,12 +382,12 @@ class SharedGoalRepositoryImpl @Inject constructor(
                 override fun onCancelled(error: DatabaseError) {
                     when {
                         error.code == NETWORK_ERROR -> {
-                            Log.e("Messages", "onCancelled: $error", )
+                            Log.e("Messages", "onCancelled: $error")
                             trySend(SupabaseOperation.Failure(Exception("Please check internet connection")))
                         }
 
                         else -> {
-                            Log.e("Messages", "onCancelled- else block: $error", )
+                            Log.e("Messages", "onCancelled- else block: $error")
                             trySend(
                                 SupabaseOperation.Failure(
                                     Exception(
@@ -441,6 +440,7 @@ class SharedGoalRepositoryImpl @Inject constructor(
         return try {
             val userId = supabaseClient.auth.currentUserOrNull()?.id
                 ?: throw NullPointerException("User not logged in")
+
             supabaseClient.postgrest[SupabaseConstants.GROUP_MEMBER_TABLE]
                 .delete {
                     filter {
@@ -448,6 +448,26 @@ class SharedGoalRepositoryImpl @Inject constructor(
                         GroupMemberDto::user_id eq userId
                     }
                 }
+
+            val exists = (supabaseClient.postgrest[SupabaseConstants.GROUP_MEMBER_TABLE]
+                .select {
+                    // no need for data, just check if there's any row exists
+                    head = true
+                    count(Count.EXACT)
+                    filter {
+                        eq("group_id", groupId)
+                    }
+                }
+                .countOrNull() ?: 0L) > 0L
+
+            if (!exists) {
+                supabaseClient.postgrest[SupabaseConstants.GROUP_TABLE]
+                    .delete {
+                        filter {
+                            GroupDto::id eq groupId
+                        }
+                    }
+            }
             SupabaseOperation.Success(Unit)
         } catch (ex: Exception) {
             SupabaseOperation.Failure(ex)
