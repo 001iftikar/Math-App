@@ -3,6 +3,7 @@ package com.example.mathapp.presentation.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,11 +18,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,35 +30,46 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.example.mathapp.R
-import com.example.mathapp.shared.SupabaseSessionViewModel
 import com.example.mathapp.presentation.components.DrawerItem
 import com.example.mathapp.presentation.navigation.Routes
+import com.example.mathapp.shared.SupabaseSessionViewModel
 import com.example.mathapp.utils.ColorHex.toColor
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun HomeScreen(
     supabaseSessionViewModel: SupabaseSessionViewModel = hiltViewModel(),
-    navHostController: NavHostController) {
+    homeScreenViewModel: HomeScreenViewModel = hiltViewModel(),
+    navHostController: NavHostController
+) {
     val supabaseSession by supabaseSessionViewModel.userSessionState.collectAsStateWithLifecycle()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val urlHandler = LocalUriHandler.current
+    var isUpdateDialogOpen by remember { mutableStateOf(false) }
+    val appDetails by homeScreenViewModel.appDetails.collectAsStateWithLifecycle()
+    val updateAvailable by homeScreenViewModel.updateAvailable.collectAsStateWithLifecycle()
 
     val user = supabaseSession.userSession
     val route = if (user != null) Routes.GoalHomeScreen else Routes.GoalSignUpScreen
@@ -101,18 +113,43 @@ fun HomeScreen(
                     onClick = {
                         scope.launch { drawerState.close() }
 
-                        urlHandler.openUri("https://github.com/001ryu-ryu/Math-App")
+                        urlHandler.openUri(appDetails.sourceCode)
                     }
                 )
+
+                NavigationDrawerItem(
+                    label = {
+                        DrawerItem(
+                            icon = R.drawable.outline_update_24,
+                            title = "Check for Update"
+                        )
+                    },
+                    selected = false,
+                    onClick = { isUpdateDialogOpen = true }
+                )
+
+                if (isUpdateDialogOpen) {
+                    HorizontalDivider()
+                    Box {
+                        UpdateAlertDialog(
+                            text = if (updateAvailable) "Update available, please download." else "The app is in the latest version",
+                            updateAvailable = updateAvailable,
+                            onDismissRequest = { isUpdateDialogOpen = false },
+                            onDownloadClick = {
+                                urlHandler.openUri(appDetails.urlToDownload)
+                            }
+                        )
+                    }
+                }
             }
         }
     ) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = {
-                TopBar(title = "WELCOME") {
-                    scope.launch { drawerState.open() }
-                }
+                TopBar(
+                    onClick = { scope.launch { drawerState.open() } }
+                )
             }
         ) { innerPadding ->
 
@@ -129,7 +166,7 @@ fun HomeScreen(
                 }
                 item {
                     SecondLayer(
-                        goToStudySmart = {navHostController.navigate(Routes.StudySmartScreen)},
+                        goToStudySmart = { navHostController.navigate(Routes.StudySmartScreen) },
                         goToGoals = {
                             navHostController.navigate(route)
                         }
@@ -142,12 +179,12 @@ fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(title: String, onClick: () -> Unit) {
+private fun TopBar(onClick: () -> Unit) {
 
     CenterAlignedTopAppBar(
         title = {
             Text(
-                title, style = MaterialTheme.typography.headlineLarge,
+                text = "WELCOME", style = MaterialTheme.typography.headlineLarge,
                 color = "#9d0ddb".toColor()
             )
         },
@@ -246,9 +283,10 @@ private fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
 
 
 @Composable
-private fun SecondLayer(goToStudySmart: () -> Unit,
-                        goToGoals: () -> Unit
-               ) {
+private fun SecondLayer(
+    goToStudySmart: () -> Unit,
+    goToGoals: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -331,17 +369,46 @@ private fun SecondLayer(goToStudySmart: () -> Unit,
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Goals(
-    onClick: () -> Unit
+private fun UpdateAlertDialog(
+    text: String,
+    updateAvailable: Boolean,
+    onDismissRequest: () -> Unit,
+    onDownloadClick: () -> Unit = {}
 ) {
-    Card(
-        onClick = onClick
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Goal")
+        Text(text)
+        Spacer(Modifier.height(3.dp))
+
+        if (!updateAvailable)
+            TextButton(
+                onClick = onDismissRequest
+            ) {
+                Text("OK", fontSize = 16.sp)
+            } else {
+            Row {
+                TextButton(
+                    onClick = onDismissRequest
+                ) {
+                    Text(text = "Later", fontSize = 16.sp)
+                }
+
+                TextButton(
+                    onClick = onDownloadClick
+                ) {
+                    Text("Download", fontSize = 16.sp)
+                }
+            }
+        }
     }
 }
-
 
 
 
