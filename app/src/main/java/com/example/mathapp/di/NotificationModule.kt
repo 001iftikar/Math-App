@@ -52,7 +52,7 @@ object NotificationModule {
         )
             .setContentTitle("Study Session")
             .setContentText("00:00:00")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.mipmap.ic_launcher_foreground)
             .setOngoing(true)
             .setContentIntent(clickPendingIntent)
     }

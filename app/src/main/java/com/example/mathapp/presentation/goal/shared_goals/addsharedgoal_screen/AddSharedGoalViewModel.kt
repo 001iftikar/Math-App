@@ -1,6 +1,5 @@
 package com.example.mathapp.presentation.goal.shared_goals.addsharedgoal_screen
 
-import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

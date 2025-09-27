@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.example.mathapp.presentation.components.TopAppBarNavIcon
-import com.example.mathapp.utils.PDF_DIRECTORY
 import com.github.barteksc.pdfviewer.PDFView
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import kotlinx.coroutines.Dispatchers
@@ -48,49 +47,27 @@ import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
 @Composable
-fun BookPdfViewer(pdfUrl: String?, bookName: String, downloadedFile: String? = null, navController: NavController) {
+fun BookPdfViewer(pdfUrl: String, bookName: String, navController: NavController) {
 
     val context = LocalContext.current
-    val pdfDir = File(context.getExternalFilesDir(null), PDF_DIRECTORY)
-    val savedFile = if (downloadedFile != null) File(pdfDir, downloadedFile) else null
-
     var isLoading by remember { mutableStateOf(true) }
 
     var pdfViewState by remember { mutableStateOf<PDFView?>(null) }
 
-    LaunchedEffect(key1 = pdfUrl, key2 = downloadedFile, key3 = bookName) {
-        if (downloadedFile != null && pdfUrl == null) {
-            savedFile?.let { file ->
-                if (file.exists()) {
-                    Log.d("BookPdfViewer", "Loading PDF from downloaded file: ${file.absolutePath}")
-                    withContext(Dispatchers.Main) {
-                        pdfViewState?.fromFile(file)
-                            ?.scrollHandle(DefaultScrollHandle(context))
-                            ?.enableAntialiasing(true)
-                            ?.onLoad {
-                                isLoading = false
-                            }
-                            ?.load() // Load the pdf
+    LaunchedEffect(Unit) {
+        val cacheFile = retrievePdfFromCacheOrUrl(
+            context = context,
+            pdfUrl = pdfUrl
+        )
+        cacheFile?.let { file ->
+            withContext(Dispatchers.Main) {
+                pdfViewState?.fromFile(file)
+                    ?.scrollHandle(DefaultScrollHandle(context))
+                    ?.enableAntialiasing(true)
+                    ?.onLoad {
+                        isLoading = false
                     }
-                } else {
-                    Log.d("BookPdfViewer", "Downloaded file not found: ${file.absolutePath}")
-                }
-            }
-        } else {
-            val cacheFile = retrievePdfFromCacheOrUrl(
-                context = context,
-                pdfUrl = pdfUrl
-            )
-            cacheFile?.let { file ->
-                withContext(Dispatchers.Main) {
-                    pdfViewState?.fromFile(file)
-                        ?.scrollHandle(DefaultScrollHandle(context))
-                        ?.enableAntialiasing(true)
-                        ?.onLoad {
-                            isLoading = false
-                        }
-                        ?.load() // Load the pdf
-                }
+                    ?.load() // Load the pdf
             }
         }
     }
@@ -120,7 +97,12 @@ fun BookPdfViewer(pdfUrl: String?, bookName: String, downloadedFile: String? = n
     )
 
     Scaffold(
-        topBar = { TopAppBarNavIcon(title = bookName.trim(), navController = navController) }
+        topBar = {
+            TopAppBarNavIcon(
+                title = bookName,
+                navController = navController
+            )
+        }
     ) { innerPadding ->
         if (pdfUrl == "") {
             Column(
@@ -194,7 +176,8 @@ private suspend fun retrievePdfFromCacheOrUrl(context: Context, pdfUrl: String?)
                 return@withContext cachedFile
             }
 
-            val urlConnection: HttpURLConnection = (URL(pdfUrl).openConnection() as HttpsURLConnection)
+            val urlConnection: HttpURLConnection =
+                (URL(pdfUrl).openConnection() as HttpsURLConnection)
 
             if (urlConnection.responseCode == 200) {
                 val inputStream = BufferedInputStream(urlConnection.inputStream) // Read the data

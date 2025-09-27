@@ -3,6 +3,7 @@ package com.example.mathapp.presentation.home
 import android.app.Application
 import android.os.Build
 import android.widget.Toast
+import androidx.annotation.Keep
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.database.DataSnapshot

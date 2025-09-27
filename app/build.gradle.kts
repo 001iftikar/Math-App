@@ -1,3 +1,5 @@
+import com.android.ide.common.pagealign.is16kAligned
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -25,7 +27,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -62,10 +65,6 @@ dependencies {
 
     // pdf
     implementation("com.github.mhiew:android-pdf-viewer:3.2.0-beta.3")
-
-
-    // Download manager
-    implementation("com.github.khushpanchal:Ketch:2.0.5")
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.1")
 

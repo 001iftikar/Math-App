@@ -38,7 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.mathapp.presentation.components.DownloadsIcon
 import com.example.mathapp.presentation.components.TopAppBarNavIcon
 import com.example.mathapp.presentation.components.paperList
 import com.example.mathapp.presentation.effects.PapersLoadingShimmer
@@ -55,9 +54,7 @@ fun StudyHomeScreen(
     var semesterNotSelectedText by remember { mutableStateOf("Select which semester you are on") }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { TopAppBarNavIcon(title = "Study Here", navController = navHostController) {
-            DownloadsIcon { navHostController.navigate(Routes.DownloadsScreen) }
-        } },
+        topBar = { TopAppBarNavIcon(title = "Study Here", navController = navHostController) },
         floatingActionButton = {
             IconButton(
                 onClick = {

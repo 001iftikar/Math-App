@@ -42,7 +42,6 @@ import com.example.mathapp.presentation.goal.specific_goal_screen.SpecificGoalSc
 import com.example.mathapp.presentation.home.HomeScreen
 import com.example.mathapp.presentation.study.BookPdfViewer
 import com.example.mathapp.presentation.study.BooksByPaperScreen
-import com.example.mathapp.presentation.study.DownloadsScreen
 import com.example.mathapp.presentation.study.StudyHomeScreen
 import com.example.mathapp.presentation.studysmart.dashboard.StudySmartScreen
 import com.example.mathapp.presentation.studysmart.session.SessionScreen
@@ -56,13 +55,11 @@ import com.example.mathapp.presentation.teacher.TeacherScreenByName
 import com.example.mathapp.shared.SharedViewModel
 import com.example.mathapp.utils.FAB_EXPLODE_BOUNDS_KEY
 import com.example.mathapp.utils.ServiceConstants
-import com.ketch.Ketch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun NavApp(
     navController: NavHostController,
-    ketch: Ketch,
     timerService: StudySessionTimerService?
 ) {
     val sharedViewModel = hiltViewModel<SharedViewModel>()
@@ -124,7 +121,6 @@ fun NavApp(
                 BooksByPaperScreen(
                     semester = data.semester,
                     paperCode = data.paperCode,
-                    ketch = ketch,
                     navController = navController
                 )
             }
@@ -134,7 +130,6 @@ fun NavApp(
                 BookPdfViewer(
                     pdfUrl = data.pdfUrl,
                     bookName = data.bookName,
-                    downloadedFile = data.downloadedPdf,
                     navController = navController
                 )
             }
@@ -183,10 +178,6 @@ fun NavApp(
 
             composable<Routes.ChatBotScreen> {
                 ChatBotScreen()
-            }
-
-            composable<Routes.DownloadsScreen> {
-                DownloadsScreen(navController)
             }
 
             composable<Routes.GoalSignUpScreen> {

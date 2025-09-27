@@ -21,10 +21,7 @@ sealed class Routes {
     data class BookByPaperScreen(val semester: String, val paperCode: String)
 
     @Serializable
-    data class PdfViewerScreen(val pdfUrl: String? = null, val downloadedPdf: String? = null, val bookName: String)
-
-    @Serializable
-    object DownloadsScreen
+    data class PdfViewerScreen(val pdfUrl: String, val bookName: String)
 
 
     // Routes for Smart Study

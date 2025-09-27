@@ -32,7 +32,6 @@ import com.example.mathapp.presentation.components.BlackBackGround
 import com.example.mathapp.presentation.components.GoalListComponent
 import com.example.mathapp.presentation.components.GoalTopAppBarComp
 import com.example.mathapp.presentation.components.LoadingListComponent
-import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

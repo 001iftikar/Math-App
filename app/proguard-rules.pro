@@ -19,3 +19,10 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+## ---keep the class dtos---
+-keep class com.example.mathapp.data.remote.model.** { *; }
+-keep class com.example.mathapp.domain.model.** { *; }
+-keep class com.example.mathapp.presentation.home.AppDetails { *; }
+
+-dontobfuscate

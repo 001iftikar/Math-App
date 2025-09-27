@@ -35,17 +35,12 @@ import com.example.mathapp.presentation.snackbar.ObserveAsEvents
 import com.example.mathapp.presentation.snackbar.SnackbarController
 import com.example.mathapp.presentation.studysmart.session.StudySessionTimerService
 import com.example.mathapp.ui.theme.MathAppTheme
-import com.ketch.DownloadConfig
-import com.ketch.Ketch
-import com.ketch.NotificationConfig
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private lateinit var ketch: Ketch
-
     private var isBound by mutableStateOf(false)
     private var timerService: StudySessionTimerService? by mutableStateOf(null)
 
@@ -90,20 +85,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        ketch = Ketch.builder()
-            .setNotificationConfig(
-                NotificationConfig(
-                    enabled = true,
-                    smallIcon = R.drawable.ic_launcher_background
-                )
-            )
-            .setDownloadConfig(
-                DownloadConfig(
-                    connectTimeOutInMs = 15000L,
-                    readTimeOutInMs = 1500L
-                )
-            )
-            .build(this)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color.Transparent.toArgb())
         )
@@ -149,7 +130,6 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavApp(
                         navController = navController,
-                        ketch = ketch,
                         timerService = timerService
                     )
                 }

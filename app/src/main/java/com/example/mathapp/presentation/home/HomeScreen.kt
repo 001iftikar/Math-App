@@ -92,19 +92,6 @@ fun HomeScreen(
                 NavigationDrawerItem(
                     label = {
                         DrawerItem(
-                            icon = R.drawable.downloads,
-                            title = "Downloads"
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-                        scope.launch { drawerState.close() }
-                        navHostController.navigate(Routes.DownloadsScreen)
-                    }
-                )
-                NavigationDrawerItem(
-                    label = {
-                        DrawerItem(
                             icon = R.drawable.source_code,
                             title = "Source Code"
                         )
