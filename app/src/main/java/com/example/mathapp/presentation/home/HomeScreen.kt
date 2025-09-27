@@ -1,9 +1,9 @@
 package com.example.mathapp.presentation.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,14 +13,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,8 +43,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -168,11 +171,10 @@ fun HomeScreen(
 @Composable
 private fun TopBar(onClick: () -> Unit) {
 
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = {
             Text(
-                text = "WELCOME", style = MaterialTheme.typography.headlineLarge,
-                color = "#9d0ddb".toColor()
+                text = "Hello, what shall I call you?", style = MaterialTheme.typography.titleLarge,
             )
         },
         navigationIcon = {
@@ -193,78 +195,21 @@ private fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
             .padding(horizontal = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        ElevatedCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .aspectRatio(1f)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 5.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                SubcomposeAsyncImage(
-                    model = R.drawable.teacher,
-                    contentDescription = null,
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
-                        .clickable(
-                            onClick = goToTeacher
-                        )
+        HomeScreenItem(
+            modifier = Modifier.weight(1f).aspectRatio(1f),
+            icon = R.drawable.teacher_3_,
+            title = "Teachers",
+            description = "Your mentors & guides",
+            onClick = goToTeacher
+        )
 
-                )
-                Text(
-                    text = "TEACHERS",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable(
-                            onClick = goToTeacher
-                        ),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
-        }
-
-        Spacer(Modifier.width(10.dp))
-        ElevatedCard(
-            modifier = Modifier
-                .weight(1f)
-                .aspectRatio(1f)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 5.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                SubcomposeAsyncImage(
-                    model = R.drawable.study_res,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
-                        .clickable(
-                            onClick = goToStudy
-                        )
-                )
-                Text(
-                    text = "STUDY TIME",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable(
-                            onClick = goToStudy
-                        ),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
-        }
+        HomeScreenItem(
+            modifier = Modifier.weight(1f).aspectRatio(1f),
+            icon = R.drawable.bookstack,
+            title = "Study time",
+            description = "Your study resources",
+            onClick = goToStudy
+        )
     }
 }
 
@@ -280,79 +225,21 @@ private fun SecondLayer(
             .padding(horizontal = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        ElevatedCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .aspectRatio(1f)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 5.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                SubcomposeAsyncImage(
-                    model = R.drawable.study_smart,
-                    contentDescription = null,
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
-                        .clickable(
-                            onClick = goToStudySmart
-                        )
+        HomeScreenItem(
+            modifier = Modifier.weight(1f).aspectRatio(1f),
+            icon = R.drawable.super_intelligence,
+            title = "Study smart",
+            description = "Track your daily grind",
+            onClick = goToStudySmart
+        )
 
-                )
-                Text(
-                    text = "STUDY SMART",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable(
-                            onClick = goToStudySmart
-                        ),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
-        }
-
-        Spacer(Modifier.width(10.dp))
-
-        ElevatedCard(
-            modifier = Modifier
-                .weight(1f)
-                .aspectRatio(1f)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 5.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                SubcomposeAsyncImage(
-                    model = R.drawable.goal_per,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
-                        .clickable(
-                            onClick = goToGoals
-                        )
-                )
-                Text(
-                    text = "Goals",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable(
-                            onClick = goToGoals
-                        ),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
-        }
+        HomeScreenItem(
+            modifier = Modifier.weight(1f).aspectRatio(1f),
+            icon = R.drawable.target,
+            title = "Goals",
+            description = "Focus. Execute. Win",
+            onClick = goToGoals
+        )
     }
 }
 
@@ -397,7 +284,58 @@ private fun UpdateAlertDialog(
     }
 }
 
+@Composable
+private fun HomeScreenItem(
+    modifier: Modifier,
+    icon: Int,
+    title: String,
+    description: String,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = modifier
+            .padding(12.dp),
+        onClick = onClick,
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Black.copy(alpha = 0.35f),
+            contentColor = Color.White
+        )
+    ) {
+        BoxWithConstraints {
+            val paddingTop = maxWidth * 0.14f
+            val paddingStart = maxWidth * 0.06f
+            val paddingEnd = maxWidth * 0.08f
+            val paddingBottom = maxWidth * 0.06f
 
+            val imageSize = maxWidth * 0.3f
+            val titleSize = maxWidth * 0.12f
+            val descSize = maxWidth * 0.09f
+            Column(
+                modifier = Modifier.padding(top = paddingTop, start = paddingStart, end = paddingEnd, bottom = paddingBottom),
+                horizontalAlignment = Alignment.Start
+            ) {
+                SubcomposeAsyncImage(
+                    model = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(imageSize)
+                )
+
+                Text(
+                    text = title,
+                    fontSize = titleSize.value.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+                Text(
+                    text = description,
+                    fontSize = descSize.value.sp,
+                    fontWeight = FontWeight.Light,
+                )
+            }
+        }
+
+    }
+}
 
 
 
