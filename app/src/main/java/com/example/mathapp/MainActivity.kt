@@ -28,12 +28,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.mathapp.presentation.navigation.NavApp
 import com.example.mathapp.presentation.navigation.Routes
 import com.example.mathapp.presentation.snackbar.ObserveAsEvents
 import com.example.mathapp.presentation.snackbar.SnackbarController
 import com.example.mathapp.presentation.studysmart.session.StudySessionTimerService
+import com.example.mathapp.shared.PreferenceViewModel
 import com.example.mathapp.ui.theme.MathAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -70,7 +72,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         if (ContextCompat.checkSelfPermission(
                 this,
                 android.Manifest.permission.POST_NOTIFICATIONS
@@ -90,6 +91,7 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             val navController = rememberNavController()
+            val preferenceViewModel = hiltViewModel<PreferenceViewModel>()
             MathAppTheme(darkTheme = true, dynamicColor = false) {
                 val snackbarHostState = remember {
                     SnackbarHostState()
@@ -130,6 +132,7 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavApp(
                         navController = navController,
+                        preferenceViewModel = preferenceViewModel,
                         timerService = timerService
                     )
                 }

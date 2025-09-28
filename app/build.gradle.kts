@@ -76,6 +76,9 @@ dependencies {
     ksp("androidx.room:room-compiler:2.7.2")
     implementation("androidx.room:room-ktx:2.7.2")
 
+    // Pref datastore
+    implementation ("androidx.datastore:datastore-preferences:1.1.7")
+
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

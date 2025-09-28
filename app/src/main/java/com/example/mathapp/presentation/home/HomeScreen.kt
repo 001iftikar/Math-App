@@ -18,6 +18,9 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
@@ -37,6 +40,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,8 +49,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -56,6 +66,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.mathapp.R
 import com.example.mathapp.presentation.components.DrawerItem
 import com.example.mathapp.presentation.navigation.Routes
+import com.example.mathapp.shared.PreferenceViewModel
 import com.example.mathapp.shared.SupabaseSessionViewModel
 import kotlinx.coroutines.launch
 
@@ -64,9 +75,17 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     supabaseSessionViewModel: SupabaseSessionViewModel = hiltViewModel(),
     homeScreenViewModel: HomeScreenViewModel = hiltViewModel(),
+    preferenceViewModel: PreferenceViewModel,
     navHostController: NavHostController
 ) {
     val supabaseSession by supabaseSessionViewModel.userSessionState.collectAsStateWithLifecycle()
+    val userNameState by preferenceViewModel.userName.collectAsState()
+    var editableUserName by remember(userNameState) {
+        mutableStateOf(
+            if (!userNameState.isNullOrBlank()) userNameState!!
+            else "What should I call you?"
+        )
+    }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val urlHandler = LocalUriHandler.current
@@ -138,6 +157,13 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize(),
             topBar = {
                 TopBar(
+                    name = editableUserName,
+                    onValueChange = { editableUserName = it },
+                    onUserSave = {
+                        scope.launch {
+                            preferenceViewModel.setUserName(editableUserName)
+                        }
+                    },
                     onClick = { scope.launch { drawerState.open() } }
                 )
             }
@@ -197,14 +223,41 @@ fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(onClick: () -> Unit) {
+private fun TopBar(
+    name: String,
+    onValueChange: (String) -> Unit,
+    onUserSave: () -> Unit,
+    onClick: () -> Unit
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     TopAppBar(
         title = {
-            Text(
-                text = "Hello, what should I call you?",
-                style = MaterialTheme.typography.titleLarge,
-            )
+            Row {
+                Text("Hello, ", fontSize = 24.sp)
+                BasicTextField(
+                    value = name,
+                    onValueChange = { onValueChange(it) },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        capitalization = KeyboardCapitalization.Words,
+                        imeAction = ImeAction.Done
+                    ),
+                    singleLine = true,
+                    textStyle = TextStyle.Default.copy(
+                        color = Color.White,
+                        fontSize = 24.sp
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            onUserSave()
+                            keyboardController?.hide()
+                            focusManager.clearFocus(true)
+                        }
+                    ),
+                    cursorBrush = SolidColor(Color.DarkGray)
+                )
+            }
         },
         navigationIcon = {
             IconButton(

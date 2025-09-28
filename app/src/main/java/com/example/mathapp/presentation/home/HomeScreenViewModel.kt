@@ -1,11 +1,15 @@
 package com.example.mathapp.presentation.home
 
 import android.app.Application
+import android.content.Context
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.Keep
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mathapp.utils.PreferenceDataStore
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -25,7 +29,6 @@ class HomeScreenViewModel @Inject constructor(
     private val application: Application,
     private val database: FirebaseDatabase
 ) : ViewModel() {
-
     private val _appDetails = MutableStateFlow(AppDetails())
     val appDetails = _appDetails.asStateFlow()
     val currentVersionCode: Long by lazy { getAppVersionCode() }

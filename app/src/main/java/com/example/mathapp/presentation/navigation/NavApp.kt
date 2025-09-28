@@ -52,6 +52,7 @@ import com.example.mathapp.presentation.studysmart.task.TaskScreen
 import com.example.mathapp.presentation.studysmart.task.TaskViewModel
 import com.example.mathapp.presentation.teacher.TeacherScreen
 import com.example.mathapp.presentation.teacher.TeacherScreenByName
+import com.example.mathapp.shared.PreferenceViewModel
 import com.example.mathapp.shared.SharedViewModel
 import com.example.mathapp.utils.FAB_EXPLODE_BOUNDS_KEY
 import com.example.mathapp.utils.ServiceConstants
@@ -60,6 +61,7 @@ import com.example.mathapp.utils.ServiceConstants
 @Composable
 fun NavApp(
     navController: NavHostController,
+    preferenceViewModel: PreferenceViewModel,
     timerService: StudySessionTimerService?
 ) {
     val sharedViewModel = hiltViewModel<SharedViewModel>()
@@ -100,7 +102,7 @@ fun NavApp(
             }
         ) {
             composable<Routes.HomeScreenRoute> {
-                HomeScreen(navHostController = navController)
+                HomeScreen(navHostController = navController, preferenceViewModel = preferenceViewModel)
             }
 
             composable<Routes.TeacherScreenRoute> {
