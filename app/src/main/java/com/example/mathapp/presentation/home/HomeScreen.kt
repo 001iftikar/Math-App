@@ -16,7 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
@@ -56,7 +57,6 @@ import com.example.mathapp.R
 import com.example.mathapp.presentation.components.DrawerItem
 import com.example.mathapp.presentation.navigation.Routes
 import com.example.mathapp.shared.SupabaseSessionViewModel
-import com.example.mathapp.utils.ColorHex.toColor
 import kotlinx.coroutines.launch
 
 
@@ -143,23 +143,51 @@ fun HomeScreen(
             }
         ) { innerPadding ->
 
-            LazyColumn(Modifier.padding(innerPadding)) {
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(12.dp),
+                columns = GridCells.Fixed(2)
+            ) {
                 item {
-                    FirstLayer(
-                        goToTeacher = { navHostController.navigate(Routes.TeacherScreenRoute) },
-                        goToStudy = { navHostController.navigate(Routes.StudyScreenRoute) }
-
+                    HomeScreenItem(
+                        modifier = Modifier.aspectRatio(1f),
+                        icon = R.drawable.teachers,
+                        title = "Teachers",
+                        description = "Your mentors & guides",
+                        onClick = { navHostController.navigate(Routes.TeacherScreenRoute) }
                     )
                 }
+
                 item {
-                    Spacer(Modifier.height(12.dp))
+                    HomeScreenItem(
+                        modifier = Modifier.aspectRatio(1f),
+                        icon = R.drawable.bookstack,
+                        title = "Study time",
+                        description = "Your study resources",
+                        onClick = { navHostController.navigate(Routes.StudyScreenRoute) }
+                    )
                 }
+
                 item {
-                    SecondLayer(
-                        goToStudySmart = { navHostController.navigate(Routes.StudySmartScreen) },
-                        goToGoals = {
-                            navHostController.navigate(route)
-                        }
+                    HomeScreenItem(
+                        modifier = Modifier
+                            .aspectRatio(1f),
+                        icon = R.drawable.super_intelligence,
+                        title = "Study smart",
+                        description = "Track your daily grind",
+                        onClick = { navHostController.navigate(Routes.StudySmartScreen) }
+                    )
+                }
+
+                item {
+                    HomeScreenItem(
+                        modifier = Modifier
+                            .aspectRatio(1f),
+                        icon = R.drawable.goals,
+                        title = "Goals",
+                        description = "Focus. Execute. Win",
+                        onClick = { navHostController.navigate(route) }
                     )
                 }
             }
@@ -174,7 +202,8 @@ private fun TopBar(onClick: () -> Unit) {
     TopAppBar(
         title = {
             Text(
-                text = "Hello, what shall I call you?", style = MaterialTheme.typography.titleLarge,
+                text = "Hello, what should I call you?",
+                style = MaterialTheme.typography.titleLarge,
             )
         },
         navigationIcon = {
@@ -187,61 +216,6 @@ private fun TopBar(onClick: () -> Unit) {
     )
 }
 
-@Composable
-private fun FirstLayer(goToTeacher: () -> Unit, goToStudy: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        HomeScreenItem(
-            modifier = Modifier.weight(1f).aspectRatio(1f),
-            icon = R.drawable.teacher_3_,
-            title = "Teachers",
-            description = "Your mentors & guides",
-            onClick = goToTeacher
-        )
-
-        HomeScreenItem(
-            modifier = Modifier.weight(1f).aspectRatio(1f),
-            icon = R.drawable.bookstack,
-            title = "Study time",
-            description = "Your study resources",
-            onClick = goToStudy
-        )
-    }
-}
-
-
-@Composable
-private fun SecondLayer(
-    goToStudySmart: () -> Unit,
-    goToGoals: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        HomeScreenItem(
-            modifier = Modifier.weight(1f).aspectRatio(1f),
-            icon = R.drawable.super_intelligence,
-            title = "Study smart",
-            description = "Track your daily grind",
-            onClick = goToStudySmart
-        )
-
-        HomeScreenItem(
-            modifier = Modifier.weight(1f).aspectRatio(1f),
-            icon = R.drawable.target,
-            title = "Goals",
-            description = "Focus. Execute. Win",
-            onClick = goToGoals
-        )
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -311,7 +285,12 @@ private fun HomeScreenItem(
             val titleSize = maxWidth * 0.12f
             val descSize = maxWidth * 0.09f
             Column(
-                modifier = Modifier.padding(top = paddingTop, start = paddingStart, end = paddingEnd, bottom = paddingBottom),
+                modifier = Modifier.padding(
+                    top = paddingTop,
+                    start = paddingStart,
+                    end = paddingEnd,
+                    bottom = paddingBottom
+                ),
                 horizontalAlignment = Alignment.Start
             ) {
                 SubcomposeAsyncImage(
@@ -336,8 +315,6 @@ private fun HomeScreenItem(
 
     }
 }
-
-
 
 
 
