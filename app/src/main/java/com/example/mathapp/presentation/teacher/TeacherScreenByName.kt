@@ -66,8 +66,6 @@ fun TeacherScreenByName(
 
         state.teacher?.let { teacher ->
             IndividualTeacher(teacher = teacher,
-                degrees = teacher.degrees,
-                role = teacher.role,
                 modifier = Modifier.padding(innerPadding))
         } ?: run {
             // Show loading or fallback UI
@@ -91,13 +89,14 @@ fun TeacherScreenByName(
 
 
 @Composable
-fun IndividualTeacher(teacher: Teacher, role: String, degrees: String, modifier: Modifier = Modifier) {
+private fun IndividualTeacher(teacher: Teacher, modifier: Modifier = Modifier) {
     Column(modifier = modifier
         .fillMaxWidth()
         .padding(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally) {
+        horizontalAlignment = Alignment.Start) {
         Box(
-            modifier = Modifier.size(350.dp)
+            modifier = Modifier
+                .size(350.dp)
                 .clip(RoundedCornerShape(6.dp))
         ) {
             SubcomposeAsyncImage(
@@ -110,23 +109,23 @@ fun IndividualTeacher(teacher: Teacher, role: String, degrees: String, modifier:
         }
         Spacer(Modifier.height(50.dp))
         TeacherCard(
-            degrees = degrees,
-            role = role
+            teacher = teacher
         )
     }
 }
 
 @Composable
-private fun TeacherCard(role: String, degrees: String) {
+private fun TeacherCard(teacher: Teacher) {
     ElevatedCard(
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .fillMaxWidth()
     ) {
-        Text(text = degrees,
+        Text(text = teacher.degrees,
             style = MaterialTheme.typography.headlineLarge,
             color = "#db520d".toColor(),
             modifier = Modifier.padding(10.dp))
-        Spacer(Modifier.height(10.dp))
-        Text(text = role,
+        Spacer(Modifier.height(6.dp))
+        Text(text = teacher.role,
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(10.dp))
     }

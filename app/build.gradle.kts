@@ -73,6 +73,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.7.2")
     implementation(libs.material)
     implementation(libs.androidx.animation.core)
+    implementation(libs.androidx.compose.foundation.layout)
     ksp("androidx.room:room-compiler:2.7.2")
     implementation("androidx.room:room-ktx:2.7.2")
 
