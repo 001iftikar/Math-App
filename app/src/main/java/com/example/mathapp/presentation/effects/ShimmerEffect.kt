@@ -81,7 +81,7 @@ fun PapersLoadingShimmer() {
 }
 
 @Composable
-fun ImageAnimation() {
+fun ImageLoadingAnimation() {
     val shimmerColors = listOf(
         Color.LightGray.copy(0.6f),
         Color.LightGray.copy(0.2f),

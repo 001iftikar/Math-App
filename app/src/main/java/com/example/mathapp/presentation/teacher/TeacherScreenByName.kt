@@ -30,7 +30,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.mathapp.domain.model.Teacher
 import com.example.mathapp.presentation.components.HomeButton
 import com.example.mathapp.presentation.components.TopAppBarNavIcon
-import com.example.mathapp.presentation.effects.ImageAnimation
+import com.example.mathapp.presentation.effects.ImageLoadingAnimation
 import com.example.mathapp.presentation.navigation.Routes
 import com.example.mathapp.utils.ColorHex.toColor
 
@@ -93,7 +93,7 @@ private fun IndividualTeacher(teacher: Teacher, modifier: Modifier = Modifier) {
     Column(modifier = modifier
         .fillMaxWidth()
         .padding(12.dp),
-        horizontalAlignment = Alignment.Start) {
+        horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
                 .size(350.dp)
@@ -102,7 +102,7 @@ private fun IndividualTeacher(teacher: Teacher, modifier: Modifier = Modifier) {
             SubcomposeAsyncImage(
                 model = teacher.profilePicture,
                 contentDescription = null,
-                loading = { ImageAnimation() },
+                loading = { ImageLoadingAnimation() },
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
@@ -124,7 +124,6 @@ private fun TeacherCard(teacher: Teacher) {
             style = MaterialTheme.typography.headlineLarge,
             color = "#db520d".toColor(),
             modifier = Modifier.padding(10.dp))
-        Spacer(Modifier.height(6.dp))
         Text(text = teacher.role,
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(10.dp))

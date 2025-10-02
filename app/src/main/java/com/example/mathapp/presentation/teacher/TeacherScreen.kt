@@ -45,6 +45,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.mathapp.domain.model.Teacher
 import com.example.mathapp.presentation.components.GroupBackGroundComponent
 import com.example.mathapp.presentation.components.LinearLoader
+import com.example.mathapp.presentation.effects.ImageLoadingAnimation
 import com.example.mathapp.presentation.navigation.Routes
 import com.example.mathapp.ui.theme.TeacherBackgroundColor
 import com.example.mathapp.utils.ColorHex.toColor
@@ -139,8 +140,13 @@ fun TeacherScreen(navHostController: NavHostController) {
                             Teacher(
                                 modifier = Modifier.padding(horizontal = 46.dp, vertical = 6.dp),
                                 teacher = teacher,
+                                loading = { ImageLoadingAnimation() },
                                 onClick = {
-                                    navHostController.navigate(Routes.TeacherScreenByNameRoute(teacher.teacherName))
+                                    navHostController.navigate(
+                                        Routes.TeacherScreenByNameRoute(
+                                            teacher.teacherName
+                                        )
+                                    )
                                 }
                             )
                         }
@@ -175,7 +181,7 @@ private fun TopBar(
         ),
         navigationIcon = {
             IconButton(
-                onClick = {navHostController.popBackStack()}
+                onClick = { navHostController.popBackStack() }
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -189,6 +195,7 @@ private fun TopBar(
 private fun Teacher(
     modifier: Modifier,
     teacher: Teacher,
+    loading: @Composable () -> Unit,
     onClick: () -> Unit
 ) {
     ElevatedCard(
@@ -218,7 +225,8 @@ private fun Teacher(
                 SubcomposeAsyncImage(
                     model = teacher.profilePicture,
                     contentDescription = null,
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    loading = { loading() }
                 )
             }
 
