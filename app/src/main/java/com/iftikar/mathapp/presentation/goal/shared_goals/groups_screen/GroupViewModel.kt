@@ -1,0 +1,86 @@
+package com.iftikar.mathapp.presentation.goal.shared_goals.groups_screen
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.iftikar.mathapp.domain.repository.SharedGoalRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class GroupViewModel @Inject constructor(
+    private val sharedGoalRepository: SharedGoalRepository
+) : ViewModel() {
+    private val _groupsState = MutableStateFlow(GroupsScreenState())
+    val groupsState = _groupsState.asStateFlow()
+
+    init {
+        getGroups()
+    }
+
+    fun onEvent(event: GroupsScreenEvent) {
+        when (event) {
+            GroupsScreenEvent.Refresh -> {
+                getGroups()
+            }
+        }
+    }
+
+    private fun getGroups() {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
+            _groupsState.update {
+                it.copy(
+                    isLoading = true,
+                    error = null
+                )
+            }
+            sharedGoalRepository.getGroups()
+                .flowOn(Dispatchers.IO)
+                .collect { supabaseOperation ->
+                supabaseOperation.onSuccess { groups ->
+                    _groupsState.update {
+                        it.copy(
+                            isLoading = false,
+                            groups = groups
+                        )
+                    }
+                }.onFailure { exception ->
+                    _groupsState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = exception.message
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

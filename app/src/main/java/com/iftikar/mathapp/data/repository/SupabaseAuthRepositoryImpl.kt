@@ -1,0 +1,178 @@
+package com.iftikar.mathapp.data.repository
+
+import android.util.Log
+import com.iftikar.mathapp.data.remote.SupabaseOperation
+import com.iftikar.mathapp.domain.model.SupabaseUser
+import com.iftikar.mathapp.domain.model.UserProfile
+import com.iftikar.mathapp.domain.repository.SupabaseAuthRepository
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.user.UserSession
+import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import okio.IOException
+import javax.inject.Inject
+
+class SupabaseAuthRepositoryImpl @Inject constructor(
+    private val supabaseClient: SupabaseClient
+) : SupabaseAuthRepository {
+    override fun signUp(
+        emailValue: String,
+        passwordValue: String,
+        name: String
+    ): Flow<SupabaseOperation<SupabaseUser>> = flow {
+
+        try {
+            val user = supabaseClient.auth.signUpWith(Email) {
+                email = emailValue
+                password = passwordValue
+                data = buildJsonObject {
+                    put("display_name", name)
+                }
+            }
+            val userId = user?.id
+            val displayName = user?.userMetadata?.get("display_name")
+                ?.jsonPrimitive
+                ?.contentOrNull
+            if (userId != null) {
+                supabaseClient.postgrest["profiles"]
+                    .upsert(
+                        UserProfile(
+                            id = userId,
+                            name = displayName ?: "User",
+                            email = user.email ?: "email not found"
+                        )
+                    )
+                emit(
+                    SupabaseOperation.Success(
+                        data = SupabaseUser(
+                            userId = userId,
+                            email = emailValue,
+                            name = displayName ?: "User"
+                        )
+                    )
+                )
+            } else {
+                emit(SupabaseOperation.Failure(NullPointerException("User creation failed!")))
+            }
+
+
+        } catch (e: IOException) {
+            Log.e("Supabase-Repo", "signUp: IO Exception: ${e.localizedMessage}")
+            emit(SupabaseOperation.Failure(Exception("Please check your internet connection")))
+        } catch (e: Exception) {
+            Log.e("Supabase-Repo", "signUp: Exception: ${e.localizedMessage}")
+            when {
+                e.localizedMessage?.contains("user_already_exists", ignoreCase = true) == true -> {
+                    emit(SupabaseOperation.Failure(Exception("This email is already registered.")))
+                }
+
+                e.localizedMessage?.contains("validation_failed", ignoreCase = true) == true -> {
+                    emit(SupabaseOperation.Failure(Exception("Please provide a valid email!")))
+                }
+
+                else -> {
+                    emit(SupabaseOperation.Failure(Exception("Some error occurred!")))
+                }
+            }
+        }
+    }
+
+    override fun signIn(
+        emailValue: String,
+        passwordValue: String
+    ): Flow<SupabaseOperation<SupabaseUser>> = flow {
+        try {
+            supabaseClient.auth.signInWith(Email) {
+                email = emailValue
+                password = passwordValue
+            }
+
+            val user = supabaseClient.auth.currentUserOrNull()
+            val name = user?.userMetadata
+                ?.get("display_name")
+                ?.jsonPrimitive
+                ?.contentOrNull
+            if (user != null) {
+                val supabaseUser = SupabaseUser(
+                    userId = user.id,
+                    email = user.email ?: "",
+                    name = name ?: "User"
+                )
+                emit(SupabaseOperation.Success(data = supabaseUser))
+            } else {
+                emit(SupabaseOperation.Failure(NullPointerException("Log in failed")))
+            }
+        } catch (e: IOException) {
+            emit(SupabaseOperation.Failure(Exception("Please check your internet connection")))
+        } catch (e: Exception) {
+            when {
+                e.localizedMessage?.contains("invalid_credentials", ignoreCase = true) == true -> {
+                    emit(SupabaseOperation.Failure(Exception("Invalid email or password.")))
+                }
+
+                else -> {
+                    emit(SupabaseOperation.Failure(Exception("Some error happened!")))
+                }
+            }
+        }
+    }
+
+    override suspend fun signOut(): SupabaseOperation<Unit> {
+        return try {
+            supabaseClient.auth.signOut()
+            SupabaseOperation.Success(Unit)
+        } catch (e: Exception) {
+            Log.e("Auth-Logout", e.localizedMessage ?: "unknown error" )
+            SupabaseOperation.Failure(Exception("please try again!"))
+        }
+    }
+
+    override fun loadUserSession(): Flow<SupabaseOperation<UserSession>> = flow {
+        try {
+            val result = supabaseClient.auth.sessionManager.loadSession()
+            val session = result?.takeIf {
+                it.user != null
+            }
+
+            if (session != null) {
+                emit(SupabaseOperation.Success(data = session))
+            } else {
+                emit(SupabaseOperation.Failure(NullPointerException("Session not found")))
+            }
+
+        } catch (e: Exception) {
+            emit(SupabaseOperation.Failure(e))
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

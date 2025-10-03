@@ -21,8 +21,8 @@
 #-renamesourcefileattribute SourceFile
 
 ## ---keep the class dtos---
--keep class com.example.mathapp.data.remote.model.** { *; }
--keep class com.example.mathapp.domain.model.** { *; }
--keep class com.example.mathapp.presentation.home.AppDetails { *; }
+-keep class com.iftikar.mathapp.data.remote.model.** { *; }
+-keep class com.iftikar.mathapp.domain.model.** { *; }
+-keep class com.iftikar.mathapp.presentation.home.AppDetails { *; }
 
 -dontobfuscate

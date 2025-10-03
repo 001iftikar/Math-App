@@ -1,4 +1,3 @@
-import com.android.ide.common.pagealign.is16kAligned
 import java.util.Properties
 
 plugins {
@@ -18,11 +17,11 @@ val localProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.example.mathapp"
+    namespace = "com.iftikar.mathapp"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.mathapp"
+        applicationId = "com.iftikar.mathapp"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -126,6 +125,7 @@ dependencies {
 
     // serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("androidx.compose.material3:material3-window-size-class:1.4.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -1,0 +1,150 @@
+package com.iftikar.mathapp
+
+import android.annotation.SuppressLint
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
+import android.os.IBinder
+import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
+import com.iftikar.mathapp.presentation.navigation.NavApp
+import com.iftikar.mathapp.presentation.navigation.Routes
+import com.iftikar.mathapp.presentation.snackbar.ObserveAsEvents
+import com.iftikar.mathapp.presentation.snackbar.SnackbarController
+import com.iftikar.mathapp.presentation.studysmart.session.StudySessionTimerService
+import com.iftikar.mathapp.shared.PreferenceViewModel
+import com.iftikar.mathapp.ui.theme.MathAppTheme
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
+    private var isBound by mutableStateOf(false)
+    private var timerService: StudySessionTimerService? by mutableStateOf(null)
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(
+            name: ComponentName?,
+            service: IBinder?
+        ) {
+            val binder = service as StudySessionTimerService.StudySessionTimerBinder
+            timerService = binder.getService()
+            isBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            isBound = false
+            timerService = null
+        }
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Intent(this, StudySessionTimerService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
+        super.onCreate(savedInstanceState)
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    1
+                )
+            }
+        }
+
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.Transparent.toArgb())
+        )
+        setContent {
+            val navController = rememberNavController()
+            val preferenceViewModel = hiltViewModel<PreferenceViewModel>()
+            MathAppTheme(darkTheme = true, dynamicColor = false, activity = this) {
+                val snackbarHostState = remember {
+                    SnackbarHostState()
+                }
+                val scope = rememberCoroutineScope()
+                ObserveAsEvents(
+                    flow = SnackbarController.events,
+                    snackbarHostState
+                ) { event ->
+                    scope.launch {
+                        snackbarHostState.currentSnackbarData?.dismiss()
+                        val result = snackbarHostState.showSnackbar(
+                            message = event.message,
+                            actionLabel = event.action?.name,
+                            duration = event.duration
+                        )
+
+                        if (result == SnackbarResult.ActionPerformed) {
+                            event.action?.route?.let { route ->
+                                if (route == Routes.FinishedGoalsScreen) {
+                                    navController.navigate(route) {
+                                        popUpTo<Routes.GoalHomeScreen> {
+                                            inclusive = false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Scaffold(
+                    snackbarHost = {
+                        SnackbarHost(
+                            hostState = snackbarHostState
+                        )
+                    },
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
+                    NavApp(
+                        navController = navController,
+                        preferenceViewModel = preferenceViewModel,
+                        timerService = timerService
+                    )
+                }
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(connection)
+        isBound = false
+    }
+}
