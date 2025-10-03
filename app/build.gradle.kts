@@ -1,4 +1,5 @@
 import com.android.ide.common.pagealign.is16kAligned
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -9,6 +10,11 @@ plugins {
     id("com.google.dagger.hilt.android")
     kotlin("plugin.serialization")
     id("androidx.room")
+}
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    file.inputStream().use { load(it) }
 }
 
 android {
@@ -23,6 +29,18 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "SUPABASE_URL",
+            "\"${localProperties.getProperty("SUPABASE_URL")}\""
+        )
+
+        buildConfigField(
+            "String",
+            "SUPABASE_KEY",
+            "\"${localProperties.getProperty("SUPABASE_KEY")}\""
+        )
     }
 
     buildTypes {
@@ -44,6 +62,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     room {
@@ -79,6 +98,9 @@ dependencies {
 
     // Pref datastore
     implementation ("androidx.datastore:datastore-preferences:1.1.7")
+
+    // Splash
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation(libs.androidx.core.ktx)
