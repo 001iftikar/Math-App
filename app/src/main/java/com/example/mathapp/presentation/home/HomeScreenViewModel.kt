@@ -70,6 +70,7 @@ class HomeScreenViewModel @Inject constructor(
     }
 }
 
+@Keep
 data class AppDetails(
     val versionCode: Long = 1L,
     val versionName: String = "",

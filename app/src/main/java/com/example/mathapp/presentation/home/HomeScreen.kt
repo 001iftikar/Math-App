@@ -83,7 +83,7 @@ fun HomeScreen(
     var editableUserName by remember(userNameState) {
         mutableStateOf(
             if (!userNameState.isNullOrBlank()) userNameState!!
-            else "What should I call you?"
+            else "Tap here to tell me your name."
         )
     }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
