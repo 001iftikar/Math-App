@@ -38,4 +38,4 @@ I helps students to get the study resources and know their teachers, track their
 
 
 ## Credits
-The idea of Study Smart is inspired by ![Study Smart Idea](https://youtube.com/playlist?list=PL1b73-6UjePA9ck6zJjMJoq_8TOxBgdsc&si=nxbV8HYYcZbDwEdf)
+The idea of Study Smart is inspired by [Mohammad Arif](https://youtube.com/playlist?list=PL1b73-6UjePA9ck6zJjMJoq_8TOxBgdsc&si=nxbV8HYYcZbDwEdf)
