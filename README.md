@@ -19,8 +19,7 @@ It helps students to get the study resources and know their teachers, track thei
 - Create subjects and organize tasks for them.
 - Start study session with a **study timer**.
 - Track progress with saved tasks and sessions.
-<img src="images/study_smart.png" alt="Study Smart" width="40%"/>
-<img src="images/study_session.png" alt="Study Smart" width="40%"/>
+<img src="images/study_smart.png" alt="Study Smart" width="40%"/> <img src="images/study_session.png" alt="Study Smart" width="40%"/>
 
 ### Goals Section
 - Define **personal goals** with deadline.
