@@ -1,8 +1,7 @@
 # Harnath
 A simple android app for the mathematics department of my college (or any other college that has same syllabus).
 It helps students to get the study resources and know their teachers, track their study, and define goals for themeselves and  collaborate on goals effectively.
-![Home Screen](images/home_screen.png)
-
+<img src="images/home_screen.png" alt="Teachers Screen" width="40%"/>
 
 ## ✨ Features
 
@@ -20,8 +19,8 @@ It helps students to get the study resources and know their teachers, track thei
 - Start study session with a **study timer**.
 - Track progress with saved tasks and sessions.
 <div align="center">
-  <img src="images/study_smart.png" alt="Study Smart" width="45%" />
-  <img src="images/study_session.png" alt="Study Session" width="45%" />
+  <img src="images/study_smart.png" alt="Study Smart" width="40%" />
+  <img src="images/study_session.png" alt="Study Session" width="40%" />
 </div>
 
 
@@ -29,8 +28,10 @@ It helps students to get the study resources and know their teachers, track thei
 - Define **personal goals** with deadline.
 - Create **shared goals** with teammates.
 - Discuss and collaborate on shared goals in real-time chat.
+<div align="center">
 <img src="images/goals_home_screen.png" alt="Study Smart" width="40%"/>
 <img src="images/shared_goals.png" alt="Study Smart" width="40%"/>
+</div>
 
 ## 🛠️ Tech Stack
 - **Kotlin** + **Jetpack Compose** for UI
