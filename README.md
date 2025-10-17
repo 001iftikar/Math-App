@@ -45,10 +45,11 @@ It helps students to get the study resources and know their teachers, track thei
 <p align="center">
   <img src="images/Add_Goal.png" width="30%" />
   <img src="images/Ongoing_Goals.png" width="30%" />
-  <img src="images/Goal_Completed_Dialoge.png" width="30%" />
   <img src="images/Goal_Description.png" width="30%" />
+  <img src="images/Goal_Completed_Dialoge.png" width="30%" />
   <img src="images/Finished_Goals.png" width="30%" />
   <img src="images/Groups.png" width="30%" />
+  <img src="images/Shared_Goals.png" width="30%" />
   <img src="images/Group_Chat.png" width="30%" />
   <img src="images/Group_Desc.png" width="30%" />
   <img src="images/Group_Desc_Admin.png" width="30%" />
@@ -57,7 +58,6 @@ It helps students to get the study resources and know their teachers, track thei
   <img src="images/Leave_Group.png" width="30%" />
   <img src="images/Profile.png" width="30%" />
   <img src="images/Remove_Member.png" width="30%" />
-  <img src="images/Shared_Goals.png" width="30%" />
   <img src="images/Sign_Up.png" width="30%" />
   <img src="images/Log_In.png" width="30%" />
   <img src="images/Study_Res.png" width="30%" />
