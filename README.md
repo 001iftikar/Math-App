@@ -9,7 +9,7 @@ It helps students to get the study resources and know their teachers, track thei
 ### Teachers Section
 - Browse the list pf parmanent teachers from the department.
 - View their details and areas of experties.
-![Teachers Screen](images/teachers_screen.png =250x250)
+<img src="images/teachers_screen.png" alt="Teachers Screen" width="40%"/>
 
 ### Study Resources
 - Access semester-wise resources.
